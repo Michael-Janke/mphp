@@ -1,6 +1,7 @@
 data/
 .RDataTmp
-.Rhistory 
+.Rhistory
 .RData
 .ipynb_checkpoints/
 .vscode
+*.Rproj*
