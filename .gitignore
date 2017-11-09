@@ -1,5 +1,4 @@
-data/
-dataset1/
+data/*
 .RDataTmp
 .Rhistory
 .RData
