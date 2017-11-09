@@ -16,9 +16,9 @@ data_file = open(DATA_PATH, "rb")
 # please set PATH constants
 
 data_file.seek(0)
-gen_labels = numpy.genfromtxt(data_file, delimiter=",", max_rows=1, dtype=numpy.unicode)[1:]
+gene_labels = numpy.genfromtxt(data_file, delimiter=",", max_rows=1, dtype=numpy.unicode)[1:]
 
-feature_count = gen_labels.shape[0]
+feature_count = gene_labels.shape[0]
 data_file.seek(0)
 row_count = sum(1 for line in data_file)
 
@@ -53,7 +53,7 @@ cancer_data.pop('NA', None)
 if not os.path.exists(SUBSET_PATH):
     os.makedirs(SUBSET_PATH)
 
-numpy.save(SUBSET_PATH + "gen_labels", gen_labels)
+numpy.save(SUBSET_PATH + "gene_labels", gene_labels)
 
 for cancer_label, subset in cancer_data.items():
     numpy.save(SUBSET_PATH + cancer_label, subset)
