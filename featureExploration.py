@@ -21,7 +21,6 @@ print("data loaded")
 #%%
 # getData(["all"])
 # getData(["GBM","LAML"])
-# data, metaData, labels, colors = dataLoader.getData(["all"])
 data, labels, colors = dataLoader.getData(["all"])
 gene_labels = dataLoader.getGeneLabels()
 print("got combined data")
@@ -42,6 +41,9 @@ selector.fit(data,labels)
 indices = selector.get_support(indices=True)
 X = data[:,indices]
 indices
+
+#%%
+gene_labels[indices]
 
 # %%
 # Plotting

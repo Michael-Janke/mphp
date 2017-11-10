@@ -23,9 +23,6 @@ class DataLoader:
 
         return data, gene_labels, cancer_types
 
-    def getData2(self):
-        return self.data
-
     def getColor(self, index):
         colors = ["blue","red","green","yellow","orange","black","grey","magenta","cyan"]
 
