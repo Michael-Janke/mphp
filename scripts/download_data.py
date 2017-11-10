@@ -39,7 +39,7 @@ for dataset, url in urls.items():
 		if url["parse"]:
 			print("parse " + dataset)
 			__import__("parse_" + dataset)
-´		else:
+		else:
 			print("parser for " + dataset + " not implemented yet. Stay tuned!")
 	else:
 		print("already parsed " + dataset)
