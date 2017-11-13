@@ -1,14 +1,18 @@
 #%%
 import numpy
 import json
+import matplotlib.pyplot as plt
 
+print("imports done")
+
+#%%
 METADATA_PATH = "data/dataset3/TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_HTSeq-Counts_metadata.csv"
 metadata_file = open(METADATA_PATH, "rb")
 metadata = numpy.genfromtxt(metadata_file, delimiter=",", dtype=numpy.unicode)[1:,1:]
 
 counts = {}
 for column in metadata.T:
-    cancer_type = column[0].strip('"').strip("TCGA-")
+    cancer_type = column[0].strip('"').split('-', 1)[-1]
     sample_type = column[1].strip('"')
     if cancer_type not in counts:
         counts[cancer_type] = {'TP' : 0, 'TM' : 0, 'TR' : 0, 'NT' : 0, 'NB' : 0}
