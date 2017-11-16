@@ -3,6 +3,7 @@
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import pandas as pd
 
 import numpy as np
 from sklearn.decomposition import PCA
@@ -15,23 +16,23 @@ print("Imported modules")
 #%%
 # execute me once
 # please only pass dataset3 for now
-dataLoader = DataLoader("dataset3")
+dataLoader = DataLoader("dataset4")
 print("data loaded")
 
 #%%
 # getData(["healthy","sick"]["all"])
 # getData(["TP","NT"]["GBM","LAML"])
-data, labels, colors = dataLoader.getData(["healthy", "sick"],["LUAD"])
+data, labels, colors = dataLoader.getData(["sick"],["LUAD", "THCA"])
 gene_labels = dataLoader.getGeneLabels()
 
 print("got combined data")
-print(gene_labels.shape)
-print(data.shape)
+
 # %%
 # PCA Transform
 pca = PCA(n_components=3, svd_solver='full')
 pca.fit(data)
 X = pca.transform(data)
+print("LUAD, THCA - sick")
 print(pca.explained_variance_ratio_)
 print("pca finished")
 
@@ -44,8 +45,10 @@ X = data[:,indices]
 indices
 
 #%%
-gene_labels[indices]
-
+pca.components_
+print pd.DataFrame(pca.components_,columns=gene_labels,index = ['PC-1','PC-2','PC-3'])
+maxIndex = np.argmax(pca.components_[1])
+gene_labels[maxIndex]
 # %%
 # Plotting
 fig = plt.figure()
