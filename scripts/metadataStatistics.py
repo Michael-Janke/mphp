@@ -30,8 +30,6 @@ for column in metadata.T:
     
     last_cancer_type = cancer_type
 
-print(json.dumps(counts, indent=4))
-
 
 # write statistics files
 if not os.path.exists(STATISTICS_PATH):
@@ -39,6 +37,9 @@ if not os.path.exists(STATISTICS_PATH):
 
 np.save(STATISTICS_PATH + "sample_types", sample_types)
 np.save(STATISTICS_PATH + "counts", counts)
+
+with open(STATISTICS_PATH + 'counts_human_readable.txt', 'w') as outfile:
+    json.dump(counts, outfile, indent=4)
 
 
 # create plot for sample types by cancer type
