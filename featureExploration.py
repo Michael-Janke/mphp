@@ -19,9 +19,9 @@ dataLoader = DataLoader("dataset3")
 print("data loaded")
 
 #%%
-# getData(["all"])
-# getData(["GBM","LAML"])
-data, labels, colors = dataLoader.getData(["TP", "NT"],["GBM"])
+# getData(["healthy","sick"]["all"])
+# getData(["TP","NT"]["GBM","LAML"])
+data, labels, colors = dataLoader.getData(["healthy"],["all"])
 gene_labels = dataLoader.getGeneLabels()
 print("got combined data")
 
@@ -30,7 +30,7 @@ print("got combined data")
 pca = PCA(n_components=3, svd_solver='full')
 pca.fit(data)
 X = pca.transform(data)
-pca.explained_variance_ratio_
+print(pca.explained_variance_ratio_)
 print("pca finished")
 
 # %%
