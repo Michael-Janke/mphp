@@ -1,5 +1,5 @@
 #%%
-import numpy
+import numpy as np
 import json
 import matplotlib.pyplot as plt
 
@@ -8,7 +8,7 @@ print("imports done")
 #%%
 METADATA_PATH = "data/dataset3/TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_HTSeq-Counts_metadata.csv"
 metadata_file = open(METADATA_PATH, "rb")
-metadata = numpy.genfromtxt(metadata_file, delimiter=",", dtype=numpy.unicode)[1:,1:]
+metadata = np.genfromtxt(metadata_file, delimiter=",", dtype=np.unicode)[1:,1:]
 
 counts = {}
 for column in metadata.T:
