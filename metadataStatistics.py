@@ -1,36 +1,56 @@
 #%%
 import numpy as np
 import json
+import os
 import matplotlib.pyplot as plt
 
 print("imports done")
 
 #%%
-METADATA_PATH = "data/dataset3/TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_HTSeq-Counts_metadata.csv"
+PATH = "data/dataset3/"
+METADATA_PATH = PATH + "TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_HTSeq-Counts_metadata.csv"
+STATISTICS_PATH = PATH + "statistics/"
+
 metadata_file = open(METADATA_PATH, "rb")
 metadata = np.genfromtxt(metadata_file, delimiter=",", dtype=np.unicode)[1:,1:]
 
+sample_types = np.unique(metadata[1:,:])
+sample_types = [x.strip('"') for x in sample_types]
+
 counts = {}
+last_cancer_type = ""
 for column in metadata.T:
     cancer_type = column[0].strip('"').split('-', 1)[-1]
     sample_type = column[1].strip('"')
+
+    if cancer_type == 'NA':
+        cancer_type = last_cancer_type
+
     if cancer_type not in counts:
-        counts[cancer_type] = {'TP' : 0, 'TM' : 0, 'TR' : 0, 'NT' : 0, 'NB' : 0}
-    if sample_type not in counts[cancer_type]:
-        print("invalid value for " + cancer_type + ": " + sample_type)
+        counts[cancer_type] = {x : 0 for x in sample_types}
     else:
         counts[cancer_type][sample_type] += 1
+    
+    last_cancer_type = cancer_type
 
 print(json.dumps(counts, indent=4))
 
+#%%
+if not os.path.exists(STATISTICS_PATH):
+    os.makedirs(STATISTICS_PATH)
+
+np.save(STATISTICS_PATH + "sample_types", sample_types)
+np.save(STATISTICS_PATH + "counts", counts)
+
+print("wrote statistics files")
 
 #%%
 fig, ax = plt.subplots()
 index = np.arange(len(counts))
 bar_width = 0.1
-sample_types = ['TP', 'TM', 'TR', 'NT', 'NB']
-colors = ['r', 'y', 'm', 'b', 'c']
-for i in range(0, 5):
+colors = ["blue","red","green","yellow","orange","black","grey","magenta","cyan"]
+colors = colors[:len(sample_types)]
+for i in range(0, len(sample_types)):
     values = [x[sample_types[i]] for x in counts.values()]
     plt.bar(index + (i * bar_width), values, bar_width, color=colors[i], label=sample_types[i])
 
@@ -40,26 +60,35 @@ plt.title('Sample types by cancer type')
 plt.xticks(index + bar_width / 2, counts.keys())
 plt.legend()
 plt.tight_layout()
-plt.show()
-
+plt.savefig(STATISTICS_PATH + 'plot_sample_types_by_cancer_type.png')
 
 #%%
 fig, ax = plt.subplots()
 index = np.arange(len(counts))
 bar_width = 0.2
 
-values = np.array([[x['TP'] for x in counts.values()], [x['TM'] for x in counts.values()], [x['TR'] for x in counts.values()]])
-values = values.sum(axis=0)
-plt.bar(index, values, bar_width, color='r', label='sick')
+sick = []
+healthy = []
+for sample_type in sample_types:
+    if sample_type.startswith("T"):
+        sick.append([x[sample_type] for x in counts.values()])
+    elif sample_type.startswith("N"):
+        healthy.append([x[sample_type] for x in counts.values()])
+    else:
+        print("sample type " + sample_type + " is not included")
 
-values = np.array([[x['NT'] for x in counts.values()], [x['NB'] for x in counts.values()]])
-values = values.sum(axis=0)
-plt.bar(index + bar_width, values, bar_width, color='b', label='healthy')
+sick = np.asarray(sick)
+sick = sick.sum(axis=0)
+healthy = np.asarray(healthy)
+healthy = healthy.sum(axis=0)
+
+plt.bar(index, sick, bar_width, color='r', label='sick')
+plt.bar(index + bar_width, healthy, bar_width, color='b', label='healthy')
 
 plt.xlabel('Cancer Type')
 plt.ylabel('Counts')
-plt.title('Sample types by cancer type')
+plt.title('Sick and healthy by cancer type')
 plt.xticks(index + bar_width / 2, counts.keys())
 plt.legend()
 plt.tight_layout()
-plt.show()
+plt.savefig(STATISTICS_PATH + 'plot_sick_and_healthy_by_cancer_type.png')
