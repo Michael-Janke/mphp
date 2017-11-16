@@ -1,0 +1,7 @@
+.text-center {
+  text-align: center; }
+
+  .result {
+  	overflow-x:hidden;
+  	max-width: calc(33% - 15px) !important;
+  }
