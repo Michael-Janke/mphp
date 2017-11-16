@@ -2,6 +2,7 @@ import urllib.request
 import os
 import zipfile
 import sys
+from parse_dataset import parse_dataset
 #sys.path.insert(0, './parse_data_scripts')
 
 urls = {
@@ -35,10 +36,10 @@ for dataset, url in urls.items():
 		else:
 			print("skip already downloaded " + dataset)
 
-	if not os.path.exists(path + "/subsets"):
+	if True or not os.path.exists(path + "/subsets"):
 		if url["parse"]:
 			print("parse " + dataset)
-			__import__("parse_" + dataset)
+			parse_dataset(dataset)
 		else:
 			print("parser for " + dataset + " not implemented yet. Stay tuned!")
 	else:
