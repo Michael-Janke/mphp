@@ -18,7 +18,7 @@ urls = {
 		"parse": True,
 	},
 	"dataset4":	{
-		"url":"https://www.dropbox.com/s/l2bpf4lka8jxktg/LargeSet.zip?dl=0",
+		"url":"https://www.dropbox.com/s/l2bpf4lka8jxktg/LargeSet.zip?dl=1",
 		"parse": True,
 	}
 }
