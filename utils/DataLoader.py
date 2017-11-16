@@ -49,7 +49,7 @@ class DataLoader:
         for sample_index, sample_type in enumerate(sample_types):
             if sample_type == "healthy":
                 new_sample_types.extend([type for type in self.sample_types if type.startswith("N")])
-                labels_vector.extend(["healthy" for type in self.sample_types if type.startswith("T")])
+                labels_vector.extend(["healthy" for type in self.sample_types if type.startswith("N")])
 
             elif sample_type == "sick":
                 new_sample_types.extend([type for type in self.sample_types if type.startswith("T")])

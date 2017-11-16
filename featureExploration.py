@@ -21,10 +21,12 @@ print("data loaded")
 #%%
 # getData(["healthy","sick"]["all"])
 # getData(["TP","NT"]["GBM","LAML"])
-data, labels, colors = dataLoader.getData(["healthy"],["all"])
+data, labels, colors = dataLoader.getData(["healthy", "sick"],["LUAD"])
 gene_labels = dataLoader.getGeneLabels()
-print("got combined data")
 
+print("got combined data")
+print(gene_labels.shape)
+print(data.shape)
 # %%
 # PCA Transform
 pca = PCA(n_components=3, svd_solver='full')
