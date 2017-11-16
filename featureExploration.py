@@ -21,10 +21,9 @@ print("data loaded")
 #%%
 # getData(["all"])
 # getData(["GBM","LAML"])
-data, labels, colors = dataLoader.getData(["all"])
+data, labels, colors = dataLoader.getData(["TP", "NT"],["GBM"])
 gene_labels = dataLoader.getGeneLabels()
 print("got combined data")
-
 
 # %%
 # PCA Transform
