@@ -36,7 +36,7 @@ for dataset, url in urls.items():
 		else:
 			print("skip already downloaded " + dataset)
 
-	if True or not os.path.exists(path + "/subsets"):
+	if not os.path.exists(path + "/subsets"):
 		if url["parse"]:
 			print("parse " + dataset)
 			parse_dataset(dataset)
