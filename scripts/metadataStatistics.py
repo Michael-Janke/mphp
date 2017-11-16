@@ -1,12 +1,9 @@
-#%%
 import numpy as np
 import json
 import os
 import matplotlib.pyplot as plt
 
-print("imports done")
 
-#%%
 PATH = "data/dataset3/"
 METADATA_PATH = PATH + "TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_HTSeq-Counts_metadata.csv"
 STATISTICS_PATH = PATH + "statistics/"
@@ -35,16 +32,16 @@ for column in metadata.T:
 
 print(json.dumps(counts, indent=4))
 
-#%%
+
+# write statistics files
 if not os.path.exists(STATISTICS_PATH):
     os.makedirs(STATISTICS_PATH)
 
 np.save(STATISTICS_PATH + "sample_types", sample_types)
 np.save(STATISTICS_PATH + "counts", counts)
 
-print("wrote statistics files")
 
-#%%
+# create plot for sample types by cancer type
 fig, ax = plt.subplots()
 index = np.arange(len(counts))
 bar_width = 0.1
@@ -62,7 +59,8 @@ plt.legend()
 plt.tight_layout()
 plt.savefig(STATISTICS_PATH + 'plot_sample_types_by_cancer_type.png')
 
-#%%
+
+# create plot for sick and healthy by cancer type
 fig, ax = plt.subplots()
 index = np.arange(len(counts))
 bar_width = 0.2
