@@ -2,9 +2,20 @@ import numpy as np
 import json
 import os
 import matplotlib.pyplot as plt
+import argparse
 
-PATH = "data/dataset4/"
-METADATA_PATH = PATH + "TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_HTSeq-Counts_metadata.csv"
+parser = argparse.ArgumentParser(description='Create statistics for sample types.')
+parser.add_argument('--name', help='name of dataset')
+args = parser.parse_args()
+
+dataset = "dataset4"
+METADATA_PATHS = {
+    "dataset3": "TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_HTSeq-Counts_metadata.csv",
+    "dataset4": "TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_HTSeq-Counts_metadata.csv",
+}
+
+PATH = "data/"+dataset+"/"
+METADATA_PATH = PATH + METADATA_PATHS[dataset]
 STATISTICS_PATH = PATH + "statistics/"
 
 metadata_file = open(METADATA_PATH, "rb")
@@ -26,7 +37,7 @@ for column in metadata.T:
         counts[cancer_type] = {x : 0 for x in sample_types}
     else:
         counts[cancer_type][sample_type] += 1
-
+    
     last_cancer_type = cancer_type
 
 
@@ -37,9 +48,30 @@ if not os.path.exists(STATISTICS_PATH):
 np.save(STATISTICS_PATH + "sample_types", sample_types)
 np.save(STATISTICS_PATH + "counts", counts)
 
+"""
 with open(STATISTICS_PATH + 'counts_human_readable.txt', 'w') as outfile:
     json.dump(counts, outfile, indent=4)
+"""
 
+with open(STATISTICS_PATH + 'counts_human_readable.md', 'w') as outfile:
+    # HEADER
+    outfile.write("| CANCER TYPE ")
+    for sample_type in sample_types:
+        outfile.write("| "+ sample_type)
+    outfile.write(" |\n")
+
+    # SEPARATION LINE
+    outfile.write("| ---- ")
+    for sample_type in sample_types:
+        outfile.write("| ---- ")
+    outfile.write(" |\n")
+
+    # DATA
+    for sample_type in counts:
+        outfile.write("| "+sample_type)
+        for count in counts[sample_type].values():
+            outfile.write("| " + str(count))
+        outfile.write(" |\n")
 
 # create plot for sample types by cancer type
 fig, ax = plt.subplots()
