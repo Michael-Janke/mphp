@@ -5,6 +5,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from utils.DataLoader import DataLoader
 from utils.DimensionalityReducer import DimensionalityReducer
+from utils.plot import plotScatter
 print("Imported modules")
 
 #%%
@@ -23,61 +24,27 @@ print("got combined data")
 
 # %%
 # PCA Transform
-n_components = 3
-n_features_per_component = 10
-X, pca, pca_indices = dimensionalityReducer.getPCA(data, n_components, n_features_per_component)
+X, pca, pca_indices = dimensionalityReducer.getPCA(data, 3, 20)
 print(pca.explained_variance_ratio_)
 print("pca finished")
 
 # %%
-# Feature Selection
-X, indices = dimensionalityReducer.getFeatures(data, labels, 100)
-fs_indices
-
-# %%
 # Plotting
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-
-unique_colors = np.unique(colors)
-for i, label in enumerate(np.unique(labels)):
-    indices = np.where(label == labels)
-    x = X[indices,0]
-    y = X[indices,1]
-    z = X[indices,2]
-    ax.scatter(x,y,z, c=unique_colors[i], label=label)
-
-ax.set_xlabel('PC1')
-ax.set_ylabel('PC2')
-ax.set_zlabel('PC3')
-
-plt.legend()
-plt.tight_layout()
-plt.show()
-
+plotScatter(X,colors,labels)
 
 # %%
 # PCA Transform 2
-smallerData = data[:,pca_indices]
-X2, pca2, pca_indices2 = dimensionalityReducer.getPCA(data, n_components, n_features_per_component)
-
+reduced_data = data[:,pca_indices]
+X2, pca2, pca_indices2 = dimensionalityReducer.getPCA(reduced_data, 3, 1)
+# these pca_indices will be indices to the pca_indices from the pca before
+pca_indices2 = pca_indices[pca_indices2]
+print(pca2.explained_variance_ratio_)
+print("pca finished")
 
 #%%
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
+plotScatter(X2,colors,labels)
 
-unique_colors = np.unique(colors)
-for i, label in enumerate(np.unique(labels)):
-    indices = np.where(label == labels)
-    x = X2[indices,0]
-    y = X2[indices,1]
-    z = X2[indices,2]
-    ax.scatter(x,y,z, c=unique_colors[i], label=label)
-
-ax.set_xlabel('PC1')
-ax.set_ylabel('PC2')
-ax.set_zlabel('PC3')
-
-plt.legend()
-plt.tight_layout()
-plt.show()
+# %%
+# Feature Selection
+X, indices = dimensionalityReducer.getFeatures(data, labels, 20)
+fs_indices
