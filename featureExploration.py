@@ -46,5 +46,5 @@ plotScatter(X2,colors,labels)
 
 # %%
 # Feature Selection
-X, indices = dimensionalityReducer.getFeatures(data, labels, 20)
-fs_indices
+X, fs_indices = dimensionalityReducer.getFeatures(data, labels, 20)
+gene_labels[fs_indices]
