@@ -49,7 +49,7 @@ indices
 
 #%%
 pca.components_
-print pd.DataFrame(pca.components_,columns=gene_labels,index = ['PC-1','PC-2','PC-3'])
+print(pd.DataFrame(pca.components_,columns=gene_labels,index = ['PC-1','PC-2','PC-3']))
 maxIndex = np.argmax(pca.components_[1])
 gene_labels[maxIndex]
 
