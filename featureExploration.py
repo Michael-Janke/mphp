@@ -59,3 +59,12 @@ print("genes in first PCA and FS:")
 print(gene_labels[intersection1])
 print("genes in second PCA and FS:")
 print(gene_labels[intersection2])
+
+#%%
+# correlation of selected genes
+print("pairwise correlation of genes selected in first PCA:")
+print(np.corrcoef(data[:,pca_indices], rowvar = False))
+print("pairwise correlation of genes selected in second PCA:")
+print(np.corrcoef(data[:,pca_indices2], rowvar = False))
+print("pairwise correlation of genes selected in FS:")
+print(np.corrcoef(data[:,fs_indices], rowvar = False))
