@@ -8,7 +8,7 @@ parser = argparse.ArgumentParser(description='Create statistics for sample types
 parser.add_argument('--name', help='name of dataset')
 args = parser.parse_args()
 
-dataset = "dataset4"
+dataset = args.name
 METADATA_PATHS = {
     "dataset3": "TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_HTSeq-Counts_metadata.csv",
     "dataset4": "TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_HTSeq-Counts_metadata.csv",
@@ -47,11 +47,6 @@ if not os.path.exists(STATISTICS_PATH):
 
 np.save(STATISTICS_PATH + "sample_types", sample_types)
 np.save(STATISTICS_PATH + "counts", counts)
-
-"""
-with open(STATISTICS_PATH + 'counts_human_readable.txt', 'w') as outfile:
-    json.dump(counts, outfile, indent=4)
-"""
 
 with open(STATISTICS_PATH + 'counts_human_readable.md', 'w') as outfile:
     # HEADER
