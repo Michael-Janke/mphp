@@ -11,6 +11,7 @@ var imagemin = require('gulp-imagemin');
 var iife = require("gulp-iife");
 var cleanCSS = require('gulp-clean-css');
 var Server = require('karma').Server;
+let babel = require('gulp-babel');
 
 gulp.task('default', ['serve']);
 
@@ -121,7 +122,9 @@ gulp.task('uglify-js', function() {
     return gulp.src(['./public/js/config/app.js', './public/js/factories/**/*.js', './public/js/services/**/*.js', './public/js/controllers/**/*.js', './public/js/filters/**/*.js', './public/js/directives/**/*.js'])
         .pipe(concat('all.min.js'))
         .pipe(gulp.dest('./public/js/min/'))
+        .pipe(babel({presets: ['es2015']}))
         .pipe(uglify())
+        .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
         .pipe(gulp.dest('./public/js/min/'));
 });
 

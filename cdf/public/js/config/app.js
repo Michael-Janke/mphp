@@ -8,7 +8,8 @@ var cdf = angular.module('cdf', ['ngMaterial', 'ngAnimate', 'ngMessages', 'ngAri
         $stateProvider.state('home', {
             url: '/',
             templateUrl: 'partials/home-partial.html',
-            controller: 'HomeController'
+            controller: 'HomeController',
+            controllerAs: 'ctrl'
         })
 
         .state('about', {

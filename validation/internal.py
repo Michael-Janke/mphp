@@ -26,7 +26,8 @@ class InternalValidationResource():
         self.validator = InternalValidator(dataLoader)
 
     def on_get(self, req, resp):
-        datasetid = req.get_param('id')
+        req_object = JSON.parse(req.get_param('req'))
+        datasetid = req_object.request.dataset
         lhs = req.get_param('lhs')
         rhs = req.get_param('rhs')
         genes = req.get_param('genes')
