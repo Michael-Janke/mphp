@@ -48,3 +48,14 @@ plotScatter(X2,colors,labels)
 # Feature Selection
 X, fs_indices = dimensionalityReducer.getFeatures(data, labels, 20)
 gene_labels[fs_indices]
+
+
+#%%
+# compare selected genes
+intersection1 = np.intersect1d(fs_indices, pca_indices)
+intersection2 = np.intersect1d(fs_indices, pca_indices2)
+
+print("genes in first PCA and FS:")
+print(gene_labels[intersection1])
+print("genes in second PCA and FS:")
+print(gene_labels[intersection2])
