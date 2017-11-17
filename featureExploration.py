@@ -58,14 +58,18 @@ gene_labels[maxIndex]
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
-x = X[:,0]
-y = X[:,1]
-z = X[:,2]
+unique_colors = np.unique(colors)
+for i, label in enumerate(np.unique(labels)):
+    indices = np.where(label == labels)
+    x = X[indices,0]
+    y = X[indices,1]
+    z = X[indices,2]
+    ax.scatter(x,y,z, c=unique_colors[i], label=label)
 
-ax.scatter(x,y,z, c=colors, marker='o')
+ax.set_xlabel('PC1')
+ax.set_ylabel('PC2')
+ax.set_zlabel('PC3')
 
-ax.set_xlabel('X Label')
-ax.set_ylabel('Y Label')
-ax.set_zlabel('Z Label')
-
+plt.legend()
+plt.tight_layout()
 plt.show()
