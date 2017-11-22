@@ -1,9 +1,13 @@
-**/__pycache__
 data/*
+
+**/__pycache__
+*.pyc
+.ipynb_checkpoints/
+venv/
+
 .RDataTmp
 .Rhistory
 .RData
-.ipynb_checkpoints/
-.vscode
 *.Rproj*
-*.pyc
+
+.vscode
