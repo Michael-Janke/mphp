@@ -19,6 +19,25 @@ Inside each folder is a data and meta data file and a folder for subsets which c
 
 **Later we could move the subsets directly inside the dataset folder and remove the original file to save disk space**
 
+# Setup servers
+
+## Flask server
+
+To start the Flask server you need to install all requirements by running:
+
+```
+pip install -r -requirements.txt
+```
+
+Then you can start the server by:
+
+```
+python app.py
+```
+
+The server should restart when file changes are detected. Also it does not die on errors and displays the error message in the browser.
+
+
 # Analyzing the data
 
 We decided to use IDE extensions for exploration and visualization. 
