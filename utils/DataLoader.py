@@ -5,7 +5,8 @@ from glob import glob
 class DataLoader:
     def __init__(self, dataset):
         self.dataset = dataset
-        self.data, self.gene_labels, self.cancer_types, self.sample_types = self.readData(dataset)
+        self.data, self.cancer_types, self.sample_types = self.readData(dataset)
+        self.gene_labels, self.statistics = self.readGenesAndStatistics(dataset)
 
     def readData(self, dataset):
         data = {}
@@ -26,9 +27,17 @@ class DataLoader:
                 indices = np.where(sample_type == meta_data)
                 data[cancer_type][sample_type] = gene_data[indices]
 
-        gene_file = glob("data/"+dataset+"/subsets/gen*")[0]
+        return data, cancer_types, all_sample_types
+
+    def readGenesAndStatistics(self, dataset):
+        gene_file = "data/"+dataset+"/subsets/gene_labels.npy"
         gene_labels = np.load(gene_file)
-        return data, gene_labels, cancer_types, all_sample_types
+
+        statistics_file = "data/"+dataset+"/statistics/counts.npy"
+        statistics = np.load(statistics_file)
+
+        return gene_labels, statistics
+
 
     def getColor(self, index):
         colors = ["blue","red","green","yellow","orange","black","grey"]
@@ -37,6 +46,9 @@ class DataLoader:
 
     def getGeneLabels(self):
         return self.gene_labels
+
+    def getStatistics(self):
+        return self.statistics
 
     def getData(self, sample_types, cancer_types):
         combined_data = labels = colors = []
