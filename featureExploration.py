@@ -18,7 +18,7 @@ print("data loaded")
 #%%
 # getData(["healthy","sick"]["all"])
 # getData(["TP","NT"]["GBM","LAML"])
-data, labels, colors = dataLoader.getData(["sick","healthy"],["LUAD"])
+data, labels = dataLoader.getData(["sick","healthy"],["LUAD"])
 gene_labels = dataLoader.getGeneLabels()
 print("got combined data")
 
@@ -30,7 +30,7 @@ print("pca finished")
 
 # %%
 # Plotting
-plotScatter(X,colors,labels)
+plotScatter(X,labels)
 
 # %%
 # PCA Transform 2
@@ -42,7 +42,7 @@ print(pca2.explained_variance_ratio_)
 print("pca finished")
 
 #%%
-plotScatter(X2,colors,labels)
+plotScatter(X2,labels)
 
 # %%
 # Feature Selection

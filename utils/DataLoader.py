@@ -38,12 +38,6 @@ class DataLoader:
 
         return gene_labels, statistics
 
-
-    def getColor(self, index):
-        colors = ["blue","red","green","yellow","orange","black","grey","purple"]
-
-        return colors[index%len(colors)]
-
     def getGeneLabels(self):
         return self.gene_labels
 
@@ -51,7 +45,7 @@ class DataLoader:
         return self.statistics
 
     def getData(self, sample_types, cancer_types, excluded_cancer_types = []):
-        combined_data = labels = colors = []
+        combined_data = labels = []
 
         if len(cancer_types) == 1 and cancer_types[0].lower() == 'all':
             cancer_types = self.cancer_types
@@ -73,7 +67,6 @@ class DataLoader:
                 labels_vector.append(sample_type)
                 new_sample_types.append(sample_type)
 
-
         for cancer_type in cancer_types:
             for sample_index, sample_type in enumerate(new_sample_types):
                 label = cancer_type + "-" + labels_vector[sample_index]
@@ -88,11 +81,5 @@ class DataLoader:
 
         labels = np.transpose(labels)
         _, label_counts = np.unique(labels, return_counts = True)
-        colors = []
-        for index, count in enumerate(label_counts):
-            if index == 0:
-                colors = [self.getColor(index)] * count
-            else:
-                colors.extend([self.getColor(index)] * count)
-
-        return combined_data, labels, colors
+        
+        return combined_data, labels

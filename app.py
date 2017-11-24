@@ -16,14 +16,13 @@ def hello_world():
 def getData():
     gene_labels = dataLoader.getGeneLabels()
     dimensionalityReducer = DimensionalityReducer()
-    data, labels, colors = dataLoader.getData(["sick", "healthy"], ["LUAD","THCA"])
+    data, labels = dataLoader.getData(["sick", "healthy"], ["LUAD","THCA"])
     #X, pca, pca_indices = dimensionalityReducer.getPCA(data, 3, 20)
     X, fs_indices = dimensionalityReducer.getFeatures(data, labels, 20)
 
     response = {
         'data': X.tolist(),
         'labels': labels.tolist(),
-        'colors': colors,
         'genes': gene_labels[fs_indices].tolist(),
     }
 

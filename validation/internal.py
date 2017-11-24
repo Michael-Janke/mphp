@@ -12,7 +12,7 @@ class InternalValidator:
 
     def validate_internal_classifier(self, lhs, rhs, genes):
 
-        expression, labels, colors = self.dataLoader.getData(["healthy", "sick"], lhs)
+        expression, labels = self.dataLoader.getData(["healthy", "sick"], lhs)
         gene_labels = self.dataLoader.getGeneLabels()
         data = expression.T[np.in1d(gene_labels, genes)].T
 

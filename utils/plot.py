@@ -7,7 +7,7 @@ def getColor(index):
 
         return colors[index%len(colors)]
 
-def plotScatter(data, colors, labels):
+def plotScatter(data, labels):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 

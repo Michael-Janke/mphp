@@ -11,20 +11,8 @@ class DataNormalizer:
             labels1 and labels2 must match their datasets and have same amount of unique labels
         """
         # separate cancer types and combine in list of matrices
-        data1_sets = []
-        for label in pd.unique(labels1):
-            if label.startswith("LAML"):
-                continue
-            data1_indices = np.where(labels1 == label)
-            data1_sets.append(data1[data1_indices,:])
-        
-        # same for second dataset
-        data2_sets = []
-        for label in pd.unique(labels2):
-            if label.startswith("LAML"):
-                continue
-            data2_indices = np.where(labels2 == label)
-            data2_sets.append(data2[data2_indices,:])
+        data1_sets = self.separateTypes(data1, labels1)
+        data2_sets = self.separateTypes(data2, labels2)
 
         # normalize by mean and combine into np array
         normalized = []
@@ -38,3 +26,14 @@ class DataNormalizer:
         normalized += np.absolute(np.min(normalized))
         labels = [label for label in labels1 if not label.startswith("LAML")]
         return normalized, np.array(labels)
+
+
+    def separateTypes(self, data, labels):
+        data_sets = []
+        for label in pd.unique(labels):
+            if label.startswith("LAML"):
+                continue
+            data_indices = np.where(labels == label)
+            data_sets.append(data[data_indices,:])
+        
+        return data_sets
