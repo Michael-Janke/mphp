@@ -30,8 +30,22 @@ class DimensionalityReducer:
 
         return X, indices
 
+    def getNormalizedFeatures(self, healthyData, sickData, healthyLabels, sickLabels, k=20):
+        numberOfGenes = healthyData.shape[1]
+        selector = SelectKBest(chi2, k=numberOfGenes)
+        selector.fit(healthyData, healthyLabels)
+        healthyScores = selector.scores_
+
+        selector = SelectKBest(chi2, k=numberOfGenes)
+        selector.fit(sickData, sickLabels)
+        sickScores = selector.scores_
+
+        indices = (sickScores - healthyScores).argsort()[-k:][::-1]
+
+        return healthyData[:, indices], sickData[:, indices], indices
+
     def getDecisionTreeFeatures(self, data, labels, k=20):
         tree =  DecisionTreeClassifier()
         tree.fit(data, labels)
-        indices = tree.feature_importances_.argsort()[-k:][::-1] #indices of k greatest values 
+        indices = tree.feature_importances_.argsort()[-k:][::-1] #indices of k greatest values
         return data[:, indices], indices
