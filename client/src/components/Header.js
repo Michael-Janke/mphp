@@ -9,7 +9,7 @@ class Header extends Component {
       <div style={{textAlign: 'center'}}>
         <AppBar
           title={
-            <div class="header-title" style={styles.title}>
+            <div className="header-title" style={styles.title}>
               {/* spacers needed to center the title */}
               <div style={styles.smallSpacer} />
               <img src={logo} className="logo" alt="logo" style={styles.logo} />

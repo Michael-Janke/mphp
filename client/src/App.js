@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Header from './components/Header';
+import Content from './components/Content';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 // Needed for onTouchTap
@@ -11,6 +12,7 @@ class App extends Component {
     return (
       <div className="app">
         <Header />
+        <Content />
       </div>
     );
   }
