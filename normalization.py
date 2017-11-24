@@ -20,8 +20,8 @@ print("got combined data")
 
 # %%
 # Feature Selection
-healthy_X, healthy_fs_indices = dimensionalityReducer.getFeatures(healthy_data, healthy_labels, 3)
-sick_X, sick_fs_indices = dimensionalityReducer.getFeatures(sick_data, sick_labels, 3)
+healthy_fs_indices, healthy_X = dimensionalityReducer.getFeatures(healthy_data, healthy_labels, 3)
+sick_fs_indices, sick_X = dimensionalityReducer.getFeatures(sick_data, sick_labels, 3)
 print("feature selection done")
 
 # compare selected genes
@@ -51,7 +51,7 @@ print("")
 dataNormalizer = DataNormalizer()
 sick_norm, sick_norm_labels = dataNormalizer.normalizeDataWithMean(sick_data, healthy_data, sick_labels, healthy_labels)
 
-sick_X_norm, sick_fs_indices_norm = dimensionalityReducer.getFeatures(sick_norm, sick_norm_labels, 3)
+sick_fs_indices_norm, sick_X_norm = dimensionalityReducer.getFeatures(sick_norm, sick_norm_labels, 3)
 plotScatter(sick_X_norm,sick_norm_labels)
 
 sick_X3 = sick_data[:,sick_fs_indices_norm]

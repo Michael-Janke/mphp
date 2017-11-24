@@ -24,31 +24,24 @@ print("got combined data")
 
 # %%
 # PCA Transform
-X, pca, pca_indices = dimensionalityReducer.getPCA(data, 3, 20)
+pca, X, pca_indices = dimensionalityReducer.getPCA(data, 3, 20)
 print(pca.explained_variance_ratio_)
-print("pca finished")
-
-# %%
-# Plotting
 plotScatter(X,labels)
 
 # %%
 # PCA Transform 2
 reduced_data = data[:,pca_indices]
-X2, pca2, pca_indices2 = dimensionalityReducer.getPCA(reduced_data, 3, 1)
+pca2, X2, pca_indices2 = dimensionalityReducer.getPCA(reduced_data, 3, 1)
 # these pca_indices will be indices to the pca_indices from the pca before
 pca_indices2 = pca_indices[pca_indices2]
 print(pca2.explained_variance_ratio_)
-print("pca finished")
-
-#%%
 plotScatter(X2,labels)
 
 # %%
 # Feature Selection
-X, fs_indices = dimensionalityReducer.getFeatures(data, labels, 20)
+fs_indices, X3 = dimensionalityReducer.getFeatures(data, labels, 20)
 gene_labels[fs_indices]
-
+plotScatter(X3,labels)
 
 #%%
 # compare selected genes

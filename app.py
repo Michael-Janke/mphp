@@ -17,13 +17,13 @@ def getData():
     gene_labels = dataLoader.getGeneLabels()
     dimensionalityReducer = DimensionalityReducer()
     data, labels = dataLoader.getData(["sick", "healthy"], ["LUAD","THCA"])
-    #X, pca, pca_indices = dimensionalityReducer.getPCA(data, 3, 20)
-    X, fs_indices = dimensionalityReducer.getFeatures(data, labels, 20)
+    # pca, X, pca_indices = dimensionalityReducer.getPCA(data, 3, 20)
+    indices, X = dimensionalityReducer.getFeatures(data, labels, 20)
 
     response = {
         'data': X.tolist(),
         'labels': labels.tolist(),
-        'genes': gene_labels[fs_indices].tolist(),
+        'genes': gene_labels[indices].tolist(),
     }
 
     return json.dumps(response)
