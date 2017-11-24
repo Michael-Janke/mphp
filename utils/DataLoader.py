@@ -40,7 +40,7 @@ class DataLoader:
 
 
     def getColor(self, index):
-        colors = ["blue","red","green","yellow","orange","black","grey"]
+        colors = ["blue","red","green","yellow","orange","black","grey","purple"]
 
         return colors[index%len(colors)]
 
@@ -50,11 +50,13 @@ class DataLoader:
     def getStatistics(self):
         return self.statistics
 
-    def getData(self, sample_types, cancer_types):
+    def getData(self, sample_types, cancer_types, excluded_cancer_types = []):
         combined_data = labels = colors = []
 
         if len(cancer_types) == 1 and cancer_types[0].lower() == 'all':
             cancer_types = self.cancer_types
+
+        cancer_types = np.asarray(list(set(cancer_types)-set(excluded_cancer_types)))
 
         labels_vector = []
         new_sample_types = []
@@ -72,20 +74,17 @@ class DataLoader:
                 new_sample_types.append(sample_type)
 
 
-        index = 0
-        for cancer_index, cancer_type in enumerate(cancer_types):
+        for cancer_type in cancer_types:
             for sample_index, sample_type in enumerate(new_sample_types):
-
                 label = cancer_type + "-" + labels_vector[sample_index]
+            
                 if sample_type in self.data[cancer_type]:
                     if len(combined_data) == 0:
                         combined_data = self.data[cancer_type][sample_type]
                         labels = [label] * self.data[cancer_type][sample_type].shape[0]
-                        index += 1
                     else:
                         combined_data = np.concatenate((combined_data,self.data[cancer_type][sample_type]),axis=0)
                         labels = np.concatenate((labels,[label] * self.data[cancer_type][sample_type].shape[0]),axis=0)
-                        index += 1
 
         labels = np.transpose(labels)
         _, label_counts = np.unique(labels, return_counts = True)
