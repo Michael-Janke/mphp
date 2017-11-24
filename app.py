@@ -2,10 +2,12 @@ import json
 import numpy as np
 
 from flask import Flask
+from flask_cors import CORS
 from utils.DataLoader import DataLoader
 from utils.DimensionalityReducer import DimensionalityReducer
 
 app = Flask(__name__)
+CORS(app)
 dataLoader = DataLoader("dataset4")
 
 @app.route('/')
