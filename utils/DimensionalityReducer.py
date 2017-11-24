@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import chi2
+from sklearn.tree import DecisionTreeClassifier
 
 class DimensionalityReducer:
     def getPCA(self, data ,n_components, n_features_per_component=10):
@@ -28,3 +29,9 @@ class DimensionalityReducer:
         X = data[:,indices]
 
         return X, indices
+
+    def getDecisionTreeFeatures(self, data, labels, k=20):
+        tree =  DecisionTreeClassifier()
+        tree.fit(data, labels)
+        indices = tree.feature_importances_.argsort()[-k:][::-1] #indices of k greatest values 
+        return data[:, indices], indices
