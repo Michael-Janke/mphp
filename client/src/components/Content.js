@@ -4,10 +4,12 @@ import Card from './Card';
 
 const STATISTICS_CARD = {
   route: "/statistics",
+  title: "Statistics",
 };
 
 const DATA_CARD = {
   route: "/data",
+  title: "Some Data",
 };
 
 class Content extends Component {

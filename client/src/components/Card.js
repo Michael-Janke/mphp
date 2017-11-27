@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Paper from 'material-ui/Paper';
+import { Card, CardTitle, CardText } from 'material-ui/Card';
 import request from '../request';
 
 class Content extends Component {
@@ -16,9 +16,12 @@ class Content extends Component {
 
   render() {
     return (
-      <Paper style={styles.card} zDepth={1}>
-        {this.state.isLoading ? this.renderLoading() : this.renderData(this.state.data)}
-      </Paper>
+      <Card style={styles.card} zDepth={1}>
+        <CardTitle>{this.props.title}</CardTitle>
+        <CardText>
+          {this.state.isLoading ? this.renderLoading() : this.renderData(this.state.data)}
+        </CardText>
+      </Card>
     );
   }
 
@@ -28,10 +31,12 @@ class Content extends Component {
   }
 
   renderData(data) {
+    // TODO do whatever we want to do here
     return <p>{JSON.stringify(data)}</p>;
   }
 }
 
+// TODO put magic numbers into constants
 const styles = {
   card: {
     margin: 12,
