@@ -11,4 +11,8 @@ export default {
   // colors
   gray: "#f3f3f3",
   blue: "#21BADA",
+  red: "#F44336",
+  green: "#4CAF50",
+  orange: "#FF9800",
+  purple: "#9C27B0",
 };

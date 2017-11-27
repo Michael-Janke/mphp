@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Card from './_Card';
+import Card from '../Card';
 
 const ROUTE = "/data";
 const TITLE = "Some Data";

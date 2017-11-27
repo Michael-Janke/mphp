@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Card, CardTitle, CardText } from 'material-ui/Card';
-import Spinner from '../Spinner';
-import request from '../../request';
-import constants from '../../constants';
+import Spinner from './Spinner';
+import request from '../request';
+import constants from '../constants';
 
 class Content extends Component {
   constructor(props) {
