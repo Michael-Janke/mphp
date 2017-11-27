@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Card, CardTitle, CardText } from 'material-ui/Card';
+import Spinner from './Spinner';
 import request from '../request';
+import constants from '../constants';
 
 class Content extends Component {
   constructor(props) {
@@ -17,32 +19,48 @@ class Content extends Component {
   render() {
     return (
       <Card style={styles.card} zDepth={1}>
-        <CardTitle>{this.props.title}</CardTitle>
-        <CardText>
-          {this.state.isLoading ? this.renderLoading() : this.renderData(this.state.data)}
-        </CardText>
+        {this.renderTitle()}
+        {this.state.isLoading ? null : this.renderData()}
       </Card>
     );
   }
 
-  renderLoading() {
-    // TODO add some spinner
-    return <p>Loading ...</p>;
+  renderTitle() {
+    return (
+      <CardTitle style={styles.cardTitle}>
+        {this.props.title}
+        {this.state.isLoading ? <Spinner style={styles.spinner} /> : null}
+      </CardTitle>
+    );
   }
 
-  renderData(data) {
+  renderData() {
     // TODO do whatever we want to do here
-    return <p>{JSON.stringify(data)}</p>;
+    return (
+      <CardText>
+        <p>{JSON.stringify(this.state.data)}</p>
+      </CardText>
+    );
   }
 }
 
-// TODO put magic numbers into constants
 const styles = {
   card: {
-    margin: 12,
-    padding: 12,
-    paddingVertical: 6,
+    margin: constants.medium,
+    padding: constants.medium,
+    paddingVertical: constants.small,
   },
+  cardTitle: {
+    display: "flex",
+    alignItems: "center",
+    height: constants.cardTitleHeight,
+  },
+  spinner: {
+    width: constants.cardTitleHeight,
+    height: constants.cardTitleHeight,
+    borderWidth: constants.cardTitleHeight / 2,
+    marginLeft: constants.medium,
+  }
 }
 
 export default Content;

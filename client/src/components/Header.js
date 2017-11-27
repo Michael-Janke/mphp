@@ -37,12 +37,12 @@ const styles = {
     marginLeft: 20,
   },
   smallSpacer: {
-    height: constants.headerPadding,
-    width: constants.headerPadding,
+    height: constants.appBarPadding,
+    width: constants.appBarPadding,
   },
   largeSpacer: {
-    height: constants.headerSize,
-    width: constants.headerSize,
+    height: constants.appBarHeight,
+    width: constants.appBarHeight,
   },
 }
 
