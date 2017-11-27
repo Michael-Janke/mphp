@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Card, CardTitle, CardText } from 'material-ui/Card';
-import Spinner from './Spinner';
-import request from '../request';
-import constants from '../constants';
+import Spinner from '../Spinner';
+import request from '../../request';
+import constants from '../../constants';
 
 class Content extends Component {
   constructor(props) {
@@ -35,10 +35,10 @@ class Content extends Component {
   }
 
   renderData() {
-    // TODO do whatever we want to do here
+    const { DataView } = this.props;
     return (
       <CardText>
-        <p>{JSON.stringify(this.state.data)}</p>
+        <DataView data={this.state.data} />
       </CardText>
     );
   }
@@ -60,7 +60,7 @@ const styles = {
     height: constants.cardTitleHeight,
     borderWidth: constants.cardTitleHeight / 2,
     marginLeft: constants.medium,
-  }
+  },
 }
 
 export default Content;

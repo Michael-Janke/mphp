@@ -1,16 +1,7 @@
 import React, { Component } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
-import Card from './Card';
-
-const STATISTICS_CARD = {
-  route: "/statistics",
-  title: "Statistics",
-};
-
-const DATA_CARD = {
-  route: "/data",
-  title: "Some Data",
-};
+import Statistics from './cards/Statistics';
+import Data from './cards/Data';
 
 class Content extends Component {
   constructor(props) {
@@ -26,13 +17,13 @@ class Content extends Component {
              label="Show statistics"
              primary={true}
              style={styles.button}
-             onClick={() => { this.addCard(STATISTICS_CARD); }}
+             onClick={() => { this.addCard(Statistics); }}
           />
            <RaisedButton
              label="Show some data"
              primary={true}
              style={styles.button}
-             onClick={() => { this.addCard(DATA_CARD); }}
+             onClick={() => { this.addCard(Data); }}
           />
         </div>
         <div className="cards">
@@ -42,12 +33,12 @@ class Content extends Component {
     );
   }
 
-  renderCard(card, index) {
-    return <Card key={`card-${index}`} {...card} />
+  renderCard(Card, index) {
+    return <Card key={`card-${index}`} />
   }
 
-  addCard(card) {
-    this.setState({ cards: [ ...this.state.cards, card ]});
+  addCard(Card) {
+    this.setState({ cards: [ ...this.state.cards, Card ]});
   }
 }
 
