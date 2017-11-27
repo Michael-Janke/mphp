@@ -3,7 +3,7 @@ import constants from '../constants';
 
 class Spinner extends Component {
   render() {
-    return <div class="spinner" style={{...styles.spinner, ...this.props.style}} />;
+    return <div className="spinner" style={{...styles.spinner, ...this.props.style}} />;
   }
 }
 
