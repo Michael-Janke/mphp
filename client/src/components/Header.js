@@ -1,49 +1,56 @@
 import React, { Component } from 'react';
 import AppBar from 'material-ui/AppBar';
+import styled from 'styled-components';
 import logo from '../assets/images/logo.png';
 import constants from '../constants';
+
+const StyledLogo = styled.img`
+  height: 45px;
+`;
+
+const StyledSmallSpacer = styled.div`
+  height: ${constants.appBarPadding}px;
+  width: ${constants.appBarPadding}px;
+`;
+
+const StyledLargeSpacer = styled.div`
+  height: ${constants.appBarHeight}px;
+  width: ${constants.appBarHeight}px;
+`;
+
+const StyledTitle = styled.h1`
+  margin: 0;
+  margin-left: 20;
+`;
+
+const StyledHeaderTitle = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const StyledRoot = styled.div`
+  text-align: "center";
+`;
 
 class Header extends Component {
   render() {
     return (
-      <div style={{textAlign: 'center'}}>
+      <StyledRoot>
         <AppBar
           title={
-            <div className="header-title" style={styles.title}>
+            <StyledHeaderTitle>
               {/* spacers needed to center the title */}
-              <div style={styles.smallSpacer} />
-              <img src={logo} className="logo" alt="logo" style={styles.logo} />
-              <p style={styles.titleText}>Epic Project</p>
-              <div style={styles.largeSpacer} />
-            </div>
+              <StyledSmallSpacer />
+              <StyledLogo src={logo} alt="logo" />
+              <StyledTitle>Epic Project</StyledTitle>
+              <StyledLargeSpacer />
+            </StyledHeaderTitle>
           }
         />
-      </div>
+      </StyledRoot>
     );
   }
-}
-
-const styles = {
-  logo: {
-    height: 45,
-  },
-  title: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  titleText: {
-    margin: 0,
-    marginLeft: 20,
-  },
-  smallSpacer: {
-    height: constants.appBarPadding,
-    width: constants.appBarPadding,
-  },
-  largeSpacer: {
-    height: constants.appBarHeight,
-    width: constants.appBarHeight,
-  },
 }
 
 export default Header;
