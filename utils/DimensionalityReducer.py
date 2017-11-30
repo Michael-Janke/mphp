@@ -46,10 +46,13 @@ class DimensionalityReducer:
         selector = SelectKBest(chi2, k="all")
         selector.fit(healthy_data, healthy_labels)
         healthy_scores = selector.scores_
+        healthy_scores /= max(healthy_scores)
+        print(max(healthy_scores))
 
-        selector = SelectKBest(chi2, k="all")
         selector.fit(sick_data, sick_labels)
         sick_scores = selector.scores_
+        sick_scores /= max(sick_scores)
+        print(max(sick_scores))
 
         # subtract healthy scores from sick scores (this is the normalization here) 
         indices = (sick_scores - healthy_scores).argsort()[-k:][::-1]
