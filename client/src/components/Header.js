@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import AppBar from 'material-ui/AppBar';
-import styled from 'styled-components';
-import logo from '../assets/images/logo.png';
-import constants from '../constants';
+import React, { Component } from "react";
+import AppBar from "material-ui/AppBar";
+import styled from "styled-components";
+import logo from "../assets/images/logo.png";
+import constants from "../constants";
 
 const StyledLogo = styled.img`
   height: 45px;
@@ -27,6 +27,7 @@ const StyledHeaderTitle = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: ${props => props.theme.textColor};
 `;
 
 const StyledRoot = styled.div`
