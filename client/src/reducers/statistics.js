@@ -1,8 +1,6 @@
 import * as types from "../actions/actionTypes";
 
-const initialState = {
-  statistics: null
-};
+const initialState = null;
 
 export function statistics(state = initialState, action = {}) {
   switch (action.type) {

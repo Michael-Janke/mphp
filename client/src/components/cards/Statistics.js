@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { load } from "../../actions/statisticsActions";
+import { withTheme } from "styled-components";
 import {
   BarChart,
   Bar,
@@ -11,33 +12,32 @@ import {
   Legend
 } from "recharts";
 import Card from "../Card";
-import { withTheme } from "styled-components";
-
-const ROUTE = "/statistics";
 
 class Statistics extends Component {
   constructor(props) {
     super(props);
-    this.state = { isLoading: this.props.statistics !== [] };
-  }
-
-  componentDidMount() {
-    this.props.loadStatistics();
+    if (this.props.statistics === null) {
+      this.props.loadStatistics();
+    }
   }
 
   render() {
     return (
-      <Card route={ROUTE} title={"Statistics"} DataView={withTheme(DataView)} />
+      <Card
+        title={"Statistics"}
+        data={this.props.statistics}
+        DataViewer={withTheme(DataViewer)}
+      />
     );
   }
 }
 
-class DataView extends Component {
+class DataViewer extends Component {
   render() {
     const chartOptions = {
       width: 600,
       height: 300,
-      data: parseData(this.props.data),
+      data: this.parseData(),
       margin: { top: 5, right: 30, left: 20, bottom: 5 }
     };
     return (
@@ -50,6 +50,20 @@ class DataView extends Component {
         {this.renderBars()}
       </BarChart>
     );
+  }
+
+  parseData() {
+    const { data } = this.props;
+    return Object.keys(data).map(tcgaToken => {
+      return {
+        name: tcgaToken,
+        NT: data[tcgaToken]["NT"],
+        TR: data[tcgaToken]["TR"],
+        TM: data[tcgaToken]["TM"],
+        TB: data[tcgaToken]["TB"],
+        TP: data[tcgaToken]["TP"]
+      };
+    });
   }
 
   renderBars() {
@@ -65,19 +79,6 @@ class DataView extends Component {
     });
   }
 }
-
-const parseData = data => {
-  return Object.keys(data).map(tcgaToken => {
-    return {
-      name: tcgaToken,
-      NT: data[tcgaToken]["NT"],
-      TR: data[tcgaToken]["TR"],
-      TM: data[tcgaToken]["TM"],
-      TB: data[tcgaToken]["TB"],
-      TP: data[tcgaToken]["TP"]
-    };
-  });
-};
 
 const mapStateToProps = state => {
   return {

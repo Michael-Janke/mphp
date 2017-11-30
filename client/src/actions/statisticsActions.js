@@ -1,5 +1,5 @@
 import * as types from "./actionTypes";
-import request from "../request";
+import request from "./_request";
 
 export function load() {
   return dispatch =>
