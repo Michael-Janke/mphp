@@ -1,21 +1,30 @@
-import React, { Component } from 'react';
-import constants from '../constants';
+import React, { Component } from "react";
+import styled from "styled-components";
 
 class Spinner extends Component {
   render() {
-    return <div className="spinner" style={{...styles.spinner, ...this.props.style}} />;
+    return <StyledRoot className="spinner" size={this.props.size} />;
   }
 }
 
-const styles = {
-  spinner: {
-    height: 40,
-    width: 40,
-    border: "20px solid " + constants.gray,
-    borderTop: "20px solid " + constants.blue,
-    borderRadius: "50%",
-    animation: "spin 2s linear infinite", // spin defined in index.css
-  },
-}
+const StyledRoot = styled.div`
+  height: ${props => props.size || 20}px;
+  width: ${props => props.size || 20}px;
+  border-style: solid;
+  border-width: ${props => (props.size ? props.size / 2 : 10)}px;
+  border-color: ${props => props.theme.lightGray};
+  border-top-color: ${props => props.theme.boringBlue};
+  border-radius: 50%;
+  animation: spin 2s linear infinite;
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+`;
 
 export default Spinner;

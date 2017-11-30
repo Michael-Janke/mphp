@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
-import RaisedButton from 'material-ui/RaisedButton';
-import Statistics from './cards/Statistics';
-import Data from './cards/Data';
+import React, { Component } from "react";
+import RaisedButton from "material-ui/RaisedButton";
+import Statistics from "./cards/Statistics";
+import Data from "./cards/Data";
+import styled from "styled-components";
 
 class Content extends Component {
   constructor(props) {
@@ -13,43 +14,47 @@ class Content extends Component {
     return (
       <div className="content">
         <div className="menu">
-           <RaisedButton
-             label="Show statistics"
-             primary={true}
-             style={styles.button}
-             onClick={() => { this.addCard(Statistics); }}
+          <StyledButton
+            label="Show statistics"
+            primary={true}
+            onClick={() => {
+              this.addCard(Statistics);
+            }}
           />
-           <RaisedButton
-             label="Show some data"
-             primary={true}
-             style={styles.button}
-             onClick={() => { this.addCard(Data); }}
+          <StyledButton
+            label="Show some data"
+            primary={true}
+            onClick={() => {
+              this.addCard(Data);
+            }}
           />
         </div>
-        <div className="cards" style={styles.cards}>
-          {this.state.cards.map(this.renderCard)}
-        </div>
+        <StyledCards>{this.state.cards.map(this.renderCard)}</StyledCards>
       </div>
     );
   }
 
   renderCard(Card, index) {
-    return <Card key={`card-${index}`} />
+    return <Card key={`card-${index}`} />;
   }
 
   addCard(Card) {
-    this.setState({ cards: [ ...this.state.cards, Card ]});
+    this.setState({ cards: [...this.state.cards, Card] });
   }
 }
 
-const styles = {
-  button: {
-    margin: 12,
-  },
-  cards: {
-    display: "flex",
-    flexWrap: "wrap",
-  },
-};
+const StyledButton = styled(RaisedButton)`
+  && {
+    margin: 12px;
+  }
+  button {
+    background: ${props => props.theme.boringBlue} !important;
+  }
+`;
+
+const StyledCards = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+`;
 
 export default Content;
