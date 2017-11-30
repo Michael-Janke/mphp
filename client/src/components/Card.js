@@ -46,6 +46,7 @@ class Content extends Component {
 
 const styles = {
   card: {
+    width: "fit-content",
     margin: constants.medium,
     padding: constants.medium,
     paddingVertical: constants.small,

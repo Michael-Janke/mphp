@@ -26,7 +26,7 @@ class Content extends Component {
              onClick={() => { this.addCard(Data); }}
           />
         </div>
-        <div className="cards">
+        <div className="cards" style={styles.cards}>
           {this.state.cards.map(this.renderCard)}
         </div>
       </div>
@@ -45,6 +45,10 @@ class Content extends Component {
 const styles = {
   button: {
     margin: 12,
+  },
+  cards: {
+    display: "flex",
+    flexWrap: "wrap",
   },
 };
 
