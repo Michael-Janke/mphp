@@ -18,9 +18,9 @@ def hello_world():
 def getData():
     gene_labels = dataLoader.getGeneLabels()
     dimensionalityReducer = DimensionalityReducer()
-    data, labels = dataLoader.getData(["sick", "healthy"], ["LUAD","THCA"])
+    luad_thca = dataLoader.getData(["sick", "healthy"], ["LUAD","THCA"])
     # pca, X, pca_indices = dimensionalityReducer.getPCA(data, 3, 20)
-    indices, X = dimensionalityReducer.getFeatures(data, labels, 20)
+    indices, X = dimensionalityReducer.getFeatures(luad_thca, 20)
 
     response = {
         'data': X.tolist(),

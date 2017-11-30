@@ -26,44 +26,44 @@ class DimensionalityReducer:
 
 
     ####### FEATURE SELECTION BY STATISTICS #######
-    def getFeatures(self, data, labels, k=20):
+    def getFeatures(self, data, k=20):
         selector = SelectKBest(chi2, k=k)
-        selector.fit(data,labels)
+        selector.fit(data.expressions, data.labels)
         # sort and select features
         # [::-1] reverses an 1d array in numpy
         indices = selector.scores_.argsort()[-k:][::-1]
 
-        return indices, data[:,indices]
+        return indices, data.expressions[:,indices]
 
-    def getNormalizedFeatures(self, healthy_data, sick_data, healthy_labels, sick_labels, method, k=20, n=1000):
+    def getNormalizedFeatures(self, sick, healthy, method, k=20, n=1000):
         options = {
             'subtract': self.getNormalizedFeaturesS,
             'exclude' : self.getNormalizedFeaturesE,
         }
-        return options[method](healthy_data, sick_data, healthy_labels, sick_labels, k, n)
+        return options[method](sick, healthy, k, n)
 
-    def getNormalizedFeaturesS(self, healthy_data, sick_data, healthy_labels, sick_labels, k, n):
+    def getNormalizedFeaturesS(self, sick, healthy, k, n):
         selector = SelectKBest(chi2, k="all")
-        selector.fit(healthy_data, healthy_labels)
+        selector.fit(healthy.expressions, healthy.labels)
         healthy_scores = selector.scores_
         healthy_scores /= max(healthy_scores)
 
-        selector.fit(sick_data, sick_labels)
+        selector.fit(sick.expressions, sick.labels)
         sick_scores = selector.scores_
         sick_scores /= max(sick_scores)
 
-        # subtract healthy scores from sick scores (this is the normalization here) 
+        # subtract healthy scores from sick scores (this is the normalization here)
         indices = (sick_scores - healthy_scores).argsort()[-k:][::-1]
 
-        return indices, healthy_data[:,indices], sick_data[:,indices]
+        return indices, sick.expressions[:,indices], healthy.expressions[:,indices]
 
-    def getNormalizedFeaturesE(self, healthy_data, sick_data, healthy_labels, sick_labels, k, n):
+    def getNormalizedFeaturesE(self, sick, healthy, k, n):
         selector = SelectKBest(chi2, k=n)
-        selector.fit(healthy_data, healthy_labels)
+        selector.fit(healthy.expresssions, healthy.labels)
         h_indices = selector.get_support(indices=True)
-        
+
         selector = SelectKBest(chi2, k=n+k)
-        selector.fit(sick_data, sick_labels)
+        selector.fit(sick.expressions, sick.labels)
         s_indices = selector.get_support(indices=True)
 
         # get features in sick data which do not discriminate healty data
@@ -72,14 +72,14 @@ class DimensionalityReducer:
         features = np.asarray(features, dtype=np.uint32)
         # sort selected features by score
         indices = features[ selector.scores_[features].argsort()[-k:][::-1] ]
-        
-        return indices, healthy_data[:,indices], sick_data[:,indices]
+
+        return indices, sick.expressions[:,indices], healthy.expresssions[:,indices]
 
 
 
     ####### EMBEDDED FEATURE SELECTION #######
-    def getDecisionTreeFeatures(self, data, labels, k=20):
+    def getDecisionTreeFeatures(self, data, k=20):
         tree =  DecisionTreeClassifier()
-        tree.fit(data, labels)
+        tree.fit(data.expressions, data.labels)
         indices = tree.feature_importances_.argsort()[-k:][::-1] #indices of k greatest values
         return indices, data[:,indices]

@@ -2,6 +2,8 @@ import numpy as np
 import ntpath
 from glob import glob
 
+import utils
+
 class DataLoader:
     def __init__(self, dataset):
         self.dataset = dataset
@@ -70,7 +72,7 @@ class DataLoader:
         for cancer_type in cancer_types:
             for sample_index, sample_type in enumerate(new_sample_types):
                 label = cancer_type + "-" + labels_vector[sample_index]
-            
+
                 if sample_type in self.data[cancer_type]:
                     if len(combined_data) == 0:
                         combined_data = self.data[cancer_type][sample_type]
@@ -81,5 +83,5 @@ class DataLoader:
 
         labels = np.transpose(labels)
         _, label_counts = np.unique(labels, return_counts = True)
-        
-        return combined_data, labels
+
+        return utils.Expressions(combined_data, labels)
