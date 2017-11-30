@@ -1,20 +1,34 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
-import { ThemeProvider } from "styled-components";
-import { injectGlobal } from "styled-components";
-
-import EpicApp from "./App";
 import registerServiceWorker from "./registerServiceWorker";
+import EpicApp from "./App";
+
+// Theme
+import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
+import { ThemeProvider, injectGlobal } from "styled-components";
 import Roboto from "./assets/fonts/Roboto/Roboto-Regular.ttf";
 import * as colors from "./config/colors";
 import * as fontSizes from "./config/fontSizes";
 import * as spacings from "./config/spacings";
 
+// Redux
+import { Provider } from "react-redux";
+import { createStore, combineReducers, applyMiddleware } from "redux";
+import thunk from "redux-thunk"; // needed for async actions
+import * as reducers from "./reducers";
+
+// Needed for onTouchTap
+// http://stackoverflow.com/a/34015469/988941
+import injectTapEventPlugin from "react-tap-event-plugin";
+
+let store = createStore(combineReducers(reducers), applyMiddleware(thunk));
+
 const App = () => (
   <ThemeProvider theme={{ ...colors, ...fontSizes, ...spacings }}>
     <MuiThemeProvider>
-      <EpicApp />
+      <Provider store={store}>
+        <EpicApp />
+      </Provider>
     </MuiThemeProvider>
   </ThemeProvider>
 );
@@ -36,3 +50,4 @@ injectGlobal`
 
 ReactDOM.render(<App />, document.getElementById("root"));
 registerServiceWorker();
+injectTapEventPlugin();

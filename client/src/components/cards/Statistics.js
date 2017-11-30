@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import { load } from "../../actions/statisticsActions";
 import {
   BarChart,
   Bar,
@@ -12,11 +14,21 @@ import Card from "../Card";
 import { withTheme } from "styled-components";
 
 const ROUTE = "/statistics";
-const TITLE = "Statistics";
 
 class Statistics extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { isLoading: this.props.statistics !== [] };
+  }
+
+  componentDidMount() {
+    this.props.loadStatistics();
+  }
+
   render() {
-    return <Card route={ROUTE} title={TITLE} DataView={withTheme(DataView)} />;
+    return (
+      <Card route={ROUTE} title={"Statistics"} DataView={withTheme(DataView)} />
+    );
   }
 }
 
@@ -67,4 +79,18 @@ const parseData = data => {
   });
 };
 
-export default Statistics;
+const mapStateToProps = state => {
+  return {
+    statistics: state.statistics
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    loadStatistics: () => {
+      dispatch(load());
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Statistics);
