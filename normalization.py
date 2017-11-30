@@ -64,6 +64,6 @@ print("plotting normalized data done")
 # NORMALIZING TAKES PLACES INSIDE THE FEATURE SELECTION HERE
 method = "subtract"
 idx, s_data, h_data = dimReducer.getNormalizedFeatures(sick, healthy, method, 3, 5000)
-plotScatter(h_data, healthy_labels)
-plotScatter(s_data, sick_labels)
+plotScatter(h_data, healthy.labels)
+plotScatter(s_data, sick.labels)
 print("plotting with normalized features done - " + method)
