@@ -32,11 +32,9 @@ def getData():
 
 @app.route('/statistics', methods=["GET"])
 def getStatistics():
-    dataLoader = DataLoader("dataset4")
     statistics = dataLoader.getStatistics()
 
     return json.dumps(statistics.tolist())
 
 if __name__ == '__main__':
-    app.debug = True
-    app.run(host='0.0.0.0', use_reloader=True)
+    app.run(host='0.0.0.0', debug=True, use_reloader=True)
