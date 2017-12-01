@@ -43,7 +43,7 @@ print("\n################")
 
 print("SICK REDUCED")
 pprint(classVal.evaluate(sick_reduced, ["LogisticRegression"]))
-plotScatter(sick_X, sick.labels, gene_labels[selected_genes][0:3])
+plotScatter(sick_X, sick.labels, gene_labels[selected_genes])
 
 print("HEALTHY REDUCED")
 pprint(classVal.evaluate(healthy_reduced, ["LogisticRegression"]))

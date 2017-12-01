@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import RaisedButton from "material-ui/RaisedButton";
 import Statistics from "./cards/Statistics";
+import Plot from "./cards/Plot";
 import Data from "./cards/Data";
 import styled from "styled-components";
 
@@ -26,6 +27,13 @@ class Content extends Component {
             primary={true}
             onClick={() => {
               this.addCard(Data);
+            }}
+          />
+          <StyledButton
+            label="Show some Plots"
+            primary={true}
+            onClick={() => {
+              this.addCard(Plot);
             }}
           />
         </div>
