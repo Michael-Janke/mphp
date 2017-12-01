@@ -5,6 +5,7 @@ from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 
+from sklearn.model_selection import cross_val_score
 from sklearn.metrics import f1_score
 
 class ClassificationValidator():
@@ -28,7 +29,6 @@ class ClassificationValidator():
             if not c in self.classifier_table:
                 continue
             clf = self.classifier_table[c]()
-            clf.fit(data.expressions, data.labels)
-            pred = clf.predict(data.expressions)
-            result[c] = f1_score(data.labels, pred, average="micro")
+            scores = cross_val_score(clf, data.expressions, data.labels, cv=5, scoring="f1_micro")
+            result[c] = (scores.mean(), scores.std())
         return result
