@@ -38,9 +38,12 @@ def getPlotData():
     sick = dataLoader.getData(["sick"], ["THCA","LUAD"])
     indices, s_data, _ = dimReducer.getNormalizedFeatures(sick, healthy, "exclude", 3, 5000)
 
+    data = {}
+    for label in np.unique(sick.labels):
+        data[label] = s_data[sick.labels==label,:].T.tolist()
+
     response = {
-        'data': s_data.T.tolist(),
-        'labels': sick.labels.tolist(),
+        'data': data,
         'genes': gene_labels[indices].tolist(),
     }
 
