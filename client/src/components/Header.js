@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import logo from "../assets/images/logo.png";
 import styled from "styled-components";
+import IconButton from './IconButton';
+import { withTheme } from "styled-components";
 
 class Header extends Component {
   render() {
@@ -12,6 +14,7 @@ class Header extends Component {
         </StyledHeader>
         <StyledExperimentHeader>
           <StyledExperimentName>Experiment Name</StyledExperimentName>
+          <IconButton tooltip="Edit experiment name" icon="edit" color={this.props.theme.almostWhite} />
         </StyledExperimentHeader>
       </StyledHeaderContainer>
     );
@@ -60,4 +63,4 @@ const StyledLogo = styled.img`
   height: 45px;
 `;
 
-export default Header;
+export default withTheme(Header);
