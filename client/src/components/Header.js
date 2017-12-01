@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import logo from "../assets/images/logo.png";
 import styled from "styled-components";
-import IconButton from './IconButton';
-import { withTheme } from "styled-components";
+import EditableText from './EditableText';
 
 class Header extends Component {
   render() {
@@ -13,8 +12,7 @@ class Header extends Component {
           <StyledTitle>Clustered Gene Analysis</StyledTitle>
         </StyledHeader>
         <StyledExperimentHeader>
-          <StyledExperimentName>Experiment Name</StyledExperimentName>
-          <IconButton tooltip="Edit experiment name" icon="edit" color={this.props.theme.almostWhite} />
+          <EditableText />
         </StyledExperimentHeader>
       </StyledHeaderContainer>
     );
@@ -54,13 +52,8 @@ const StyledTitle = styled.h1`
   font-size: ${props => props.theme.h1};
 `;
 
-const StyledExperimentName = styled.div`
-  color: ${props => props.theme.almostWhite};
-  font-size: ${props => props.theme.h2};
-`;
-
 const StyledLogo = styled.img`
   height: 45px;
 `;
 
-export default withTheme(Header);
+export default Header;

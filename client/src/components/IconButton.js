@@ -11,7 +11,7 @@ class IconButton extends Component {
     const Icon = icons[this.props.icon]
 
     return (
-      <StyledIconButton tooltip={this.props.tooltip} color={this.props.color}>
+      <StyledIconButton tooltip={this.props.tooltip} color={this.props.color} onClick={this.props.onClick}>
         <Icon />
       </StyledIconButton>
     );
