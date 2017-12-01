@@ -17,14 +17,30 @@ def hello_world():
 @app.route('/data', methods=["GET"])
 def getData():
     gene_labels = dataLoader.getGeneLabels()
-    dimensionalityReducer = DimensionalityReducer()
+    dimReducer = DimensionalityReducer()
     luad_thca = dataLoader.getData(["sick", "healthy"], ["LUAD","THCA"])
     # pca, X, pca_indices = dimensionalityReducer.getPCA(data, 3, 20)
-    indices, X = dimensionalityReducer.getFeatures(luad_thca, 20)
+    indices, X = dimReducer.getFeatures(luad_thca, 20)
 
     response = {
         'data': X.tolist(),
-        'labels': labels.tolist(),
+        'labels': luad_thca.labels.tolist(),
+        'genes': gene_labels[indices].tolist(),
+    }
+
+    return json.dumps(response)
+
+@app.route('/plot', methods=["GET"])
+def getPlotData():
+    gene_labels = dataLoader.getGeneLabels()
+    dimReducer = DimensionalityReducer()
+    healthy = dataLoader.getData(["healthy"], ["THCA","LUAD"])
+    sick = dataLoader.getData(["sick"], ["THCA","LUAD"])
+    indices, s_data, _ = dimReducer.getNormalizedFeatures(sick, healthy, "exclude", 3, 5000)
+
+    response = {
+        'data': s_data.tolist(),
+        'labels': sick.labels.tolist(),
         'genes': gene_labels[indices].tolist(),
     }
 
