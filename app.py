@@ -9,6 +9,8 @@ from utils.DimensionalityReducer import DimensionalityReducer
 app = Flask(__name__)
 CORS(app)
 dataLoader = DataLoader("dataset4")
+gene_labels = dataLoader.getGeneLabels()
+dimReducer = DimensionalityReducer()
 
 @app.route('/')
 def hello_world():
@@ -16,10 +18,7 @@ def hello_world():
 
 @app.route('/data', methods=["GET"])
 def getData():
-    gene_labels = dataLoader.getGeneLabels()
-    dimReducer = DimensionalityReducer()
     luad_thca = dataLoader.getData(["sick", "healthy"], ["LUAD","THCA"])
-    # pca, X, pca_indices = dimensionalityReducer.getPCA(data, 3, 20)
     indices, X = dimReducer.getFeatures(luad_thca, 20)
 
     response = {
@@ -32,11 +31,9 @@ def getData():
 
 @app.route('/plot', methods=["GET"])
 def getPlotData():
-    gene_labels = dataLoader.getGeneLabels()
-    dimReducer = DimensionalityReducer()
     healthy = dataLoader.getData(["healthy"], ["THCA","LUAD"])
     sick = dataLoader.getData(["sick"], ["THCA","LUAD"])
-    indices, s_data, _ = dimReducer.getNormalizedFeatures(sick, healthy, "exclude", 3, 5000)
+    indices, s_data, _ = dimReducer.getNormalizedFeatures(sick, healthy, "exclude", 3)
 
     data = {}
     for label in np.unique(sick.labels):

@@ -35,7 +35,7 @@ class DimensionalityReducer:
 
         return indices, data.expressions[:,indices]
 
-    def getNormalizedFeatures(self, sick, healthy, method, k=20, n=1000):
+    def getNormalizedFeatures(self, sick, healthy, method, k=20, n=5000):
         options = {
             'substract': self.getNormalizedFeaturesS,
             'exclude' : self.getNormalizedFeaturesE,
