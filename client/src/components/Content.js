@@ -12,7 +12,7 @@ class Content extends Component {
 
   render() {
     return (
-      <div className="content">
+      <StyledContent className="content">
         <div className="menu">
           <StyledButton
             label="Show statistics"
@@ -30,7 +30,7 @@ class Content extends Component {
           />
         </div>
         <StyledCards>{this.state.cards.map(this.renderCard)}</StyledCards>
-      </div>
+      </StyledContent>
     );
   }
 
@@ -42,6 +42,11 @@ class Content extends Component {
     this.setState({ cards: [...this.state.cards, Card] });
   }
 }
+
+const StyledContent = styled.div`
+  position: relative;
+  top: ${props => props.theme.totalHeaderHeight};
+`;
 
 const StyledButton = styled(RaisedButton)`
   && {

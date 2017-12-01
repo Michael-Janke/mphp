@@ -4,6 +4,7 @@ export const lightOrange = "rgb(221, 97, 8)";
 export const cherryRed = "rgb(177, 6, 58)";
 export const sunYellow = "rgb(246, 168, 0)";
 export const boringBlue = "rgb(0, 122, 158)";
+export const slightlyBoringBlue = "#5CABC1";
 
 export const lightGray = "#f3f3f3";
 export const leafGreen = "#4CAF50";
