@@ -37,7 +37,7 @@ class DimensionalityReducer:
 
     def getNormalizedFeatures(self, sick, healthy, method, k=20, n=1000):
         options = {
-            'subtract': self.getNormalizedFeaturesS,
+            'substract': self.getNormalizedFeaturesS,
             'exclude' : self.getNormalizedFeaturesE,
         }
         return options[method](sick, healthy, k, n)
