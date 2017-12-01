@@ -23,14 +23,14 @@ classVal = ClassificationValidator()
 print("data loaded")
 
 #%%
-healthy = dataLoader.getData(["healthy"], ["THCA","LUAD","KIRC","HNSC"])
-sick = dataLoader.getData(["sick"], ["THCA","LUAD","KIRC","HNSC"])
+healthy = dataLoader.getData(["healthy"], ["THCA","LUAD"])
+sick = dataLoader.getData(["sick"], ["THCA","LUAD"])
 gene_labels = dataLoader.getGeneLabels()
 print("got combined data")
 
 # %%
 # Feature Selection
-healthy_fs_indices, sick_X, healthy_X = dimReducer.getNormalizedFeatures(sick,healthy,"exclude", 20)
+selected_genes, sick_X, healthy_X = dimReducer.getNormalizedFeatures(sick,healthy,"exclude", 3)
 
 sick_reduced = Expressions(sick_X, sick.labels)
 healthy_reduced = Expressions(healthy_X, healthy.labels)
@@ -43,8 +43,8 @@ print("\n################")
 
 print("SICK REDUCED")
 pprint(classVal.evaluate(sick_reduced, ["LogisticRegression"]))
-plotScatter(sick_X,sick.labels)
+plotScatter(sick_X, sick.labels, gene_labels[selected_genes][0:3])
 
 print("HEALTHY REDUCED")
 pprint(classVal.evaluate(healthy_reduced, ["LogisticRegression"]))
-plotScatter(healthy_X,healthy.labels)
+plotScatter(healthy_X,healthy.labels, gene_labels[selected_genes])
