@@ -37,7 +37,7 @@ class DimensionalityReducer:
 
     def getNormalizedFeatures(self, sick, healthy, method, k=20, n=1000):
         options = {
-            'subtract': self.getNormalizedFeaturesS,
+            'substract': self.getNormalizedFeaturesS,
             'exclude' : self.getNormalizedFeaturesE,
         }
         return options[method](sick, healthy, k, n)
@@ -59,7 +59,7 @@ class DimensionalityReducer:
 
     def getNormalizedFeaturesE(self, sick, healthy, k, n):
         selector = SelectKBest(chi2, k=n)
-        selector.fit(healthy.expresssions, healthy.labels)
+        selector.fit(healthy.expressions, healthy.labels)
         h_indices = selector.get_support(indices=True)
 
         selector = SelectKBest(chi2, k=n+k)
@@ -73,7 +73,7 @@ class DimensionalityReducer:
         # sort selected features by score
         indices = features[ selector.scores_[features].argsort()[-k:][::-1] ]
 
-        return indices, sick.expressions[:,indices], healthy.expresssions[:,indices]
+        return indices, sick.expressions[:,indices], healthy.expressions[:,indices]
 
 
 

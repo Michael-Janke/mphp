@@ -20,19 +20,23 @@ class ClusterValidator():
         }
 
     def evaluate(self, data, algorithms, measures):
-        result = []
+        result = {}
+        if "*" in algorithms:
+            algorithms = self.cluster_table.keys()
         for a in algorithms:
             if a not in self.cluster_table:
                 continue
             clustering = self.cluster_table[a]()
             clustering.fit(data.expressions)
-            result +=  [self.evaluateClustering(data.labels, clustering.labels_, measures)]
+            result[a] = self.evaluateClustering(data.labels, clustering.labels_, measures)
         return result
 
     def evaluateClustering(self, labels, cluster_labels, measures):
-        result = []
+        result = {}
+        if "*" in measures:
+            measures = self.metric_table.keys()
         for m in measures:
             if m not in self.metric_table:
                 continue
-            result += [self.metric_table[m](labels, cluster_labels)]
+            result[m] = self.metric_table[m](labels, cluster_labels)
         return result

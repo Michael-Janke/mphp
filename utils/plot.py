@@ -7,7 +7,7 @@ def getColor(index):
 
         return colors[index%len(colors)]
 
-def plotScatter(data, labels):
+def plotScatter(data, labels, gene_labels = ["PC1","PC2","PC3"]):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
@@ -18,9 +18,9 @@ def plotScatter(data, labels):
         z = data[indices,2]
         ax.scatter(x,y,z, c=getColor(i), label=label)
 
-    ax.set_xlabel('PC1')
-    ax.set_ylabel('PC2')
-    ax.set_zlabel('PC3')
+    ax.set_xlabel(gene_labels[0])
+    ax.set_ylabel(gene_labels[1])
+    ax.set_zlabel(gene_labels[2])
 
     plt.legend()
     plt.tight_layout()
