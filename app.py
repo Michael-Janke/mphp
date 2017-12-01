@@ -39,7 +39,7 @@ def getPlotData():
     indices, s_data, _ = dimReducer.getNormalizedFeatures(sick, healthy, "exclude", 3, 5000)
 
     response = {
-        'data': s_data.tolist(),
+        'data': s_data.T.tolist(),
         'labels': sick.labels.tolist(),
         'genes': gene_labels[indices].tolist(),
     }
