@@ -94,7 +94,7 @@ const StyledInput = styled.input`
 `;
 
 const StyledContainer = styled.div`
-  width: 100%;
+  width: 80%;
   display: flex;
   align-items: center;
 `;

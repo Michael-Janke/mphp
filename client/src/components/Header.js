@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import logo from "../assets/images/logo.png";
-import styled from "styled-components";
-import EditableText from './EditableText';
+import styled, { withTheme } from "styled-components";
+import EditableText from "./EditableText";
+import IconButton from "./IconButton";
 
 class Header extends Component {
   render() {
@@ -13,6 +14,18 @@ class Header extends Component {
         </StyledHeader>
         <StyledExperimentHeader>
           <EditableText />
+          <StyledButtonContainer>
+            <IconButton
+              tooltip="Open existing experiment"
+              icon="open"
+              color={this.props.theme.almostWhite}
+            />
+            <IconButton
+              tooltip="Save experiment"
+              icon="save"
+              color={this.props.theme.almostWhite}
+            />
+          </StyledButtonContainer>
         </StyledExperimentHeader>
       </StyledHeaderContainer>
     );
@@ -56,4 +69,10 @@ const StyledLogo = styled.img`
   height: 45px;
 `;
 
-export default Header;
+const StyledButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  width: 20%;
+`;
+
+export default withTheme(Header);
