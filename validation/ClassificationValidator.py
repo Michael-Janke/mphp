@@ -21,7 +21,7 @@ class ClassificationValidator():
         }
 
     def evaluate(self, data, classifier):
-        result = []
+        result = {}
         if "*" in classifier:
             classifier = self.classifier_table.keys()
         for c in classifier:
@@ -30,5 +30,5 @@ class ClassificationValidator():
             clf = self.classifier_table[c]()
             clf.fit(data.expressions, data.labels)
             pred = clf.predict(data.expressions)
-            result += [f1_score(data.labels, pred, average="micro")]
+            result[c] = f1_score(data.labels, pred, average="micro")
         return result
