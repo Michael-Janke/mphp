@@ -24,7 +24,7 @@ def getData():
 
     response = {
         'data': X.tolist(),
-        'labels': labels.tolist(),
+        'labels': gene_labels.tolist(),
         'genes': gene_labels[indices].tolist(),
     }
 
