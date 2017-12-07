@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import { updateName } from "../actions/experimentActions";
 import logo from "../assets/images/logo.png";
 import styled, { withTheme } from "styled-components";
 import EditableText from "./EditableText";
@@ -13,7 +15,10 @@ class Header extends Component {
           <StyledTitle>Clustered Gene Analysis</StyledTitle>
         </StyledHeader>
         <StyledExperimentHeader>
-          <EditableText />
+          <EditableText
+            text={this.props.experimentName}
+            onChange={this.props.updateExperimentName}
+          />
           <StyledButtonContainer>
             <IconButton
               tooltip="Open existing experiment"
@@ -75,4 +80,18 @@ const StyledButtonContainer = styled.div`
   width: 20%;
 `;
 
-export default withTheme(Header);
+const mapStateToProps = state => {
+  return {
+    experimentName: state.experiment.name
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    updateExperimentName: newName => {
+      dispatch(updateName(newName));
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(withTheme(Header));

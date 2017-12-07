@@ -6,7 +6,7 @@ class EditableText extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      text: "Epic Experiment",
+      text: this.props.text || "Edit text...",
       isEditing: false
     };
   }
@@ -52,7 +52,8 @@ class EditableText extends Component {
   }
 
   stopEditing() {
-    this.setState({ isEditing: false });
+    const onChange = this.props.onChange || (() => {});
+    this.setState({ isEditing: false }, onChange(this.state.text));
   }
 
   handleFocus(event) {
