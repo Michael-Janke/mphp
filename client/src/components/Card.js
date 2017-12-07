@@ -36,7 +36,7 @@ class Card extends Component {
 }
 
 const StyledCard = styled(_Card)`
-  width: ${props => props.width || "fit-content"};
+  width: ${props => (props.fitContent ? "fit-content" : null)};
   margin: ${props => props.theme.mediumSpace};
   padding: ${props => props.theme.mediumSpace};
   padding-top: ${props => props.theme.smallSpace};

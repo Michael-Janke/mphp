@@ -13,7 +13,6 @@ class SelectDataset extends Component {
         title={this.props.title}
         data={this.props.data}
         DataViewer={DataViewer}
-        width="100%"
       />
     );
   }
