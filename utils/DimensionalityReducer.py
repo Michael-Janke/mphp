@@ -2,10 +2,20 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import chi2
+from sklearn.feature_selection import mutual_info_classif
+from sklearn.feature_selection import f_classif
 from sklearn.tree import DecisionTreeClassifier
 
 class DimensionalityReducer:
     ####### PCA #######
+
+    def __init__(self):
+        self.method_table = {
+            "chi2": chi2,
+            "f_classif": f_classif,
+            "mutual_info_classif": mutual_info_classif
+        }
+
     def getPCA(self, data ,n_components, n_features_per_component=10):
         pca = PCA(n_components=n_components, svd_solver='full')
         pca.fit(data)
@@ -26,8 +36,8 @@ class DimensionalityReducer:
 
 
     ####### FEATURE SELECTION BY STATISTICS #######
-    def getFeatures(self, data, k=20):
-        selector = SelectKBest(chi2, k=k)
+    def getFeatures(self,  data, k=20, m="chi2"):
+        selector = SelectKBest(self.method_table[m], k=k)
         selector.fit(data.expressions, data.labels)
         # sort and select features
         # [::-1] reverses an 1d array in numpy
@@ -35,15 +45,15 @@ class DimensionalityReducer:
 
         return indices, data.expressions[:,indices]
 
-    def getNormalizedFeatures(self, sick, healthy, method, k=20, n=5000):
+    def getNormalizedFeatures(self, sick, healthy, normalization, k=20, n=5000, m="chi2"):
         options = {
             'substract': self.getNormalizedFeaturesS,
             'exclude' : self.getNormalizedFeaturesE,
         }
-        return options[method](sick, healthy, k, n)
+        return options[normalization](sick, healthy, k, n, m)
 
-    def getNormalizedFeaturesS(self, sick, healthy, k, n):
-        selector = SelectKBest(chi2, k="all")
+    def getNormalizedFeaturesS(self, sick, healthy, k, n, m):
+        selector = SelectKBest(self.method_table[m], k="all")
         selector.fit(healthy.expressions, healthy.labels)
         healthy_scores = selector.scores_
         healthy_scores /= max(healthy_scores)
@@ -57,12 +67,12 @@ class DimensionalityReducer:
 
         return indices, sick.expressions[:,indices], healthy.expressions[:,indices]
 
-    def getNormalizedFeaturesE(self, sick, healthy, k, n):
-        selector = SelectKBest(chi2, k=n)
+    def getNormalizedFeaturesE(self, sick, healthy, k, n, m):
+        selector = SelectKBest(self.method_table[m], k=n)
         selector.fit(healthy.expressions, healthy.labels)
         h_indices = selector.get_support(indices=True)
 
-        selector = SelectKBest(chi2, k=n+k)
+        selector = SelectKBest(self.method_table[m], k=n+k)
         selector.fit(sick.expressions, sick.labels)
         s_indices = selector.get_support(indices=True)
 
