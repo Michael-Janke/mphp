@@ -29,6 +29,7 @@ class DataSelection extends Component {
         title={"Statistics"}
         data={this.props.statistics}
         DataViewer={withTheme(DataViewer)}
+        width="100%"
       />
     );
   }

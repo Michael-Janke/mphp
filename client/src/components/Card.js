@@ -1,5 +1,9 @@
 import React, { Component } from "react";
-import { Card as _Card, CardTitle as _CardTitle, CardText as _CardText } from "material-ui/Card";
+import {
+  Card as _Card,
+  CardTitle as _CardTitle,
+  CardText as _CardText
+} from "material-ui/Card";
 import Spinner from "./Spinner";
 import styled from "styled-components";
 
@@ -7,10 +11,10 @@ const CARD_TITLE_HEIGHT = 15;
 
 class Card extends Component {
   render() {
-    const { title, data } = this.props;
+    const { title, data, width } = this.props;
     const isLoading = !data;
     return (
-      <StyledCard zDepth={1}>
+      <StyledCard zDepth={1} width={width}>
         <StyledCardTitle>
           <StyledTitleText>{title}</StyledTitleText>
           {isLoading ? <Spinner size={CARD_TITLE_HEIGHT} /> : null}
@@ -32,7 +36,7 @@ class Card extends Component {
 }
 
 const StyledCard = styled(_Card)`
-  width: fit-content;
+  width: ${props => props.width || "fit-content"};
   margin: ${props => props.theme.mediumSpace};
   padding: ${props => props.theme.mediumSpace};
   padding-top: ${props => props.theme.smallSpace};
