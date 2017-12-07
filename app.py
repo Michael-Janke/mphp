@@ -46,6 +46,56 @@ def getPlotData():
 
     return json.dumps(response)
 
+@app.route("/getAlgorithms", methods=["GET"])
+def algorithms():
+    response = {
+        'algorithms': [
+            {
+                "name": 'PCA',
+                "parameters": [
+                    "components",
+                    "featuresPerComponent"
+                ],
+                "key": "getPCA"
+            },
+            {
+                "name": 'Decision Tree',
+                "parameters": ["k"],
+                "key": "getDecisionTreeFeatures"
+            },
+            {
+                "name":'Feature Selection Normalization:Exclude',
+                "parameters": [
+                    "k",
+                    "n"
+                ],
+                "key": "getNormalizedFeaturesE"
+            },
+            {
+                "name":'Feature Selection Normalization:Substract',
+                "parameters": [
+                    "k",
+                    "n"
+                ],
+                "key": "getNormalizedFeaturesS"
+            },
+            {
+                "name": "Feature Selection",
+                "parameters": [
+                    "k"
+                ],
+                "key": "getFeatures"
+            }
+        ],
+
+    }
+
+    return json.dumps(response)
+
+@app.route("/runAlgorithm", methods=["POST"])
+def runSpecificAlgorithm():
+    return runAlgorithm(request.args.get("algorithm",""))
+
 @app.route('/statistics', methods=["GET"])
 def getStatistics():
     statistics = dataLoader.getStatistics()
