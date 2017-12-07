@@ -8,7 +8,7 @@ const CARD_TITLE_HEIGHT = 15;
 class Card extends Component {
   render() {
     const { title, data } = this.props;
-    const isLoading = data === null;
+    const isLoading = !data;
     return (
       <StyledCard zDepth={1}>
         <StyledCardTitle>

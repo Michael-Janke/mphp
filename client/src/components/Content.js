@@ -4,6 +4,8 @@ import Statistics from "./cards/Statistics";
 import Plot from "./cards/Plot";
 import Data from "./cards/Data";
 import styled from "styled-components";
+import SelectDataset from "./cards/SelectDataset";
+import DataSelection from "./cards/DataSelection";
 
 class Content extends Component {
   constructor(props) {
@@ -14,6 +16,8 @@ class Content extends Component {
   render() {
     return (
       <StyledContent className="content">
+        <SelectDataset title="Your Dataset:" data="DATA SET 4" />
+        <DataSelection />
         <div className="menu">
           <StyledButton
             label="Show statistics"
