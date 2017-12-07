@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { Card, CardTitle, CardText } from "material-ui/Card";
+import { Card as _Card, CardTitle as _CardTitle, CardText as _CardText } from "material-ui/Card";
 import Spinner from "./Spinner";
 import styled from "styled-components";
 
 const CARD_TITLE_HEIGHT = 15;
 
-class Content extends Component {
+class Card extends Component {
   render() {
     const { title, data } = this.props;
     const isLoading = !data;
@@ -31,7 +31,7 @@ class Content extends Component {
   }
 }
 
-const StyledCard = styled(Card)`
+const StyledCard = styled(_Card)`
   width: fit-content;
   margin: ${props => props.theme.mediumSpace};
   padding: ${props => props.theme.mediumSpace};
@@ -39,7 +39,7 @@ const StyledCard = styled(Card)`
   padding-bottom: ${props => props.theme.smallSpace};
 `;
 
-const StyledCardTitle = styled(CardTitle)`
+const StyledCardTitle = styled(_CardTitle)`
   display: flex;
   align-items: center;
   height: ${CARD_TITLE_HEIGHT};
@@ -49,8 +49,8 @@ const StyledTitleText = styled.p`
   margin-right: ${props => props.theme.mediumSpace};
 `;
 
-const StyledError = styled(CardText)`
+const StyledError = styled(_CardText)`
   color: red !important;
 `;
 
-export default Content;
+export default Card;

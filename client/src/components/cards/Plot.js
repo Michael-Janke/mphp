@@ -57,11 +57,11 @@ class DataViewer extends Component {
         y: plotData.data[key][1],
         z: plotData.data[key][2],
         marker: {
-          size: 6,
+          size: 4,
           color: colors[index],
           line: {
             color: "black",
-            width: 0.2
+            width: 0.1
           },
           opacity: 1
         }
@@ -85,6 +85,10 @@ class DataViewer extends Component {
         zaxis: {
           title: plotData.genes[2]
         }
+      },
+      legend: {
+        yanchor: "middle",
+        y: 0.7
       }
     };
     return <Plot data={data} layout={layout} />;
