@@ -51,6 +51,7 @@ const StyledCardTitle = styled(_CardTitle)`
 
 const StyledTitleText = styled.p`
   margin-right: ${props => props.theme.mediumSpace};
+  font-size: ${props => props.theme.h2};
 `;
 
 const StyledError = styled(_CardText)`
