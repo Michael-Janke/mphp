@@ -40,7 +40,6 @@ class Header extends Component {
 const StyledHeaderContainer = styled.div`
   display: flex;
   flex-direction: column;
-  position: fixed;
   width: 100%;
   z-index: 9001; /* The z-index is over 9000! */
 `;

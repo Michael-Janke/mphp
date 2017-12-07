@@ -15,7 +15,7 @@ class Content extends Component {
 
   render() {
     return (
-      <StyledContent className="content">
+      <div className="content">
         <SelectDataset title="Your Dataset:" data="DATA SET 4" />
         <DataSelection />
         <div className="menu">
@@ -42,7 +42,7 @@ class Content extends Component {
           />
         </div>
         <StyledCards>{this.state.cards.map(this.renderCard)}</StyledCards>
-      </StyledContent>
+      </div>
     );
   }
 
@@ -54,11 +54,6 @@ class Content extends Component {
     this.setState({ cards: [...this.state.cards, Card] });
   }
 }
-
-const StyledContent = styled.div`
-  position: relative;
-  top: ${props => props.theme.totalHeaderHeight};
-`;
 
 const StyledButton = styled(RaisedButton)`
   && {
