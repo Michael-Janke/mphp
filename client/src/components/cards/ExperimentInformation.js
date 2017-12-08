@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import styled from "styled-components";
 import Card from "../Card";
 
 class SelectDataset extends Component {
@@ -16,12 +15,8 @@ class SelectDataset extends Component {
 
 class DataViewer extends Component {
   render() {
-    return <StyledContent>Data Set: {this.props.dataset}</StyledContent>;
+    return <div>Data Set: {this.props.dataset}</div>;
   }
 }
-
-const StyledContent = styled.p`
-  margin-left: 16px;
-`;
 
 export default SelectDataset;
