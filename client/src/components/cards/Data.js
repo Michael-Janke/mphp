@@ -15,8 +15,9 @@ class Data extends Component {
     return (
       <Card
         title={"Some Data"}
-        data={this.props.someData}
         DataViewer={DataViewer}
+        isLoading={!this.props.someData}
+        viewerProps={{ data: this.props.someData }}
       />
     );
   }

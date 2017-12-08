@@ -37,8 +37,9 @@ class InteractivePlot extends Component {
     return (
       <Card
         title={"Interactive Plots"}
-        data={this.props.plot}
         DataViewer={withTheme(DataViewer)}
+        viewerProps={{ data: this.props.plot }}
+        isLoading={!this.props.plot}
       />
     );
   }
