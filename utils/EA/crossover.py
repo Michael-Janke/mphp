@@ -1,5 +1,5 @@
 from random import random, randint, sample
-from config import prob_crossover as default_prob
+from .config import prob_crossover as default_prob
 
 def one_point_crossover(indiv_1, indiv_2, prob_crossover = default_prob):
     if random() < prob_crossover:

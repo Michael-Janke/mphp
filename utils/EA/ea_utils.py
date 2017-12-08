@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from operator import itemgetter
 
-from config import maximization
+from .config import maximization
 
 ### UTILS ###
 def best_indiv(population):

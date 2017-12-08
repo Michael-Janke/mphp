@@ -1,5 +1,5 @@
 from random import random
-from config import prob_mutation as default_prob
+from .config import prob_mutation as default_prob
 
 def binary_mutation(indiv, prob_mutation = default_prob):
     chromosome = indiv[0][:]

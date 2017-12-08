@@ -1,6 +1,3 @@
-import mutation
-import crossover
-
 ### General ###
 maximization = True
 runs = 1
@@ -13,8 +10,8 @@ elite_percentage = 0.1
 
 
 ### METHODS ###
-mutation = mutation.binary_mutation
-crossover = crossover.one_point_crossover
+mutation = "binary_simple"
+crossover = "one_point"
 
 ### Restart ####
 should_restart = False

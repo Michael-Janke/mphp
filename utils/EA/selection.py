@@ -1,6 +1,6 @@
 from random import sample
 from operator import itemgetter
-from config import maximization, tour_size, elite_percentage
+from .config import maximization, tour_size, elite_percentage
 
 # Parents Selection: tournament
 def tournament(population):

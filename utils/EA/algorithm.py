@@ -6,16 +6,16 @@ import numpy as np
 from copy import deepcopy
 from random import seed
 
-from population import generate_population
-from selection import tournament, elitism
-from ea_utils import best_indiv, average_indiv
-import config as c
+from .population import generate_population
+from .selection import tournament, elitism
+from .ea_utils import best_indiv, average_indiv
 
-def run(size_cromo, fitness_func):
+
+def run(c, size_cromo, fitness_func, crossover, mutation):
     statistics = []
     for i in range(c.runs):
         seed(i)
-        best, stat_best, _ = ea_for_plot(size_cromo, fitness_func)
+        best, stat_best, _ = ea_for_plot(c, size_cromo, fitness_func, crossover, mutation)
         print(best)
         statistics.append(stat_best)
 
@@ -30,7 +30,7 @@ def run(size_cromo, fitness_func):
     return best, aver_gener
 
 # Return the best individual, best by generations, average population by generation
-def ea_for_plot(size_cromo, fitness_func):
+def ea_for_plot(c, size_cromo, fitness_func, crossover, mutation):
     # initialize population: indiv = (cromo,fit)
     population = generate_population(size_cromo)
     population = [(indiv[0], fitness_func(indiv)) for indiv in population]
@@ -59,13 +59,13 @@ def ea_for_plot(size_cromo, fitness_func):
         for j in range(0, c.population_size-1, 2):
             cromo_1 = mate_pool[j]
             cromo_2 = mate_pool[j+1]
-            children = c.crossover(cromo_1, cromo_2)
+            children = crossover(cromo_1, cromo_2)
             parents.extend(children) 
 
         # ------ Mutation
         descendents = []
         for indiv in parents:
-            new_indiv = c.mutation(indiv)
+            new_indiv = mutation(indiv)
             descendents.append( (new_indiv[0], fitness_func(new_indiv)) )
         
         # New population

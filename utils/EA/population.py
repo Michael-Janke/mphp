@@ -1,5 +1,6 @@
+import numpy as np
 from random import randint
-from config import population_size
+from .config import population_size
 
 ### POPULATION CREATION ###
 def generate_population(size_cromo, size_pop = population_size):
@@ -15,4 +16,4 @@ def generate_indiv(size_cromo):
 def phenotype(indiv):
     #should return indices of ones
     selected_features = [i for i, x in enumerate(indiv[0]) if x == 1]
-    return selected_features
+    return np.array(selected_features)

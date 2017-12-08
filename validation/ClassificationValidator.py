@@ -6,7 +6,6 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 
 from sklearn.model_selection import cross_val_score
-from sklearn.metrics import f1_score
 
 class ClassificationValidator():
 
