@@ -29,7 +29,11 @@ class DataSelection extends Component {
         title={"Data Selection"}
         DataViewer={withTheme(DataViewer)}
         isLoading={!this.props.statistics}
-        viewerProps={{ data: this.props.statistics }}
+        viewerProps={{
+          data: this.props.statistics,
+          tcgaTokens: this.props.tcgaTokens,
+          tissueTypes: this.props.tissueTypes
+        }}
       />
     );
   }
@@ -38,13 +42,14 @@ class DataSelection extends Component {
 class DataViewer extends Component {
   render() {
     const chartOptions = {
-      width: 600,
-      height: 300,
+      width: 100 * this.props.tcgaTokens.filter(token => token.selected).length,
+      height: 400,
       data: this.parseData(),
       margin: { top: 5, right: 30, left: 20, bottom: 5 }
     };
     return (
       <StyledRoot>
+        <TcgaSelection data={this.props.data} />
         <BarChart {...chartOptions}>
           <XAxis dataKey="name" />
           <YAxis />
@@ -53,21 +58,21 @@ class DataViewer extends Component {
           <Legend />
           {this.renderBars()}
         </BarChart>
-        <TcgaSelection data={this.props.data} />
       </StyledRoot>
     );
   }
 
   parseData() {
-    const { data } = this.props;
-    return Object.keys(data).map(tcgaToken => {
+    const { data, tcgaTokens, tissueTypes } = this.props;
+    const currentTcgaTokens = tcgaTokens.filter(token => token.selected);
+    return currentTcgaTokens.map(tcgaToken => {
       return {
-        name: tcgaToken,
-        NT: data[tcgaToken]["NT"],
-        TR: data[tcgaToken]["TR"],
-        TM: data[tcgaToken]["TM"],
-        TB: data[tcgaToken]["TB"],
-        TP: data[tcgaToken]["TP"]
+        name: tcgaToken.name,
+        NT: data[tcgaToken.name]["NT"],
+        TR: data[tcgaToken.name]["TR"],
+        TM: data[tcgaToken.name]["TM"],
+        TB: data[tcgaToken.name]["TB"],
+        TP: data[tcgaToken.name]["TP"]
       };
     });
   }
@@ -93,7 +98,9 @@ const StyledRoot = styled.div`
 
 const mapStateToProps = state => {
   return {
-    statistics: state.statistics
+    statistics: state.statistics,
+    tcgaTokens: state.dataSelection.tcgaTokens,
+    tissueTypes: state.dataSelection.tissueTypes
   };
 };
 
