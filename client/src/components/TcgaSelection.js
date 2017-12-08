@@ -26,7 +26,7 @@ class TcgaSelection extends PureComponent {
     return (
       <StyledRoot>
         <StyledList>
-          <Subheader>Cancer Type</Subheader>
+          <Subheader>Cancer Types</Subheader>
           {tcgaTokens.map(tcgaToken => (
             <StyledButton
               label={tcgaToken.name}
@@ -34,11 +34,12 @@ class TcgaSelection extends PureComponent {
               value={tcgaToken.name}
               onClick={() => this.transferTcgaToken(tcgaToken)}
               selected={tcgaToken.selected}
+              primary={tcgaToken.selected}
             />
           ))}
         </StyledList>
         <StyledList>
-          <Subheader>Tissue Type</Subheader>
+          <Subheader>Tissue Types</Subheader>
           {tissueTypes.map(tissueType => (
             <StyledButton
               label={tissueType.name}
@@ -46,6 +47,7 @@ class TcgaSelection extends PureComponent {
               value={tissueType.name}
               onClick={() => this.transferTissueType(tissueType)}
               selected={tissueType.selected}
+              primary={tissueType.selected}
             />
           ))}
         </StyledList>
@@ -63,7 +65,7 @@ const StyledButton = styled(RaisedButton)`
   button {
     background-color: ${props =>
       props.selected
-        ? props.theme.slightlyBoringBlue
+        ? props.theme.boringBlue
         : props.theme.lightGray} !important;
   }
 `;
