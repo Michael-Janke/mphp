@@ -39,17 +39,16 @@ def ea_for_plot(c, size_cromo, fitness_func, crossover, mutation):
     
     gen_without_improvement = 0
     current_best = c.max_fitness
-    
     for i in range(c.generations):
         old_pop = deepcopy(population)
 
         if c.should_restart and gen_without_improvement == c.restart_generations:
-            gen_without_improvement=0
-            old_pop_size = int(len(population)*(1-c.immigrant_perc))
-            population = population[0:old_pop_size]
+            gen_without_improvement = 0
+            old_pop_size = int(len(population) * (1 - c.immigrant_perc))
+            population = population[ 0 : old_pop_size ]
             immigrants = generate_population(c.population_size - old_pop_size)
             [population.append(immigrant) for immigrant in immigrants]
-            population = [(indiv[0], fitness_func(indiv[0])) for indiv in population]
+            population = [ (indiv[0], fitness_func(indiv)) for indiv in population ]
 
         mate_pool = tournament(population)
         # Variation
@@ -68,7 +67,7 @@ def ea_for_plot(c, size_cromo, fitness_func, crossover, mutation):
             descendents.append( (new_indiv[0], fitness_func(new_indiv)) )
         
         # New population
-        population = elitism(old_pop, descendents)        
+        population = elitism(old_pop, descendents)
         population = [(indiv[0], fitness_func(indiv)) for indiv in population]
     
         # Statistics
@@ -77,6 +76,8 @@ def ea_for_plot(c, size_cromo, fitness_func, crossover, mutation):
 
         # Check if solution improved in this generation
         best_fitness = best_indiv(population)[1]
+        print(best_fitness)
+
         if best_fitness == c.max_fitness:
             #fill stat with zeros to allow plot to show values until final generation
             while len(stat) < c.generations:

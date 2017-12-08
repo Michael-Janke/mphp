@@ -1,3 +1,4 @@
+import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_val_score
 
@@ -14,16 +15,15 @@ def fitness(sick_data, sick_labels, healthy_data, healthy_labels):
 def evaluate(sick_data, sick_labels, healthy_data, healthy_labels):
     clf = DecisionTreeClassifier()
 
-    if sick_data.shape[1] > 20:
-        return 0
+    if sick_data.shape[1] > 10:
+        return -10
     else:
         sick_scores = cross_val_score(clf, sick_data, sick_labels, cv=5, scoring="f1_micro")
-        fitness_score = 2 * sick_scores.mean() - sick_scores.std()
+        fitness_score = sick_scores.mean() - sick_scores.std()
 
         healthy_scores = cross_val_score(clf, healthy_data, healthy_labels, cv=5, scoring="f1_micro")
-        fitness_score -= healthy_scores.mean() - healthy_scores.std()
+        fitness_score -= 2*healthy_scores.mean() - healthy_scores.std()
 
-        if sick_data.shape[1] > 5:
-            fitness_score -= 1
+        #fitness_score -= np.log10(sick_data.shape[1])
 
         return fitness_score

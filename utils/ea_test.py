@@ -23,13 +23,12 @@ gene_labels = dataLoader.getGeneLabels()
 print("got data")
 
 # %%
-chromo_size = 100
-selected_genes, sick_X, healthy_X = dimReducer.getNormalizedFeatures(sick,healthy,"exclude", chromo_size)
+chromo_size = c.chromo_size
+selected_genes, sick_X, healthy_X = dimReducer.getNormalizedFeatures(sick,healthy,"substract", chromo_size, chromo_size)
 print("preselected genes")
 
 
 #%%
-
 ### PARAMS FOR EA
 if c.crossover == "uniform":
     crossover = uniform_crossover
@@ -45,10 +44,13 @@ fitness_function = fitness(sick_X, sick.labels, healthy_X, healthy.labels)
 best, stat, stat_aver = ea_for_plot(c, chromo_size, fitness_function, crossover, mutation)
 
 display_stat_1(stat, stat_aver)
+print(best[0])
 print(phenotype(best), best[1])
-
 
 
 # %%
 features = selected_genes[phenotype(best)]
 print(features)
+
+#%%
+selected_genes.shape
