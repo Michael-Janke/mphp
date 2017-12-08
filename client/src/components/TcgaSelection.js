@@ -13,7 +13,6 @@ import {
 class TcgaSelection extends PureComponent {
   transferTcgaToken(tcgaToken) {
     this.props.toggleToken(tcgaToken);
-    // switch item between the two lists
   }
 
   transferTissueType(tissueType) {
@@ -21,20 +20,9 @@ class TcgaSelection extends PureComponent {
   }
 
   render() {
-    const tcgaTokens = Object.keys(this.props.data);
-    const selectedTcgaTokens = this.props.tcgaTokens;
-    const notSelectedTcgaTokens = tcgaTokens.filter(
-      x => selectedTcgaTokens.indexOf(x) === -1
-    );
-
-    const tissueTypes = Object.keys(this.props.data[tcgaTokens[0]]);
-    tissueTypes.push("healthy");
-    tissueTypes.push("sick");
-    tissueTypes.push("all");
-    const selectedTissueTypes = this.props.tissueTypes;
-    const notSelectedTissueTypes = tissueTypes.filter(
-      x => selectedTissueTypes.indexOf(x) === -1
-    );
+    console.log("test");
+    const tcgaTokens = this.props.tcgaTokens;
+    const tissueTypes = this.props.tissueTypes;
 
     return (
       <StyledRoot>
@@ -42,11 +30,11 @@ class TcgaSelection extends PureComponent {
           <Subheader>Cancer Type</Subheader>
           {tcgaTokens.map(tcgaToken => (
             <StyledButton
-              key={tcgaToken}
-              label={tcgaToken}
+              label={tcgaToken.name}
+              key={tcgaToken.name}
+              value={tcgaToken.name}
               onClick={() => this.transferTcgaToken(tcgaToken)}
-              value={tcgaToken}
-              selected={selectedTcgaTokens.indexOf(tcgaToken) >= 0}
+              selected={tcgaToken.selected}
             />
           ))}
         </StyledList>
@@ -54,11 +42,11 @@ class TcgaSelection extends PureComponent {
           <Subheader>Tissue Type</Subheader>
           {tissueTypes.map(tissueType => (
             <StyledButton
-              key={tissueType}
-              label={tissueType}
+              label={tissueType.name}
+              key={tissueType.name}
+              value={tissueType.name}
               onClick={() => this.transferTissueType(tissueType)}
-              value={tissueType}
-              selected={selectedTissueTypes.indexOf(tissueType) >= 0}
+              selected={tissueType.selected}
             />
           ))}
         </StyledList>
@@ -72,6 +60,7 @@ const StyledRoot = styled.div`
 `;
 
 const StyledButton = styled(RaisedButton)`
+  margin: 1px;
   button {
     background-color: ${props =>
       props.selected
