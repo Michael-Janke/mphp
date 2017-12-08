@@ -15,8 +15,7 @@ def run(c, size_cromo, fitness_func, crossover, mutation):
     statistics = []
     for i in range(c.runs):
         seed(i)
-        best, stat_best, _ = ea_for_plot(c, size_cromo, fitness_func, crossover, mutation)
-        print(best)
+        _, stat_best, _ = ea_for_plot(c, size_cromo, fitness_func, crossover, mutation)
         statistics.append(stat_best)
 
     stat_gener = list(zip(*statistics))
@@ -69,8 +68,8 @@ def ea_for_plot(c, size_cromo, fitness_func, crossover, mutation):
             descendents.append( (new_indiv[0], fitness_func(new_indiv)) )
         
         # New population
-        population = elitism(old_pop, descendents)
-        population = [(indiv[0], fitness_func(indiv[0])) for indiv in population]
+        population = elitism(old_pop, descendents)        
+        population = [(indiv[0], fitness_func(indiv)) for indiv in population]
     
         # Statistics
         stat.append(best_indiv(population)[1])

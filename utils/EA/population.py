@@ -8,7 +8,11 @@ def generate_population(size_cromo, size_pop = population_size):
 
 def generate_indiv(size_cromo):
     # random initialization
-    indiv = [randint(0, 1) for i in range(size_cromo)]
+    indiv = [0 for i in range(size_cromo)]
+
+    for i in range(10):
+        indiv[randint(0,size_cromo-1)] = 1
+
     return indiv
 
 

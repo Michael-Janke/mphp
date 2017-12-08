@@ -7,6 +7,7 @@ from utils.EA.mutation import *
 from utils.EA.algorithm import ea_for_plot, run
 from utils.EA.fitness import fitness
 from utils.EA.ea_utils import display_stat_1
+from utils.EA.population import phenotype
 import utils.EA.config as c
 
 print("import successful")
@@ -44,4 +45,10 @@ fitness_function = fitness(sick_X, sick.labels, healthy_X, healthy.labels)
 best, stat, stat_aver = ea_for_plot(c, chromo_size, fitness_function, crossover, mutation)
 
 display_stat_1(stat, stat_aver)
-print(best)
+print(phenotype(best), best[1])
+
+
+
+# %%
+features = selected_genes[phenotype(best)]
+print(features)
