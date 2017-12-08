@@ -3,8 +3,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 
 def getColor(index):
-        colors = ["blue","red","green","yellow","orange","black","grey","purple"]
-
+        colors = "bgrcmyk"
         return colors[index%len(colors)]
 
 def plotScatter(data, labels, gene_labels = ["PC1","PC2","PC3"]):
