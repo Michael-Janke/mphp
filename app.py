@@ -46,7 +46,7 @@ def getPlotData():
 
     return json.dumps(response)
 
-@app.route("/getAlgorithms", methods=["GET"])
+@app.route("/algorithms", methods=["GET"])
 def algorithms():
     response = {
         'algorithms': [
