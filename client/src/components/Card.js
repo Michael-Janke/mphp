@@ -43,7 +43,7 @@ const StyledCard = styled(_Card)`
 const StyledCardTitle = styled(CardTitle)`
   display: flex;
   align-items: center;
-  height: ${CARD_TITLE_HEIGHT};
+  height: ${CARD_TITLE_HEIGHT}px;
 `;
 
 const StyledTitleText = styled.p`

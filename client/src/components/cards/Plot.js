@@ -8,8 +8,6 @@ import { withTheme } from "styled-components";
 import Card from "../Card";
 import { load } from "../../actions/plotActions";
 
-const colors = ["red", "blue", "green", "yellow", "magenta", "brown"];
-
 let Plot;
 loadScript("https://cdn.plot.ly/plotly-latest.min.js", function(err, script) {
   if (err) {
@@ -59,7 +57,7 @@ class DataViewer extends Component {
         z: plotData.data[key][2],
         marker: {
           size: 4,
-          color: colors[index],
+          color: this.props.theme.statisticsColors[index],
           line: {
             color: "black",
             width: 0.1

@@ -42,6 +42,7 @@ const StyledHeaderContainer = styled.div`
   flex-direction: column;
   width: 100%;
   z-index: 9001; /* The z-index is over 9000! */
+  overflow: hidden;
 `;
 
 const StyledHeader = styled.div`
