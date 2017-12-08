@@ -2,6 +2,7 @@ import React, { PureComponent } from "react";
 import styled from "styled-components";
 import RaisedButton from "material-ui/RaisedButton";
 import { List } from "material-ui/List";
+import Subheader from "material-ui/Subheader";
 import { connect } from "react-redux";
 
 import {
@@ -38,57 +39,27 @@ class TcgaSelection extends PureComponent {
     return (
       <StyledRoot>
         <StyledList>
-          <label>Not selected Tcga</label>
-          {notSelectedTcgaTokens.map(tcgaToken => (
+          <Subheader>Cancer Type</Subheader>
+          {tcgaTokens.map(tcgaToken => (
             <StyledButton
-              primary={true}
               key={tcgaToken}
+              label={tcgaToken}
               onClick={() => this.transferTcgaToken(tcgaToken)}
               value={tcgaToken}
-            >
-              {tcgaToken}
-            </StyledButton>
+              selected={selectedTcgaTokens.indexOf(tcgaToken) >= 0}
+            />
           ))}
         </StyledList>
         <StyledList>
-          <label>Selected Tcga</label>
-          {selectedTcgaTokens.map(tcgaToken => (
+          <Subheader>Tissue Type</Subheader>
+          {tissueTypes.map(tissueType => (
             <StyledButton
-              secondary={true}
-              key={tcgaToken}
-              onClick={() => this.transferTcgaToken(tcgaToken)}
-              value={tcgaToken}
-              selected={true}
-            >
-              {tcgaToken}
-            </StyledButton>
-          ))}
-        </StyledList>
-        <StyledList>
-          <label>Not selected Tissue</label>
-          {notSelectedTissueTypes.map(tissueType => (
-            <StyledButton
-              primary={true}
               key={tissueType}
+              label={tissueType}
               onClick={() => this.transferTissueType(tissueType)}
               value={tissueType}
-            >
-              {tissueType}
-            </StyledButton>
-          ))}
-        </StyledList>
-        <StyledList>
-          <label>Selected Tissue</label>
-          {selectedTissueTypes.map(tissueType => (
-            <StyledButton
-              secondary={true}
-              key={tissueType}
-              onClick={() => this.transferTissueType(tissueType)}
-              value={tissueType}
-              selected={true}
-            >
-              {tissueType}
-            </StyledButton>
+              selected={selectedTissueTypes.indexOf(tissueType) >= 0}
+            />
           ))}
         </StyledList>
       </StyledRoot>
@@ -104,8 +75,8 @@ const StyledButton = styled(RaisedButton)`
   button {
     background-color: ${props =>
       props.selected
-        ? props.theme.leafGreen
-        : props.theme.boringBlue} !important;
+        ? props.theme.slightlyBoringBlue
+        : props.theme.lightGray} !important;
   }
 `;
 
@@ -113,6 +84,7 @@ const StyledList = styled(List)`
   display: flex;
   flex-direction: column;
   margin: 0px 16px;
+  width: 120px;
 `;
 
 const mapStateToProps = state => {
