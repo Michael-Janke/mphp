@@ -1,9 +1,5 @@
 import React, { Component } from "react";
-import {
-  Card as _Card,
-  CardTitle as _CardTitle,
-  CardText as _CardText
-} from "material-ui/Card";
+import { Card as _Card, CardTitle, CardText } from "material-ui/Card";
 import Spinner from "./Spinner";
 import styled from "styled-components";
 
@@ -29,7 +25,9 @@ class Card extends Component {
     return isError ? (
       <StyledError>{`${viewerProps.data.error}`}</StyledError>
     ) : (
-      <DataViewer {...viewerProps} />
+      <CardText>
+        <DataViewer {...viewerProps} />
+      </CardText>
     );
   }
 }
@@ -42,7 +40,7 @@ const StyledCard = styled(_Card)`
   padding-bottom: ${props => props.theme.smallSpace};
 `;
 
-const StyledCardTitle = styled(_CardTitle)`
+const StyledCardTitle = styled(CardTitle)`
   display: flex;
   align-items: center;
   height: ${CARD_TITLE_HEIGHT};
@@ -53,7 +51,7 @@ const StyledTitleText = styled.p`
   font-size: ${props => props.theme.h2};
 `;
 
-const StyledError = styled(_CardText)`
+const StyledError = styled(CardText)`
   color: red !important;
 `;
 
