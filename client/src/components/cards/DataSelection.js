@@ -27,8 +27,9 @@ class DataSelection extends Component {
     return (
       <Card
         title={"Data Selection"}
-        data={this.props.statistics}
         DataViewer={withTheme(DataViewer)}
+        isLoading={!this.props.statistics}
+        viewerProps={{ data: this.props.statistics }}
       />
     );
   }

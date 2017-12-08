@@ -11,8 +11,7 @@ const CARD_TITLE_HEIGHT = 15;
 
 class Card extends Component {
   render() {
-    const { title, data, width } = this.props;
-    const isLoading = !data;
+    const { title, isLoading, width } = this.props;
     return (
       <StyledCard zDepth={1} width={width}>
         <StyledCardTitle>
@@ -25,12 +24,12 @@ class Card extends Component {
   }
 
   renderContent() {
-    const { data, DataViewer } = this.props;
-    const isError = data && data.isError;
+    const { DataViewer, viewerProps } = this.props;
+    const isError = viewerProps.data && viewerProps.data.isError;
     return isError ? (
-      <StyledError>{`${data.error}`}</StyledError>
+      <StyledError>{`${viewerProps.data.error}`}</StyledError>
     ) : (
-      <DataViewer data={data} />
+      <DataViewer {...viewerProps} />
     );
   }
 }

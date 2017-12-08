@@ -7,8 +7,8 @@ class SelectDataset extends Component {
     return (
       <Card
         title="Experiment Information"
-        data={this.props.data}
         DataViewer={DataViewer}
+        viewerProps={{ ...this.props.data }}
       />
     );
   }
@@ -16,7 +16,7 @@ class SelectDataset extends Component {
 
 class DataViewer extends Component {
   render() {
-    return <StyledContent>Data Set: {this.props.data.dataset}</StyledContent>;
+    return <StyledContent>Data Set: {this.props.dataset}</StyledContent>;
   }
 }
 
