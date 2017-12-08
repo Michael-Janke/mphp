@@ -2,10 +2,8 @@
 EA algorithm for binary genotypes with restart and immigrants
 """
 
-
-from copy import deepcopy
-from config import *
 import numpy as np
+from copy import deepcopy
 
 def run(numb_runs,numb_generations,size_pop, size_cromo, prob_mut, prob_cross,sel_parents,recombination,mutation,sel_survivors, fitness_func, gen_function, fix_func,givens):
     statistics = []

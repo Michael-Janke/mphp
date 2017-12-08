@@ -1,16 +1,15 @@
 from population import phenotype
 
-def fitness(dimension):
+def fitness(data, labels):
     def fitness_(indiv):
-        return evaluate(phenotype(indiv),dimension)
+        pheno = phenotype(indiv)
+        # select features and only pass this data to evaluate
+        selected_data = []
+        
+        return evaluate(selected_data, labels)
     return fitness_
 
-def evaluate(pheno,dimension):
-    conflicts = 0
+def evaluate(data, labels):
+    fitness = 0
 
-    #There are no conflicts inside the sub-boxes as the algorithm is implemented to keep this constraint
-    #conflicts += calculateRowConflicts(pheno,dimension)
-    #conflicts += calculateColumnConflicts(pheno,dimension)
-    #conflicts += calculateDiagonalConflicts(pheno,dimension)
-
-    return conflicts
+    return fitness

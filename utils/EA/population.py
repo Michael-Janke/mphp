@@ -1,7 +1,8 @@
 from random import randint
+from config import population_size
 
 ### POPULATION CREATION ###
-def gera_pop(size_pop,size_cromo):
+def gera_pop(size_cromo, size_pop = population_size):
     return [(gera_indiv(size_cromo),0) for i in range(size_pop)]
 
 def gera_indiv(size_cromo):
@@ -12,5 +13,6 @@ def gera_indiv(size_cromo):
 
 ### CONVERSION ###
 def phenotype(indiv):
-    #should be the same as the genotype
-    return indiv
+    #should return indices of ones
+    selected_features = [i for i,x in enumerate(indiv[0]) if x == 1]
+    return selected_features
