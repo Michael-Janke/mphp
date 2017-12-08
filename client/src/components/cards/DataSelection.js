@@ -65,26 +65,32 @@ class DataViewer extends Component {
   parseData() {
     const { data, tcgaTokens, tissueTypes } = this.props;
     const currentTcgaTokens = tcgaTokens.filter(token => token.selected);
+    const currentTissueTypes = tissueTypes.filter(
+      tissueType => tissueType.selected
+    );
     return currentTcgaTokens.map(tcgaToken => {
-      return {
-        name: tcgaToken.name,
-        NT: data[tcgaToken.name]["NT"],
-        TR: data[tcgaToken.name]["TR"],
-        TM: data[tcgaToken.name]["TM"],
-        TB: data[tcgaToken.name]["TB"],
-        TP: data[tcgaToken.name]["TP"]
-      };
+      const result = { name: tcgaToken.name };
+      currentTissueTypes.forEach(tissueType => {
+        result[tissueType.name] = data[tcgaToken.name][tissueType.name];
+      });
+      return result;
     });
   }
 
   renderBars() {
-    const dataKeys = ["NT", "TR", "TM", "TB", "TP"];
+    const tissueTypesWithColors = this.props.tissueTypes;
+    tissueTypesWithColors.forEach((tissueType, index) => {
+      tissueType.color = this.props.theme.statisticsColors[index];
+    });
+    const dataKeys = tissueTypesWithColors.filter(
+      tissueType => tissueType.selected
+    );
     return dataKeys.map((dataKey, index) => {
       return (
         <Bar
-          key={`bar-${dataKey}`}
-          dataKey={dataKey}
-          fill={this.props.theme.statisticsColors[index]}
+          key={`bar-${dataKey.name}`}
+          dataKey={dataKey.name}
+          fill={dataKey.color}
         />
       );
     });

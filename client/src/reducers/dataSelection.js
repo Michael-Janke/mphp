@@ -20,9 +20,9 @@ export function dataSelection(state = initialState, action = {}) {
         name: tissueType,
         selected: true
       }));
-      tissueTypes.push({ name: "healthy", selected: true });
+      /*tissueTypes.push({ name: "healthy", selected: true });
       tissueTypes.push({ name: "sick", selected: true });
-      tissueTypes.push({ name: "all", selected: true });
+      tissueTypes.push({ name: "all", selected: true });*/
 
       return {
         tcgaTokens,
