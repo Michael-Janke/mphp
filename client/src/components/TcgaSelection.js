@@ -20,7 +20,6 @@ class TcgaSelection extends PureComponent {
   }
 
   render() {
-    console.log("test");
     const tcgaTokens = this.props.tcgaTokens;
     const tissueTypes = this.props.tissueTypes;
 
