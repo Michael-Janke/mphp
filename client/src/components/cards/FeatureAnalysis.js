@@ -2,12 +2,12 @@ import React, { Component } from "react";
 import RaisedButton from "material-ui/RaisedButton";
 import SelectField from "material-ui/SelectField";
 import MenuItem from "material-ui/MenuItem";
+import TextField from "material-ui/TextField";
+import styled, { withTheme } from "styled-components";
 import { connect } from "react-redux";
 import { load } from "../../actions/featureAnalysisActions";
 import Card from "../Card";
 import Plot from "./Plot";
-import Data from "./Data";
-import styled from "styled-components";
 
 class FeatureAnalysis extends Component {
   constructor(props) {
@@ -23,7 +23,7 @@ class FeatureAnalysis extends Component {
       <div className="feature-analysis">
         <Card
           title={"Feature Analysis"}
-          DataViewer={DataViewer}
+          DataViewer={withTheme(DataViewer)}
           isLoading={!this.props.algorithms}
           viewerProps={{
             addCard: this.addCard.bind(this),
@@ -35,12 +35,13 @@ class FeatureAnalysis extends Component {
     );
   }
 
-  renderCard(SpecifiedCard, index) {
-    return <SpecifiedCard key={`card-${index}`} />;
+  renderCard(card, index) {
+    const SpecifiedCard = card.component;
+    return <SpecifiedCard key={`card-${index}`} {...card.props} />;
   }
 
-  addCard(SpecifiedCard) {
-    this.setState({ cards: [...this.state.cards, SpecifiedCard] });
+  addCard(card) {
+    this.setState({ cards: [...this.state.cards, card] });
   }
 }
 
@@ -51,33 +52,41 @@ class DataViewer extends Component {
   }
 
   render() {
+    const runnable = this.state.selectedAlgorithm !== null;
     return (
-      <div className="menu">
-        <SelectField
-          floatingLabelText="Algorithm"
-          floatingLabelFixed={true}
-          hintText="Select algorithm..."
-          value={this.state.selectedAlgorithm}
-          onChange={this.selectAlgorithm.bind(this)}
-          autoWidth={true}
-        >
-          {this.props.algorithms.map(this.renderMenuItem)}
-        </SelectField>
+      <StyledMenu>
+        <StyledOptions>
+          <SelectField
+            floatingLabelText="Algorithm"
+            floatingLabelFixed={true}
+            hintText="Select algorithm..."
+            value={runnable ? this.state.selectedAlgorithm.key : null}
+            onChange={this.selectAlgorithm.bind(this)}
+            autoWidth={true}
+            selectedMenuItemStyle={{ color: this.props.theme.boringBlue }}
+          >
+            {this.props.algorithms.map(this.renderMenuItem)}
+          </SelectField>
+          {runnable
+            ? this.state.selectedAlgorithm.parameters.map(
+                this.renderParameter.bind(this)
+              )
+            : null}
+        </StyledOptions>
         <StyledButton
-          label="Show some data"
+          title={
+            runnable
+              ? `Run ${this.state.selectedAlgorithm.name}`
+              : `Please select an algorithm`
+          }
+          label="Run"
           primary={true}
           onClick={() => {
-            this.props.addCard(Data);
+            this.executeAlgorithm();
           }}
+          disabled={!runnable}
         />
-        <StyledButton
-          label="Show some Plots"
-          primary={true}
-          onClick={() => {
-            this.props.addCard(Plot);
-          }}
-        />
-      </div>
+      </StyledMenu>
     );
   }
 
@@ -91,8 +100,39 @@ class DataViewer extends Component {
     );
   }
 
-  selectAlgorithm(event, index, selectedAlgorithm) {
+  renderParameter(parameter, index) {
+    return (
+      <StyledTextField
+        key={`parameter-${index}`}
+        defaultValue={parameter.default}
+        hintText={parameter.default}
+        floatingLabelText={parameter.name}
+        floatingLabelFixed={true}
+        type="number"
+      />
+    );
+  }
+
+  selectAlgorithm(event, index, key) {
+    const selectedAlgorithm = this.props.algorithms.find(
+      algorithm => algorithm.key === key
+    );
     this.setState({ selectedAlgorithm });
+  }
+
+  executeAlgorithm() {
+    const { selectedAlgorithm } = this.state;
+    const cards = {
+      getPCA: Plot,
+      getDecisionTreeFeatures: Plot,
+      getNormalizedFeaturesE: Plot,
+      getNormalizedFeaturesS: Plot,
+      getFeatures: Plot
+    };
+    this.props.addCard({
+      component: cards[selectedAlgorithm.key],
+      props: { route: `/${selectedAlgorithm.key}`, k: 10, n: 5000 }
+    });
   }
 }
 
@@ -103,11 +143,29 @@ const StyledButton = styled(RaisedButton)`
   button {
     background: ${props => props.theme.boringBlue} !important;
   }
+  button:disabled {
+    background: ${props => props.theme.lightGray} !important;
+  }
 `;
 
 const StyledCards = styled.div`
   display: flex;
   flex-wrap: wrap;
+`;
+
+const StyledMenu = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const StyledOptions = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const StyledTextField = styled(TextField)`
+  margin-left: ${props => props.theme.mediumSpace};
 `;
 
 const mapStateToProps = state => {

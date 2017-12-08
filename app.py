@@ -53,36 +53,76 @@ def algorithms():
             {
                 "name": 'PCA',
                 "parameters": [
-                    "components",
-                    "featuresPerComponent"
+                    {
+                        "name": "#Components",
+                        "key": "n_components",
+                        "default": 3
+                    },
+                    {
+                        "name": "#Features per component",
+                        "key": "n_features_per_component",
+                        "default": 10
+                    }
                 ],
                 "key": "getPCA"
             },
             {
                 "name": 'Decision Tree',
-                "parameters": ["k"],
+                "parameters": [
+                    {
+                        "name": "#Features",
+                        "key": "k",
+                        "default": 20
+
+                    }
+                ],
                 "key": "getDecisionTreeFeatures"
             },
             {
                 "name":'Feature Selection Normalization:Exclude',
                 "parameters": [
-                    "k",
-                    "n"
+                    {
+                        "name": "#Features",
+                        "key": "k",
+                        "default": 20
+
+                    },
+                    {
+                        "name": "#Considered features",
+                        "key": "n",
+                        "default": 5000
+
+                    }
                 ],
                 "key": "getNormalizedFeaturesE"
             },
             {
                 "name":'Feature Selection Normalization:Substract',
                 "parameters": [
-                    "k",
-                    "n"
+                    {
+                        "name": "#Features",
+                        "key": "k",
+                        "default": 20
+
+                    },
+                    {
+                        "name": "#Considered features",
+                        "key": "n",
+                        "default": 5000
+
+                    }
                 ],
                 "key": "getNormalizedFeaturesS"
             },
             {
                 "name": "Feature Selection",
                 "parameters": [
-                    "k"
+                    {
+                        "name": "#Features",
+                        "key": "k",
+                        "default": 20
+
+                    }
                 ],
                 "key": "getFeatures"
             }
