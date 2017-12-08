@@ -11,7 +11,17 @@ import { load } from "../../actions/plotActions";
 let Plot;
 loadScript("https://cdn.plot.ly/plotly-latest.min.js", function(err, script) {
   if (err) {
-    // print useful message
+    console.warn(
+      "Could not load plotly script from CDN, trying to load local script..."
+    );
+    loadScript("plotly-1.31.2.min.js", function(err, script) {
+      if (err) {
+        console.warn("Could not load plotly");
+      } else {
+        // note that in IE8 and below loading error wouldn't be reported
+        Plot = createPlotlyComponent(Plotly);
+      }
+    });
   } else {
     // use script
     // note that in IE8 and below loading error wouldn't be reported
