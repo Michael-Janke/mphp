@@ -1,11 +1,11 @@
 import * as types from "./actionTypes";
-import request from "./_request";
+import { postRequest } from "./_request";
 
-export function load() {
+export function load(route, params) {
   return dispatch =>
-    request("/plot").then(plot => {
-      dispatch(_load(plot));
-    });
+    postRequest(route, {
+      algorithm: params
+    }).then(response => dispatch(_load(response)));
 
   function _load(plot) {
     return {

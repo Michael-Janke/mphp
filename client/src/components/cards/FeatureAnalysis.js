@@ -129,9 +129,22 @@ class DataViewer extends Component {
       getNormalizedFeaturesS: Plot,
       getFeatures: Plot
     };
+    const params = {
+      key: "getPCA",
+      cancerTypes: ["LUAD", "THCA"],
+      sickTissueTypes: ["TP"],
+      healthyTissueTypes: ["NT"],
+      parameters: {
+        components: 3,
+        featuresPerComponent: 10
+      }
+    };
     this.props.addCard({
       component: cards[selectedAlgorithm.key],
-      props: { route: `/${selectedAlgorithm.key}`, k: 10, n: 5000 }
+      props: {
+        route: `/runAlgorithm`,
+        params
+      }
     });
   }
 }
