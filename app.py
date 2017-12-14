@@ -1,7 +1,8 @@
 import json
 import numpy as np
+import base64
 
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 from utils.DataLoader import DataLoader
 from utils.DimensionalityReducer import DimensionalityReducer
@@ -134,7 +135,46 @@ def algorithms():
 
 @app.route("/runAlgorithm", methods=["POST"])
 def runSpecificAlgorithm():
-    return runAlgorithm(request.args.get("algorithm",""))
+    # POST key, parameters, cancerTypes, healthyTissueTypes, sickTissueTypes
+    # match to specific algorithm
+    #algorithm = request.args.get("algorithm")
+    algorithm = {
+        "key": "getPCA",
+        "cancerTypes": ["LUAD"],
+        "sickTissueTypes": ["TP"],
+        "healthyTissueTypes": ["NT"],
+        "parameters": {
+            "components": 3,
+            "featuresPerComponent": 10
+            }
+
+    }
+    key = algorithm["key"];
+
+    sick = dataLoader.getData(algorithm["sickTissueTypes"], algorithm["cancerTypes"])
+    healthy = dataLoader.getData(algorithm["healthyTissueTypes"], algorithm["cancerTypes"])
+    data = sick.expressions
+
+    if key == "getPCA":
+        _, X, gene_indices = dimReducer.getPCA(data, algorithm["parameters"]["components"],algorithm["parameters"]["featuresPerComponent"])
+    elif key == "getDecisionTreeFeatures":
+        gene_indices, X = dimReducer.getDecisionTreeFeatures(data, algorithm["parameters"]["k"])
+    elif key == "getNormalizedFeaturesE":
+        gene_indices, X, _ = dimReducer.getNormalizedFeaturesE(sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"])
+    elif key == "getNormalizedFeaturesS":
+        gene_indices, X, _ = dimReducer.getNormalizedFeaturesS(sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"])
+    elif key == "getFeatures":
+        gene_indices, X = dimReducer.getFeatures(data, algorithm["parameters"]["k"])
+
+    data = {}
+    for label in np.unique(sick.labels):
+        data[label] = X[sick.labels==label,:].T.tolist()
+
+    response = {
+        'data': data,
+        'genes': gene_labels[gene_indices].tolist(),
+    }
+    return json.dumps(response)
 
 @app.route('/statistics', methods=["GET"])
 def getStatistics():
