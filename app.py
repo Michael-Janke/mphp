@@ -137,18 +137,18 @@ def algorithms():
 def runSpecificAlgorithm():
     # POST key, parameters, cancerTypes, healthyTissueTypes, sickTissueTypes
     # match to specific algorithm
-    #algorithm = request.args.get("algorithm")
-    algorithm = {
-        "key": "getPCA",
-        "cancerTypes": ["LUAD"],
-        "sickTissueTypes": ["TP"],
-        "healthyTissueTypes": ["NT"],
-        "parameters": {
-            "components": 3,
-            "featuresPerComponent": 10
-            }
-
-    }
+    algorithm = request.args.get("algorithm")
+    # algorithm = {
+    #     "key": "getPCA",
+    #     "cancerTypes": ["LUAD"],
+    #     "sickTissueTypes": ["TP"],
+    #     "healthyTissueTypes": ["NT"],
+    #     "parameters": {
+    #         "components": 3,
+    #         "featuresPerComponent": 10
+    #         }
+    #
+    # }
     key = algorithm["key"];
 
     sick = dataLoader.getData(algorithm["sickTissueTypes"], algorithm["cancerTypes"])
