@@ -18,11 +18,9 @@ export function dataSelection(state = initialState, action = {}) {
         action.statistics[tcgaTokens[0].name]
       ).map(tissueType => ({
         name: tissueType,
-        selected: true
+        selected: true,
+        isHealthy: tissueType[0] === "N"
       }));
-      /*tissueTypes.push({ name: "healthy", selected: true });
-      tissueTypes.push({ name: "sick", selected: true });
-      tissueTypes.push({ name: "all", selected: true });*/
 
       return {
         tcgaTokens,

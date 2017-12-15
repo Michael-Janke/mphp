@@ -13,13 +13,15 @@ dataLoader = DataLoader("dataset4")
 gene_labels = dataLoader.getGeneLabels()
 dimReducer = DimensionalityReducer()
 
+
 @app.route('/')
 def hello_world():
     return 'Hello World!'
 
+
 @app.route('/data', methods=["GET"])
 def getData():
-    luad_thca = dataLoader.getData(["sick", "healthy"], ["LUAD","THCA"])
+    luad_thca = dataLoader.getData(["sick", "healthy"], ["LUAD", "THCA"])
     indices, X = dimReducer.getFeatures(luad_thca, 20)
 
     response = {
@@ -30,15 +32,17 @@ def getData():
 
     return json.dumps(response)
 
+
 @app.route('/plot', methods=["GET"])
 def getPlotData():
-    healthy = dataLoader.getData(["healthy"], ["THCA","LUAD"])
-    sick = dataLoader.getData(["sick"], ["THCA","LUAD"])
-    indices, s_data, _ = dimReducer.getNormalizedFeatures(sick, healthy, "exclude", 3)
+    healthy = dataLoader.getData(["healthy"], ["THCA", "LUAD"])
+    sick = dataLoader.getData(["sick"], ["THCA", "LUAD"])
+    indices, s_data, _ = dimReducer.getNormalizedFeatures(
+        sick, healthy, "exclude", 3)
 
     data = {}
     for label in np.unique(sick.labels):
-        data[label] = s_data[sick.labels==label,:].T.tolist()
+        data[label] = s_data[sick.labels == label, :].T.tolist()
 
     response = {
         'data': data,
@@ -46,6 +50,7 @@ def getPlotData():
     }
 
     return json.dumps(response)
+
 
 @app.route("/algorithms", methods=["GET"])
 def algorithms():
@@ -80,7 +85,7 @@ def algorithms():
                 "key": "getDecisionTreeFeatures"
             },
             {
-                "name":'Feature Selection Normalization:Exclude',
+                "name": 'Feature Selection Normalization:Exclude',
                 "parameters": [
                     {
                         "name": "#Features",
@@ -98,7 +103,7 @@ def algorithms():
                 "key": "getNormalizedFeaturesE"
             },
             {
-                "name":'Feature Selection Normalization:Substract',
+                "name": 'Feature Selection Normalization:Substract',
                 "parameters": [
                     {
                         "name": "#Features",
@@ -133,6 +138,7 @@ def algorithms():
 
     return json.dumps(response)
 
+
 @app.route("/runAlgorithm", methods=["POST"])
 def runSpecificAlgorithm():
     # POST key, parameters, cancerTypes, healthyTissueTypes, sickTissueTypes
@@ -144,31 +150,38 @@ def runSpecificAlgorithm():
     #     "sickTissueTypes": ["TP"],
     #     "healthyTissueTypes": ["NT"],
     #     "parameters": {
-    #         "components": 3,
-    #         "featuresPerComponent": 10
+    #         "n_components": 3,
+    #         "n_features_per_component": 10
     #         }
     #
     # }
     key = algorithm["key"]
 
-    sick = dataLoader.getData(algorithm["sickTissueTypes"], algorithm["cancerTypes"])
-    healthy = dataLoader.getData(algorithm["healthyTissueTypes"], algorithm["cancerTypes"])
+    sick = dataLoader.getData(
+        algorithm["sickTissueTypes"], algorithm["cancerTypes"])
+    healthy = dataLoader.getData(
+        algorithm["healthyTissueTypes"], algorithm["cancerTypes"])
     data = sick.expressions
 
     if key == "getPCA":
-        _, X, gene_indices = dimReducer.getPCA(data, algorithm["parameters"]["components"],algorithm["parameters"]["featuresPerComponent"])
+        _, X, gene_indices = dimReducer.getPCA(
+            data, algorithm["parameters"]["n_components"], algorithm["parameters"]["n_features_per_component"])
     elif key == "getDecisionTreeFeatures":
-        gene_indices, X = dimReducer.getDecisionTreeFeatures(data, algorithm["parameters"]["k"])
+        gene_indices, X = dimReducer.getDecisionTreeFeatures(
+            data, algorithm["parameters"]["k"])
     elif key == "getNormalizedFeaturesE":
-        gene_indices, X, _ = dimReducer.getNormalizedFeaturesE(sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"])
+        gene_indices, X, _ = dimReducer.getNormalizedFeaturesE(
+            sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"])
     elif key == "getNormalizedFeaturesS":
-        gene_indices, X, _ = dimReducer.getNormalizedFeaturesS(sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"])
+        gene_indices, X, _ = dimReducer.getNormalizedFeaturesS(
+            sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"])
     elif key == "getFeatures":
-        gene_indices, X = dimReducer.getFeatures(data, algorithm["parameters"]["k"])
+        gene_indices, X = dimReducer.getFeatures(
+            data, algorithm["parameters"]["k"])
 
     data = {}
     for label in np.unique(sick.labels):
-        data[label] = X[sick.labels==label,:].T.tolist()
+        data[label] = X[sick.labels == label, :].T.tolist()
 
     response = {
         'data': data,
@@ -176,11 +189,13 @@ def runSpecificAlgorithm():
     }
     return json.dumps(response)
 
+
 @app.route('/statistics', methods=["GET"])
 def getStatistics():
     statistics = dataLoader.getStatistics()
 
     return json.dumps(statistics.tolist())
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True, use_reloader=True)

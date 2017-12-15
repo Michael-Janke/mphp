@@ -30,12 +30,16 @@ loadScript("https://cdn.plot.ly/plotly-latest.min.js", function(err, script) {
 });
 
 class InteractivePlot extends Component {
+  constructor(props) {
+    super(props);
+    this.props.loadPlot(this.props.route, this.props.params);
+  }
+
   rerender() {
     this.forceUpdate();
   }
 
   render() {
-    this.props.loadPlot(this.props.route, this.props.params);
     return (
       <Card
         title={"Interactive Plots"}
