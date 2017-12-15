@@ -161,30 +161,33 @@ def runSpecificAlgorithm():
         algorithm["sickTissueTypes"], algorithm["cancerTypes"])
     healthy = dataLoader.getData(
         algorithm["healthyTissueTypes"], algorithm["cancerTypes"])
-    data = sick.expressions
+    data = dataLoader.getData(
+        algorithm["healthyTissueTypes"] + algorithm["sickTissueTypes"], algorithm["cancerTypes"])
 
     if key == "getPCA":
         _, X, gene_indices = dimReducer.getPCA(
-            data, algorithm["parameters"]["n_components"], algorithm["parameters"]["n_features_per_component"])
+            data.expressions, algorithm["parameters"]["n_components"], algorithm["parameters"]["n_features_per_component"])
     elif key == "getDecisionTreeFeatures":
         gene_indices, X = dimReducer.getDecisionTreeFeatures(
             data, algorithm["parameters"]["k"])
     elif key == "getNormalizedFeaturesE":
-        gene_indices, X, _ = dimReducer.getNormalizedFeaturesE(
-            sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"])
+        gene_indices, X, Y = dimReducer.getNormalizedFeaturesE(
+            sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"], "chi2")
+        X = np.vstack((X, Y))
     elif key == "getNormalizedFeaturesS":
-        gene_indices, X, _ = dimReducer.getNormalizedFeaturesS(
-            sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"])
+        gene_indices, X, Y = dimReducer.getNormalizedFeaturesS(
+            sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"], "chi2")
+        X = np.vstack((X, Y))
     elif key == "getFeatures":
         gene_indices, X = dimReducer.getFeatures(
             data, algorithm["parameters"]["k"])
 
-    data = {}
-    for label in np.unique(sick.labels):
-        data[label] = X[sick.labels == label, :].T.tolist()
+    responseData = {}
+    for label in np.unique(data.labels):
+        responseData[label] = X[data.labels == label, :].T.tolist()
 
     response = {
-        'data': data,
+        'data': responseData,
         'genes': gene_labels[gene_indices].tolist(),
     }
     return json.dumps(response)
