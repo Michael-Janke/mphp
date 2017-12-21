@@ -7,9 +7,9 @@ const CARD_TITLE_HEIGHT = 15;
 
 export default class Card extends Component {
   render() {
-    const { title, isLoading, width, isError } = this.props;
+    const { title, isLoading, width, isError, className } = this.props;
     return (
-      <StyledCard zDepth={1} width={width}>
+      <StyledCard className={className} zDepth={1} width={width}>
         <StyledCardTitle>
           <StyledTitleText>{title}</StyledTitleText>
           {isLoading ? <Spinner size={CARD_TITLE_HEIGHT} /> : null}

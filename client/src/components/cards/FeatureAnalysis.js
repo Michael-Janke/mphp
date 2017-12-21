@@ -7,7 +7,6 @@ import styled from "styled-components";
 
 import { boringBlue } from "../../config/colors";
 import Card from "../Card";
-import Plot from "./Plot";
 
 export default class FeatureAnalysis extends Component {
   constructor(props) {
@@ -70,24 +69,7 @@ export default class FeatureAnalysis extends Component {
               </StyledMenu>
             )}
         </Card>
-        <StyledCards>
-          {Object.keys(this.props.runs).map(this.renderRun.bind(this))}
-        </StyledCards>
       </div>
-    );
-  }
-
-  renderRun(runId) {
-    const run = this.props.runs[runId];
-    return (
-      <Card
-        title={run.params.name}
-        isLoading={!run.result}
-        isError={run.result && run.result.isError}
-        key={`run-${runId}`}
-      >
-        <Plot {...run.result} />
-      </Card>
     );
   }
 
@@ -178,11 +160,6 @@ const StyledButton = styled(RaisedButton)`
   button:disabled {
     background: ${props => props.theme.lightGray} !important;
   }
-`;
-
-const StyledCards = styled.div`
-  display: flex;
-  flex-wrap: wrap;
 `;
 
 const StyledMenu = styled.div`

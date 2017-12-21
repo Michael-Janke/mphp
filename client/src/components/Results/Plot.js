@@ -76,6 +76,11 @@ export default class InteractivePlot extends Component {
       }
     };
 
-    return <Plot data={plotData} layout={plotLayout} />;
+    return (
+      <div>
+        <h3>Visualization</h3>
+        <Plot data={plotData} layout={plotLayout} />
+      </div>
+    );
   }
 }
