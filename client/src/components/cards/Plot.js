@@ -32,9 +32,7 @@ loadScript("https://cdn.plot.ly/plotly-latest.min.js", function(err, script) {
 class InteractivePlot extends Component {
   constructor(props) {
     super(props);
-    if (this.props.plot === null) {
-      this.props.loadPlot();
-    }
+    this.props.loadPlot(this.props.route, this.props.params);
   }
 
   rerender() {
@@ -112,8 +110,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    loadPlot: () => {
-      dispatch(load());
+    loadPlot: (route, params) => {
+      dispatch(load(route, params));
     }
   };
 };

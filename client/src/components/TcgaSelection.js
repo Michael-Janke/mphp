@@ -21,10 +21,10 @@ class TcgaSelection extends PureComponent {
     const tcgaTokens = this.props.tcgaTokens;
     const tissueTypes = this.props.tissueTypes;
     const healthyTissueTypes = tissueTypes.filter(
-      tissueType => tissueType.name[0] === "N"
+      tissueType => tissueType.isHealthy
     );
     const sickTissueTypes = tissueTypes.filter(
-      tissueType => tissueType.name[0] === "T"
+      tissueType => !tissueType.isHealthy
     );
 
     // dialog

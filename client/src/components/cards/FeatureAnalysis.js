@@ -27,7 +27,8 @@ class FeatureAnalysis extends Component {
           isLoading={!this.props.algorithms}
           viewerProps={{
             addCard: this.addCard.bind(this),
-            algorithms: this.props.algorithms
+            algorithms: this.props.algorithms,
+            dataSelection: this.props.dataSelection
           }}
         />
         <StyledCards>{this.state.cards.map(this.renderCard)}</StyledCards>
@@ -48,7 +49,10 @@ class FeatureAnalysis extends Component {
 class DataViewer extends Component {
   constructor(props) {
     super(props);
-    this.state = { selectedAlgorithm: null };
+    this.state = {
+      selectedAlgorithm: null,
+      params: {}
+    };
   }
 
   render() {
@@ -103,21 +107,38 @@ class DataViewer extends Component {
   renderParameter(parameter, index) {
     return (
       <StyledTextField
-        key={`parameter-${index}`}
+        key={parameter.key}
+        id={parameter.key}
         defaultValue={parameter.default}
         hintText={parameter.default}
         floatingLabelText={parameter.name}
         floatingLabelFixed={true}
         type="number"
+        onChange={this.changeParameter.bind(this)}
       />
     );
+  }
+
+  changeParameter(event, index, key) {
+    const params = this.state.params;
+    params[event.target.id] = event.target.value;
+    this.setState({
+      params
+    });
   }
 
   selectAlgorithm(event, index, key) {
     const selectedAlgorithm = this.props.algorithms.find(
       algorithm => algorithm.key === key
     );
-    this.setState({ selectedAlgorithm });
+    const params = {};
+    selectedAlgorithm.parameters.forEach(param => {
+      params[param.key] = param.default;
+    });
+    this.setState({
+      selectedAlgorithm,
+      params
+    });
   }
 
   executeAlgorithm() {
@@ -129,9 +150,32 @@ class DataViewer extends Component {
       getNormalizedFeaturesS: Plot,
       getFeatures: Plot
     };
+
+    const cancerTypes = this.props.dataSelection.tcgaTokens
+      .filter(token => token.selected)
+      .map(token => token.name);
+    const sickTissueTypes = this.props.dataSelection.tissueTypes
+      .filter(tissueType => !tissueType.isHealthy && tissueType.selected)
+      .map(tissueType => tissueType.name);
+    const healthyTissueTypes = this.props.dataSelection.tissueTypes
+      .filter(tissueType => tissueType.isHealthy && tissueType.selected)
+      .map(tissueType => tissueType.name);
+    const params = {
+      key: selectedAlgorithm.key,
+      cancerTypes,
+      sickTissueTypes,
+      healthyTissueTypes,
+      // TODO: set parameters
+      parameters: {
+        ...this.state.params
+      }
+    };
     this.props.addCard({
       component: cards[selectedAlgorithm.key],
-      props: { route: `/${selectedAlgorithm.key}`, k: 10, n: 5000 }
+      props: {
+        route: `/runAlgorithm`,
+        params
+      }
     });
   }
 }
@@ -170,7 +214,8 @@ const StyledTextField = styled(TextField)`
 
 const mapStateToProps = state => {
   return {
-    ...state.featureAnalysis
+    ...state.featureAnalysis,
+    dataSelection: state.dataSelection
   };
 };
 
