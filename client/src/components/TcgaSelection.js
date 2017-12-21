@@ -17,6 +17,40 @@ class TcgaSelection extends PureComponent {
     this.state = { tissueTypeError: false };
   }
 
+  componentDidMount() {
+    // Preselection of cancer and tissue types for easier testing
+    this.transferTcgaToken(
+      this.props.tcgaTokens.find(({ name }) => name === "GBM")
+    );
+    this.transferTcgaToken(
+      this.props.tcgaTokens.find(({ name }) => name === "HNSC")
+    );
+    this.transferTcgaToken(
+      this.props.tcgaTokens.find(({ name }) => name === "KIRC")
+    );
+    this.transferTcgaToken(
+      this.props.tcgaTokens.find(({ name }) => name === "UCEC")
+    );
+    this.transferTcgaToken(
+      this.props.tcgaTokens.find(({ name }) => name === "SARC")
+    );
+    this.transferTcgaToken(
+      this.props.tcgaTokens.find(({ name }) => name === "LAML")
+    );
+    this.transferTissueType(
+      this.props.tissueTypes.find(({ name }) => name === "TB")
+    );
+    this.transferTissueType(
+      this.props.tissueTypes.find(({ name }) => name === "TR")
+    );
+    this.transferTissueType(
+      this.props.tissueTypes.find(({ name }) => name === "TAP")
+    );
+    this.transferTissueType(
+      this.props.tissueTypes.find(({ name }) => name === "TM")
+    );
+  }
+
   render() {
     const tcgaTokens = this.props.tcgaTokens;
     const tissueTypes = this.props.tissueTypes;
