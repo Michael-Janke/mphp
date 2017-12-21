@@ -5,7 +5,10 @@ import MenuItem from "material-ui/MenuItem";
 import TextField from "material-ui/TextField";
 import styled, { withTheme } from "styled-components";
 import { connect } from "react-redux";
-import { load } from "../../actions/featureAnalysisActions";
+import {
+  loadAlgorithms,
+  runAlgorithm
+} from "../../actions/featureAnalysisActions";
 import Card from "../Card";
 import Plot from "./Plot";
 
@@ -28,7 +31,8 @@ class FeatureAnalysis extends Component {
           viewerProps={{
             addCard: this.addCard.bind(this),
             algorithms: this.props.algorithms,
-            dataSelection: this.props.dataSelection
+            dataSelection: this.props.dataSelection,
+            runAlgorithm: this.props.runAlgorithm
           }}
         />
         <StyledCards>{this.state.cards.map(this.renderCard)}</StyledCards>
@@ -170,6 +174,7 @@ class DataViewer extends Component {
         ...this.state.params
       }
     };
+    // this.props.runAlgorithm(params);
     this.props.addCard({
       component: cards[selectedAlgorithm.key],
       props: {
@@ -222,7 +227,10 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     loadAlgorithms: () => {
-      dispatch(load());
+      dispatch(loadAlgorithms());
+    },
+    runAlgorithm: params => {
+      dispatch(runAlgorithm(params));
     }
   };
 };
