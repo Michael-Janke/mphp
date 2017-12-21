@@ -4,6 +4,7 @@ from pprint import pprint
 from utils.DataLoader import DataLoader
 from utils.DimensionalityReducer import DimensionalityReducer
 from utils.DataNormalizer import DataNormalizer
+from utils.Analyzer import Analyzer
 from utils.plot import plotScatter
 
 from utils import Expressions
@@ -11,6 +12,7 @@ print("Imported modules")
 
 dataLoader = DataLoader("dataset4")
 dimReducer = DimensionalityReducer()
+analyzer = Analyzer()
 print("data loaded")
 
 healthy = dataLoader.getData(["healthy"], ["THCA","LUAD"])
@@ -58,6 +60,9 @@ for label in np.unique(sick.labels):
 pprint(data)
 
 
+#%%
+expression_matrix = analyzer.computeExpressionMatrix(sick_reduced, healthy, selected_genes)
+pprint(expression_matrix)
 
 # %%
 # GENE EXPRESSION RELATIVE TO HEALTHY DATA
@@ -78,7 +83,7 @@ pprint(levels)
 data = {"genes": gene_labels[selected_genes].tolist()}
 for label in np.unique(sick.labels):
     indices = np.where(sick.labels == label)
-    medians = np.median(sick_X[indices,], axis=1).tolist()[0]
+    medians = np.median(sick.expressions[indices,selected_genes], axis=1).tolist()[0]
     expressions = []
     for index, median in enumerate(medians):
         thresholds = levels[label[0:4]][selected_genes[index]]
