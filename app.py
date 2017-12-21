@@ -131,6 +131,11 @@ def algorithms():
                     }
                 ],
                 "key": "getFeatures"
+            },
+            {
+            "name": "Sequential Forward Selection (normalized)",
+            "key": "getFeaturesBySFS",
+            "parameters": []
             }
         ],
 
@@ -180,6 +185,11 @@ def runSpecificAlgorithm():
     elif key == "getFeatures":
         gene_indices, X = dimReducer.getFeatures(
             data, algorithm["parameters"]["k"])
+    elif key == "getFeaturesBySFS":
+        gene_indices, X, Y = dimReducer.getFeaturesBySFS(
+            sick, healthy)
+        X = np.vstack((X, Y))
+
 
     responseData = {}
     for label in np.unique(data.labels):

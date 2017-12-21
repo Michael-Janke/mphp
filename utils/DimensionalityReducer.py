@@ -106,7 +106,7 @@ class DimensionalityReducer:
         indices = selected_genes[phenotype(best)]
         return indices, sick.expressions[:, indices], healthy.expressions[:, indices]
 
-    def getFaturesBySFS(self, sick, healthy, k=3, n=5000, m=100):
+    def getFeaturesBySFS(self, sick, healthy, k=3, n=5000, m=100):
         # preselect 100 genes in sick data which do not separate healthy data well
         selected_genes, _, _ = self.getNormalizedFeatures(sick,healthy,"exclude", m, n)
 
@@ -130,7 +130,7 @@ class DimensionalityReducer:
 
 
     ####### EMBEDDED FEATURE SELECTION #######
-    
+
     def getDecisionTreeFeatures(self, data, k=20):
         tree = DecisionTreeClassifier()
         tree.fit(data.expressions, data.labels)
