@@ -138,7 +138,6 @@ def algorithms():
 
     return json.dumps(response)
 
-
 @app.route("/runAlgorithm", methods=["POST"])
 def runSpecificAlgorithm():
     # POST key, parameters, cancerTypes, healthyTissueTypes, sickTissueTypes

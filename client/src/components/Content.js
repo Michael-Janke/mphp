@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import ExperimentInformation from "./cards/ExperimentInformation";
-import DataSelection from "./cards/DataSelection";
-import FeatureAnalysis from "./cards/FeatureAnalysis";
+import DataSelection from "./cards/DataSelectionContainer";
+import FeatureAnalysis from "./cards/FeatureAnalysisContainer";
 
 class Content extends Component {
   render() {

@@ -4,37 +4,71 @@ import SelectField from "material-ui/SelectField";
 import MenuItem from "material-ui/MenuItem";
 import TextField from "material-ui/TextField";
 import styled, { withTheme } from "styled-components";
-import { connect } from "react-redux";
-import {
-  loadAlgorithms,
-  runAlgorithm
-} from "../../actions/featureAnalysisActions";
-import Card from "../Card";
-import Plot from "./Plot";
 
-class FeatureAnalysis extends Component {
+import { boringBlue } from "../../config/colors";
+import Card from "../Card";
+import Plot from "./PlotContainer";
+
+export default class FeatureAnalysis extends Component {
   constructor(props) {
     super(props);
-    this.state = { cards: [] };
+    this.state = {
+      cards: [],
+      selectedAlgorithm: null,
+      params: {}
+    };
     if (this.props.algorithms === null) {
       this.props.loadAlgorithms();
     }
   }
 
   render() {
+    const runnable = this.state.selectedAlgorithm !== null;
+
     return (
       <div className="feature-analysis">
         <Card
           title={"Feature Analysis"}
-          DataViewer={withTheme(DataViewer)}
           isLoading={!this.props.algorithms}
-          viewerProps={{
-            addCard: this.addCard.bind(this),
-            algorithms: this.props.algorithms,
-            dataSelection: this.props.dataSelection,
-            runAlgorithm: this.props.runAlgorithm
-          }}
-        />
+          isError={this.props.algorithms && this.props.algorithms.isError}
+        >
+          {this.props.algorithms &&
+            !this.props.algorithms.isError && (
+              <StyledMenu>
+                <StyledOptions>
+                  <SelectField
+                    floatingLabelText="Algorithm"
+                    floatingLabelFixed={true}
+                    hintText="Select algorithm..."
+                    value={runnable ? this.state.selectedAlgorithm.key : null}
+                    onChange={this.selectAlgorithm.bind(this)}
+                    autoWidth={true}
+                    selectedMenuItemStyle={{ color: boringBlue }}
+                  >
+                    {this.props.algorithms.map(this.renderMenuItem)}
+                  </SelectField>
+                  {runnable
+                    ? this.state.selectedAlgorithm.parameters.map(
+                        this.renderParameter.bind(this)
+                      )
+                    : null}
+                </StyledOptions>
+                <StyledButton
+                  title={
+                    runnable
+                      ? `Run ${this.state.selectedAlgorithm.name}`
+                      : `Please select an algorithm`
+                  }
+                  label="Run"
+                  primary={true}
+                  onClick={() => {
+                    this.executeAlgorithm();
+                  }}
+                  disabled={!runnable}
+                />
+              </StyledMenu>
+            )}
+        </Card>
         <StyledCards>{this.state.cards.map(this.renderCard)}</StyledCards>
       </div>
     );
@@ -47,55 +81,6 @@ class FeatureAnalysis extends Component {
 
   addCard(card) {
     this.setState({ cards: [...this.state.cards, card] });
-  }
-}
-
-class DataViewer extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedAlgorithm: null,
-      params: {}
-    };
-  }
-
-  render() {
-    const runnable = this.state.selectedAlgorithm !== null;
-    return (
-      <StyledMenu>
-        <StyledOptions>
-          <SelectField
-            floatingLabelText="Algorithm"
-            floatingLabelFixed={true}
-            hintText="Select algorithm..."
-            value={runnable ? this.state.selectedAlgorithm.key : null}
-            onChange={this.selectAlgorithm.bind(this)}
-            autoWidth={true}
-            selectedMenuItemStyle={{ color: this.props.theme.boringBlue }}
-          >
-            {this.props.algorithms.map(this.renderMenuItem)}
-          </SelectField>
-          {runnable
-            ? this.state.selectedAlgorithm.parameters.map(
-                this.renderParameter.bind(this)
-              )
-            : null}
-        </StyledOptions>
-        <StyledButton
-          title={
-            runnable
-              ? `Run ${this.state.selectedAlgorithm.name}`
-              : `Please select an algorithm`
-          }
-          label="Run"
-          primary={true}
-          onClick={() => {
-            this.executeAlgorithm();
-          }}
-          disabled={!runnable}
-        />
-      </StyledMenu>
-    );
   }
 
   renderMenuItem(algorithm, index) {
@@ -175,7 +160,7 @@ class DataViewer extends Component {
       }
     };
     // this.props.runAlgorithm(params);
-    this.props.addCard({
+    this.addCard({
       component: cards[selectedAlgorithm.key],
       props: {
         route: `/runAlgorithm`,
@@ -206,6 +191,7 @@ const StyledMenu = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin: 16px;
 `;
 
 const StyledOptions = styled.div`
@@ -216,23 +202,3 @@ const StyledOptions = styled.div`
 const StyledTextField = styled(TextField)`
   margin-left: ${props => props.theme.mediumSpace};
 `;
-
-const mapStateToProps = state => {
-  return {
-    ...state.featureAnalysis,
-    dataSelection: state.dataSelection
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    loadAlgorithms: () => {
-      dispatch(loadAlgorithms());
-    },
-    runAlgorithm: params => {
-      dispatch(runAlgorithm(params));
-    }
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(FeatureAnalysis);
