@@ -39,8 +39,8 @@ class Analyzer:
             for gene in selected_genes:
                 indices = np.where(healthy.labels == label)
                 reduced_data = healthy.expressions[indices,gene]
-                min_thresh = np.min(reduced_data)
-                max_thresh = np.max(reduced_data)
+                min_thresh = np.percentile(reduced_data, 5)
+                max_thresh = np.percentile(reduced_data, 95)
                 lower_thresh = np.percentile(reduced_data, 33)
                 upper_thresh = np.percentile(reduced_data, 66)
                 levels[label[0:4]][gene] = [min_thresh, lower_thresh, upper_thresh, max_thresh]

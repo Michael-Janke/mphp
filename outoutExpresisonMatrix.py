@@ -15,8 +15,8 @@ dimReducer = DimensionalityReducer()
 analyzer = Analyzer()
 print("data loaded")
 
-healthy = dataLoader.getData(["healthy"], ["THCA","LUAD"])
-sick = dataLoader.getData(["sick"], ["THCA","LUAD"])
+healthy = dataLoader.getData(["healthy"], ["THCA","LUAD","KIRC"])
+sick = dataLoader.getData(["sick"], ["THCA","LUAD","KIRC"])
 gene_labels = dataLoader.getGeneLabels()
 print("got combined data")
 
@@ -63,41 +63,3 @@ pprint(data)
 #%%
 expression_matrix = analyzer.computeExpressionMatrix(sick_reduced, healthy, selected_genes)
 pprint(expression_matrix)
-
-# %%
-# GENE EXPRESSION RELATIVE TO HEALTHY DATA
-levels = {}
-for label in np.unique(healthy.labels):
-    levels[label[0:4]] = {}
-    for gene in selected_genes:
-        indices = np.where(healthy.labels == label)
-        reduced_data = healthy.expressions[indices,gene]
-        min_thresh = np.min(reduced_data)
-        max_thresh = np.max(reduced_data)
-        lower_thresh = np.percentile(reduced_data, 33)
-        upper_thresh = np.percentile(reduced_data, 66)
-        levels[label[0:4]][gene] = [min_thresh, lower_thresh, upper_thresh, max_thresh]
-
-pprint(levels)
-
-data = {"genes": gene_labels[selected_genes].tolist()}
-for label in np.unique(sick.labels):
-    indices = np.where(sick.labels == label)
-    medians = np.median(sick.expressions[indices,selected_genes], axis=1).tolist()[0]
-    expressions = []
-    for index, median in enumerate(medians):
-        thresholds = levels[label[0:4]][selected_genes[index]]
-        if median < thresholds[0]:
-            expressions.append("lower")
-        elif median < thresholds[1]:
-            expressions.append("mid-lower")
-        elif median < thresholds[2]:
-            expressions.append("unchanged")
-        elif median < thresholds[3]:
-            expressions.append("mid-higher")
-        else:
-            expressions.append("higher")
-
-    data[label] = expressions
-
-pprint(data)
