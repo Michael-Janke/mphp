@@ -32,8 +32,8 @@ class ClassificationValidator():
             clf = self.classifier_table[c]()
             
             scoring = {
-                'precision': make_scorer(precision_score),
-                'recall': make_scorer(recall_score),
+                'precision': make_scorer(precision_score, average='micro'),
+                'recall': make_scorer(recall_score, average='micro'),
                 'f1': make_scorer(f1_score, average='micro'),
             }
             

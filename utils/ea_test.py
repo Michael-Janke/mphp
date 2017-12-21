@@ -51,6 +51,3 @@ print(phenotype(best), best[1])
 # %%
 features = selected_genes[phenotype(best)]
 print(features)
-
-#%%
-selected_genes.shape

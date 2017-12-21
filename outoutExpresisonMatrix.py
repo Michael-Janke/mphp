@@ -15,8 +15,8 @@ dimReducer = DimensionalityReducer()
 analyzer = Analyzer()
 print("data loaded")
 
-healthy = dataLoader.getData(["healthy"], ["THCA","LUAD","KIRC"])
-sick = dataLoader.getData(["sick"], ["THCA","LUAD","KIRC"])
+healthy = dataLoader.getData(["healthy"], ["THCA","LUAD","KIRC","HNSC"])
+sick = dataLoader.getData(["sick"], ["THCA","LUAD","KIRC","HNSC"])
 gene_labels = dataLoader.getGeneLabels()
 print("got combined data")
 
@@ -35,31 +35,12 @@ print("HEALTHY REDUCED")
 plotScatter(healthy_X,healthy.labels, gene_labels[selected_genes])
 
 
-
-# %%
-# EXPRESSION RELATIVE ACCORDING TO SICK DATA AND TYPES
-expression_levels = {
-    1:   "high",
-    0.8: "mid-high",
-    0.6: "neutral",
-    0.4: "mid-low",
-    0.2: "low",
-}
-
-normalized_Data = sick_X / np.max(sick_X)
-data = {"genes": gene_labels[selected_genes].tolist()}
-
-for label in np.unique(sick.labels):
-    indices = np.where(sick.labels == label)
-    medians = np.median(normalized_Data[indices,:], axis=1).tolist()[0]
-    expressions = []
-    for median in medians:
-        expressions.append(expression_levels[np.ceil(median*5)/5])
-    data[label] = expressions
-
-pprint(data)
-
-
 #%%
 expression_matrix = analyzer.computeExpressionMatrix(sick_reduced, healthy, selected_genes)
 pprint(expression_matrix)
+
+
+# %%
+from utils.EA.fitness import distance_evaluate
+fitness = distance_evaluate(sick_reduced.expressions, sick.labels, healthy_reduced.expressions, healthy.labels)
+fitness

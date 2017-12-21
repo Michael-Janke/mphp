@@ -24,21 +24,16 @@ classVal = ClassificationValidator()
 print("data loaded")
 
 #%%
-healthy = dataLoader.getData(["healthy"], ["THCA","LUAD"])
-sick = dataLoader.getData(["sick"], ["THCA","LUAD"])
+healthy = dataLoader.getData(["healthy"], ["THCA","LUAD","KIRC","HNSC"])
+sick = dataLoader.getData(["sick"], ["THCA","LUAD","KIRC","HNSC"])
 gene_labels = dataLoader.getGeneLabels()
 print("got combined data")
 
 # %%
 # Feature Selection
-#selected_genes, sick_X, healthy_X = dimReducer.getEAFeatures(sick,healthy)
-selected_genes, sick_X, healthy_X = dimReducer.getFaturesBySFS(sick,healthy,10)
+selected_genes, sick_X, healthy_X = dimReducer.getEAFeatures(sick,healthy)
+#selected_genes, sick_X, healthy_X = dimReducer.getFaturesBySFS(sick,healthy,3)
 print(selected_genes)
-
-#selected_genes = np.array([ 1178, 3349, 15737, 590, 10600, 232, 21125])
-#sick_X = sick.expressions[:,selected_genes]
-#healthy_X = healthy.expressions[:,selected_genes]
-
 
 sick_reduced = Expressions(sick_X, sick.labels)
 healthy_reduced = Expressions(healthy_X, healthy.labels)
