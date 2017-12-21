@@ -7,17 +7,10 @@ from utils.DataNormalizer import DataNormalizer
 from utils.plot import plotScatter
 
 from utils import Expressions
-
-
-from validation.ClusterValidator import ClusterValidator
-from validation.ClassificationValidator import ClassificationValidator
-
 print("Imported modules")
+
 dataLoader = DataLoader("dataset4")
 dimReducer = DimensionalityReducer()
-
-clusVal = ClusterValidator()
-classVal = ClassificationValidator()
 print("data loaded")
 
 healthy = dataLoader.getData(["healthy"], ["THCA","LUAD"])
@@ -27,14 +20,8 @@ print("got combined data")
 
 # %%
 # Feature Selection
-#selected_genes, sick_X, healthy_X = dimReducer.getEAFeatures(sick,healthy)
 selected_genes, sick_X, healthy_X = dimReducer.getFaturesBySFS(sick,healthy,3)
 print(selected_genes)
-
-#selected_genes = np.array([ 1178, 3349, 15737, 590, 10600, 232, 21125])
-#sick_X = sick.expressions[:,selected_genes]
-#healthy_X = healthy.expressions[:,selected_genes]
-
 
 sick_reduced = Expressions(sick_X, sick.labels)
 healthy_reduced = Expressions(healthy_X, healthy.labels)
@@ -44,6 +31,7 @@ plotScatter(sick_X, sick.labels, gene_labels[selected_genes])
 
 print("HEALTHY REDUCED")
 plotScatter(healthy_X,healthy.labels, gene_labels[selected_genes])
+
 
 
 # %%
@@ -74,12 +62,16 @@ pprint(data)
 # %%
 # GENE EXPRESSION RELATIVE TO HEALTHY DATA
 levels = {}
-for gene in selected_genes:
-    min_thresh = np.min(healthy.expressions[:,gene])
-    max_thresh = np.max(healthy.expressions[:,gene])
-    lower_thresh = np.percentile(healthy.expressions[:,gene], 30)
-    upper_thresh = np.percentile(healthy.expressions[:,gene], 70)
-    levels[gene] = [min_thresh, lower_thresh, upper_thresh, max_thresh]
+for label in np.unique(healthy.labels):
+    levels[label[0:4]] = {}
+    for gene in selected_genes:
+        indices = np.where(healthy.labels == label)
+        reduced_data = healthy.expressions[indices,gene]
+        min_thresh = np.min(reduced_data)
+        max_thresh = np.max(reduced_data)
+        lower_thresh = np.percentile(reduced_data, 33)
+        upper_thresh = np.percentile(reduced_data, 66)
+        levels[label[0:4]][gene] = [min_thresh, lower_thresh, upper_thresh, max_thresh]
 
 pprint(levels)
 
@@ -89,7 +81,7 @@ for label in np.unique(sick.labels):
     medians = np.median(sick_X[indices,], axis=1).tolist()[0]
     expressions = []
     for index, median in enumerate(medians):
-        thresholds = levels[selected_genes[index]]
+        thresholds = levels[label[0:4]][selected_genes[index]]
         if median < thresholds[0]:
             expressions.append("lower")
         elif median < thresholds[1]:
