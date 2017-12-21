@@ -5,8 +5,9 @@ from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 
-from sklearn.model_selection import cross_val_score
-from sklearn.metrics import f1_score
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import cross_validate
+from sklearn.metrics import make_scorer, precision_score, recall_score, f1_score
 
 class ClassificationValidator():
 
@@ -29,6 +30,29 @@ class ClassificationValidator():
             if not c in self.classifier_table:
                 continue
             clf = self.classifier_table[c]()
-            scores = cross_val_score(clf, data.expressions, data.labels, cv=5, scoring="f1_micro")
-            result[c] = (scores.mean(), scores.std())
+            
+            scoring = {
+                'precision': make_scorer(precision_score),
+                'recall': make_scorer(recall_score),
+                'f1': make_scorer(f1_score, average='micro'),
+            }
+            
+            le = LabelEncoder()
+            labels = le.fit_transform(data.labels)
+            scores = cross_validate(clf, data.expressions, labels, cv=5, scoring=scoring, return_train_score=False)
+            score_dict = {
+                'precision': {
+                    'mean': scores['test_precision'].mean(), 
+                    'std':  scores['test_precision'].std(),
+                },
+                'recall': {
+                    'mean': scores['test_recall'].mean(), 
+                    'std':  scores['test_recall'].std(),
+                },
+                'f1': {
+                    'mean': scores['test_f1'].mean(), 
+                    'std':  scores['test_f1'].std(),
+                },
+            }
+            result[c] = score_dict
         return result
