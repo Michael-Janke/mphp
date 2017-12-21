@@ -13,15 +13,19 @@ import * as spacings from "./config/spacings";
 
 // Redux
 import { Provider } from "react-redux";
-import { createStore, combineReducers, applyMiddleware } from "redux";
+import { createStore, combineReducers, applyMiddleware, compose } from "redux";
 import thunk from "redux-thunk"; // needed for async actions
 import * as reducers from "./reducers";
 
 // Needed for onTouchTap
 // http://stackoverflow.com/a/34015469/988941
 import injectTapEventPlugin from "react-tap-event-plugin";
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-let store = createStore(combineReducers(reducers), applyMiddleware(thunk));
+let store = createStore(
+  combineReducers(reducers),
+  composeEnhancers(applyMiddleware(thunk))
+);
 
 const App = () => (
   <ThemeProvider theme={{ ...colors, ...fontSizes, ...spacings }}>

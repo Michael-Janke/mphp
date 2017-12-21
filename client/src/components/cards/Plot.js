@@ -8,14 +8,21 @@ import { withTheme } from "styled-components";
 import Card from "../Card";
 import { load } from "../../actions/plotActions";
 
-const colors = ["red", "blue", "green", "yellow", "magenta", "brown"];
-
 let Plot;
 loadScript("https://cdn.plot.ly/plotly-latest.min.js", function(err, script) {
   if (err) {
-    // print useful message
+    console.warn(
+      "Could not load plotly script from CDN, trying to load local script..."
+    );
+    loadScript("plotly-1.31.2.min.js", function(err, script) {
+      if (err) {
+        console.warn("Could not load plotly");
+      } else {
+        // note that in IE8 and below loading error wouldn't be reported
+        Plot = createPlotlyComponent(Plotly);
+      }
+    });
   } else {
-    console.log(script.src); // Prints 'foo'.js'
     // use script
     // note that in IE8 and below loading error wouldn't be reported
     Plot = createPlotlyComponent(Plotly);
@@ -25,9 +32,7 @@ loadScript("https://cdn.plot.ly/plotly-latest.min.js", function(err, script) {
 class InteractivePlot extends Component {
   constructor(props) {
     super(props);
-    if (this.props.plot === null) {
-      this.props.loadPlot();
-    }
+    this.props.loadPlot(this.props.route, this.props.params);
   }
 
   rerender() {
@@ -38,8 +43,9 @@ class InteractivePlot extends Component {
     return (
       <Card
         title={"Interactive Plots"}
-        data={this.props.plot}
         DataViewer={withTheme(DataViewer)}
+        viewerProps={{ data: this.props.plot }}
+        isLoading={!this.props.plot}
       />
     );
   }
@@ -58,11 +64,11 @@ class DataViewer extends Component {
         y: plotData.data[key][1],
         z: plotData.data[key][2],
         marker: {
-          size: 6,
-          color: colors[index],
+          size: 4,
+          color: this.props.theme.statisticsColors[index],
           line: {
             color: "black",
-            width: 0.2
+            width: 0.1
           },
           opacity: 1
         }
@@ -86,6 +92,10 @@ class DataViewer extends Component {
         zaxis: {
           title: plotData.genes[2]
         }
+      },
+      legend: {
+        yanchor: "middle",
+        y: 0.7
       }
     };
     return <Plot data={data} layout={layout} />;
@@ -100,8 +110,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    loadPlot: () => {
-      dispatch(load());
+    loadPlot: (route, params) => {
+      dispatch(load(route, params));
     }
   };
 };

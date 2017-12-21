@@ -31,12 +31,12 @@ print("got combined data")
 
 # %%
 # Feature Selection
-selected_genes, sick_X, healthy_X = dimReducer.getNormalizedFeatures(sick,healthy,"exclude", 7)
+selected_genes, sick_X, healthy_X = dimReducer.getNormalizedFeatures(sick,healthy,"substract", 7)
 
 
-#selected_genes = np.array([ 1178, 3349, 15737, 590, 10600, 232, 21125])
-#sick_X = sick.expressions[:,selected_genes]
-#healthy_X = healthy.expressions[:,selected_genes]
+selected_genes = np.array([ 1178, 3349, 15737, 590, 10600, 232, 21125])
+sick_X = sick.expressions[:,selected_genes]
+healthy_X = healthy.expressions[:,selected_genes]
 
 
 sick_reduced = Expressions(sick_X, sick.labels)

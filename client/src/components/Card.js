@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Card as _Card, CardTitle as _CardTitle, CardText as _CardText } from "material-ui/Card";
+import { Card as _Card, CardTitle, CardText } from "material-ui/Card";
 import Spinner from "./Spinner";
 import styled from "styled-components";
 
@@ -7,10 +7,9 @@ const CARD_TITLE_HEIGHT = 15;
 
 class Card extends Component {
   render() {
-    const { title, data } = this.props;
-    const isLoading = data === null;
+    const { title, isLoading, width } = this.props;
     return (
-      <StyledCard zDepth={1}>
+      <StyledCard zDepth={1} width={width}>
         <StyledCardTitle>
           <StyledTitleText>{title}</StyledTitleText>
           {isLoading ? <Spinner size={CARD_TITLE_HEIGHT} /> : null}
@@ -21,35 +20,38 @@ class Card extends Component {
   }
 
   renderContent() {
-    const { data, DataViewer } = this.props;
-    const isError = data && data.isError;
+    const { DataViewer, viewerProps } = this.props;
+    const isError = viewerProps.data && viewerProps.data.isError;
     return isError ? (
-      <StyledError>{`${data.error}`}</StyledError>
+      <StyledError>{`${viewerProps.data.error}`}</StyledError>
     ) : (
-      <DataViewer data={data} />
+      <CardText>
+        <DataViewer {...viewerProps} />
+      </CardText>
     );
   }
 }
 
 const StyledCard = styled(_Card)`
-  width: fit-content;
+  width: ${props => (props.fitContent ? "fit-content" : null)};
   margin: ${props => props.theme.mediumSpace};
   padding: ${props => props.theme.mediumSpace};
   padding-top: ${props => props.theme.smallSpace};
   padding-bottom: ${props => props.theme.smallSpace};
 `;
 
-const StyledCardTitle = styled(_CardTitle)`
+const StyledCardTitle = styled(CardTitle)`
   display: flex;
   align-items: center;
-  height: ${CARD_TITLE_HEIGHT};
+  height: ${CARD_TITLE_HEIGHT}px;
 `;
 
 const StyledTitleText = styled.p`
   margin-right: ${props => props.theme.mediumSpace};
+  font-size: ${props => props.theme.h2};
 `;
 
-const StyledError = styled(_CardText)`
+const StyledError = styled(CardText)`
   color: red !important;
 `;
 

@@ -1,8 +1,10 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import { updateName } from "../actions/experimentActions";
 import logo from "../assets/images/logo.png";
-import styled from "styled-components";
-import IconButton from './IconButton';
-import { withTheme } from "styled-components";
+import styled, { withTheme } from "styled-components";
+import EditableText from "./EditableText";
+import IconButton from "./IconButton";
 
 class Header extends Component {
   render() {
@@ -13,8 +15,22 @@ class Header extends Component {
           <StyledTitle>Clustered Gene Analysis</StyledTitle>
         </StyledHeader>
         <StyledExperimentHeader>
-          <StyledExperimentName>Experiment Name</StyledExperimentName>
-          <IconButton tooltip="Edit experiment name" icon="edit" color={this.props.theme.almostWhite} />
+          <EditableText
+            text={this.props.experimentName}
+            onChange={this.props.updateExperimentName}
+          />
+          <StyledButtonContainer>
+            <IconButton
+              tooltip="Open existing experiment"
+              icon="open"
+              color={this.props.theme.almostWhite}
+            />
+            <IconButton
+              tooltip="Save experiment"
+              icon="save"
+              color={this.props.theme.almostWhite}
+            />
+          </StyledButtonContainer>
         </StyledExperimentHeader>
       </StyledHeaderContainer>
     );
@@ -24,9 +40,9 @@ class Header extends Component {
 const StyledHeaderContainer = styled.div`
   display: flex;
   flex-direction: column;
-  position: fixed;
   width: 100%;
   z-index: 9001; /* The z-index is over 9000! */
+  overflow: hidden;
 `;
 
 const StyledHeader = styled.div`
@@ -54,13 +70,28 @@ const StyledTitle = styled.h1`
   font-size: ${props => props.theme.h1};
 `;
 
-const StyledExperimentName = styled.div`
-  color: ${props => props.theme.almostWhite};
-  font-size: ${props => props.theme.h2};
-`;
-
 const StyledLogo = styled.img`
   height: 45px;
 `;
 
-export default withTheme(Header);
+const StyledButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  width: 20%;
+`;
+
+const mapStateToProps = state => {
+  return {
+    experimentName: state.experiment.name
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    updateExperimentName: newName => {
+      dispatch(updateName(newName));
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(withTheme(Header));
