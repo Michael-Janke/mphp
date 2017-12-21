@@ -35,7 +35,7 @@ export default class FeatureAnalysis extends Component {
             !this.props.algorithms.isError && (
               <StyledMenu>
                 <StyledOptions>
-                  <SelectField
+                  <StyledSelectField
                     floatingLabelText="Algorithm"
                     floatingLabelFixed={true}
                     hintText="Select algorithm..."
@@ -45,7 +45,7 @@ export default class FeatureAnalysis extends Component {
                     selectedMenuItemStyle={{ color: boringBlue }}
                   >
                     {this.props.algorithms.map(this.renderMenuItem)}
-                  </SelectField>
+                  </StyledSelectField>
                   {runnable
                     ? this.state.selectedAlgorithm.parameters.map(
                         this.renderParameter.bind(this)
@@ -188,6 +188,12 @@ const StyledMenu = styled.div`
 const StyledOptions = styled.div`
   display: flex;
   align-items: center;
+`;
+
+const StyledSelectField = styled(SelectField)`
+  button {
+    fill: ${props => props.theme.textColor} !important;
+  }
 `;
 
 const StyledTextField = styled(TextField)`
