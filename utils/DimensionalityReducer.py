@@ -7,7 +7,7 @@ from sklearn.feature_selection import f_classif
 from sklearn.tree import DecisionTreeClassifier
 
 import utils.EA.config as c
-from utils.EA.fitness import fitness, evaluate
+from utils.EA.fitness import fitness, evaluate, distance_evaluate
 from utils.EA.crossover import *
 from utils.EA.mutation import *
 from utils.EA.population import phenotype

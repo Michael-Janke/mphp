@@ -35,8 +35,8 @@ def distance_evaluate(sick_data, sick_labels, healthy_data, healthy_labels):
     sick_intra_distance, sick_inner_distance = compute_cluster_distance(sick_data, sick_labels)
     healthy_intra_distance, healthy_inner_distance = compute_cluster_distance(healthy_data, healthy_labels)
 
-    fitness_sick = sick_intra_distance - sick_inner_distance
-    fitness_healthy = healthy_intra_distance + healthy_inner_distance
+    fitness_sick = 5*sick_intra_distance - sick_inner_distance
+    fitness_healthy = 5*healthy_intra_distance + healthy_inner_distance
     fitness = fitness_sick - fitness_healthy
     return fitness
 
