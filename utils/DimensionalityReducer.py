@@ -6,6 +6,12 @@ from sklearn.feature_selection import mutual_info_classif
 from sklearn.feature_selection import f_classif
 from sklearn.tree import DecisionTreeClassifier
 
+import utils.EA.config as c
+from utils.EA.fitness import fitness
+from utils.EA.crossover import *
+from utils.EA.mutation import *
+from utils.EA.population import phenotype
+from utils.EA.algorithm import ea_for_plot
 
 class DimensionalityReducer:
     ####### PCA #######
@@ -35,7 +41,9 @@ class DimensionalityReducer:
 
         return pca, X, gene_indices
 
+
     ####### FEATURE SELECTION BY STATISTICS #######
+
     def getFeatures(self,  data, k=20, m="chi2"):
         selector = SelectKBest(self.method_table[m], k=k)
         selector.fit(data.expressions, data.labels)
@@ -85,7 +93,22 @@ class DimensionalityReducer:
 
         return indices, sick.expressions[:, indices], healthy.expressions[:, indices]
 
+
+    ####### MULTI-VARIATE FEATURE SELECTION #######
+
+    def getEAFeatures(self, sick, healthy):
+        # preselect features to reduce runtime
+        selected_genes, sick_X, healthy_X = self.getNormalizedFeatures(sick,healthy,"substract", c.chromo_size, c.chromo_size)
+        crossover = one_point_crossover
+        mutation = binary_mutation
+        fitness_function = fitness(sick_X, sick.labels, healthy_X, healthy.labels)
+        best, stat, stat_aver = ea_for_plot(c, c.chromo_size, fitness_function, crossover, mutation)
+        indices = selected_genes[phenotype(best)]
+        return indices, sick.expressions[:, indices], healthy.expressions[:, indices]
+
+
     ####### EMBEDDED FEATURE SELECTION #######
+    
     def getDecisionTreeFeatures(self, data, k=20):
         tree = DecisionTreeClassifier()
         tree.fit(data.expressions, data.labels)
