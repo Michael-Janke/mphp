@@ -52,19 +52,21 @@ export default class FeatureAnalysis extends Component {
                       )
                     : null}
                 </StyledOptions>
-                <StyledButton
-                  title={
-                    runnable
-                      ? `Run ${this.state.selectedAlgorithm.name}`
-                      : `Please select an algorithm`
-                  }
-                  label="Run"
-                  primary={true}
-                  onClick={() => {
-                    this.executeAlgorithm();
-                  }}
-                  disabled={!runnable}
-                />
+                <CardActions>
+                  <StyledButton
+                    title={
+                      runnable
+                        ? `Run ${this.state.selectedAlgorithm.name}`
+                        : `Please select an algorithm`
+                    }
+                    label="Run"
+                    primary={true}
+                    onClick={() => {
+                      this.executeAlgorithm();
+                    }}
+                    disabled={!runnable}
+                  />
+                </CardActions>
               </StyledMenu>
             )}
         </Card>
@@ -161,6 +163,11 @@ export default class FeatureAnalysis extends Component {
   }
 }
 
+const CardActions = styled.div`
+  display: flex;
+  flex-direction: row-reverse;
+`;
+
 const StyledButton = styled(RaisedButton)`
   && {
     margin: 12px;
@@ -180,7 +187,7 @@ const StyledCards = styled.div`
 
 const StyledMenu = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: space-between;
   margin: 16px;
 `;
