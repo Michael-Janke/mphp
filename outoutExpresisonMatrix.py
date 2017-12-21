@@ -47,6 +47,7 @@ plotScatter(healthy_X,healthy.labels, gene_labels[selected_genes])
 
 
 # %%
+# EXPRESSION RELATIVE ACCORDING TO SICK DATA AND TYPES
 expression_levels = {
     1:   "high",
     0.8: "mid-high",
@@ -64,6 +65,42 @@ for label in np.unique(sick.labels):
     expressions = []
     for median in medians:
         expressions.append(expression_levels[np.ceil(median*5)/5])
+    data[label] = expressions
+
+pprint(data)
+
+
+
+# %%
+# GENE EXPRESSION RELATIVE TO HEALTHY DATA
+levels = {}
+for gene in selected_genes:
+    min_thresh = np.min(healthy.expressions[:,gene])
+    max_thresh = np.max(healthy.expressions[:,gene])
+    lower_thresh = np.percentile(healthy.expressions[:,gene], 30)
+    upper_thresh = np.percentile(healthy.expressions[:,gene], 70)
+    levels[gene] = [min_thresh, lower_thresh, upper_thresh, max_thresh]
+
+pprint(levels)
+
+data = {"genes": gene_labels[selected_genes].tolist()}
+for label in np.unique(sick.labels):
+    indices = np.where(sick.labels == label)
+    medians = np.median(sick_X[indices,], axis=1).tolist()[0]
+    expressions = []
+    for index, median in enumerate(medians):
+        thresholds = levels[selected_genes[index]]
+        if median < thresholds[0]:
+            expressions.append("lower")
+        elif median < thresholds[1]:
+            expressions.append("mid-lower")
+        elif median < thresholds[2]:
+            expressions.append("unchanged")
+        elif median < thresholds[3]:
+            expressions.append("mid-higher")
+        else:
+            expressions.append("higher")
+
     data[label] = expressions
 
 pprint(data)
