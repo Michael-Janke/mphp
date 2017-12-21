@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 import {
+  ResponsiveContainer,
   BarChart,
   Bar,
   XAxis,
@@ -24,8 +25,6 @@ export default class DataSelection extends Component {
 
   render() {
     const chartOptions = {
-      width: 100 * this.props.tcgaTokens.filter(token => token.selected).length,
-      height: 400,
       data: this.parseData(),
       margin: { top: 5, right: 30, left: 20, bottom: 5 }
     };
@@ -40,14 +39,18 @@ export default class DataSelection extends Component {
           !this.props.statistics.isError && (
             <StyledContent>
               <TcgaSelection data={this.props.statistics} />
-              <BarChart {...chartOptions}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <CartesianGrid strokeDasharray="3 3" />
-                <Tooltip />
-                <Legend />
-                {this.renderBars()}
-              </BarChart>
+              <DiagramContaier>
+                <ResponsiveContainer height="100%" width="100%">
+                  <BarChart {...chartOptions}>
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <Tooltip />
+                    <Legend />
+                    {this.renderBars()}
+                  </BarChart>
+                </ResponsiveContainer>
+              </DiagramContaier>
             </StyledContent>
           )}
       </Card>
@@ -83,6 +86,7 @@ export default class DataSelection extends Component {
           key={`bar-${dataKey.name}`}
           dataKey={dataKey.name}
           fill={dataKey.color}
+          maxBarSize={30}
         />
       );
     });
@@ -90,6 +94,9 @@ export default class DataSelection extends Component {
 }
 
 const StyledContent = styled.div`
-  display: inline-flex;
-  flex-direction: row;
+  display: flex;
+`;
+
+const DiagramContaier = styled.div`
+  width: 100%;
 `;
