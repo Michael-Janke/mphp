@@ -7,11 +7,12 @@ export function runs(state = initialState, action = {}) {
     case types.CREATE_RUN:
       return { ...state, [action.id]: { params: action.params } };
     case types.RUN_ALGORITHM:
-      const currentRun = state[action.id];
-      return {
-        ...state,
-        [action.id]: { ...currentRun, result: action.result }
-      };
+      return Object.keys(state).includes(`${action.id}`)
+        ? {
+            ...state,
+            [action.id]: { ...state[action.id], result: action.result }
+          }
+        : state;
     default:
       return state;
   }
