@@ -10,7 +10,7 @@ export function load() {
   function _load(algorithms) {
     return {
       type: types.LOAD_ALGORITHMS,
-      algorithms
+      ...algorithms
     };
   }
 }
