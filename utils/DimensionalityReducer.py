@@ -77,8 +77,8 @@ class DimensionalityReducer:
         s_indices = selector.get_support(indices=True)
 
         # get features in sick data which do not discriminate healty data
-        features = list(set(s_indices) - set(h_indices))
-        print("excluded " + str(n - len(features)) + " features")
+        features = list(set(s_indices)-set(h_indices))
+        print("excluded "+str(n+k-len(features))+" features")
         features = np.asarray(features, dtype=np.uint32)
         # sort selected features by score
         indices = features[selector.scores_[features].argsort()[-k:][::-1]]
