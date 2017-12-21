@@ -7,13 +7,12 @@ import styled from "styled-components";
 
 import { boringBlue } from "../../config/colors";
 import Card from "../Card";
-import Plot from "./PlotContainer";
+import Plot from "./Plot";
 
 export default class FeatureAnalysis extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      cards: [],
       selectedAlgorithm: null,
       params: {}
     };
@@ -69,18 +68,25 @@ export default class FeatureAnalysis extends Component {
               </StyledMenu>
             )}
         </Card>
-        <StyledCards>{this.state.cards.map(this.renderCard)}</StyledCards>
+        <StyledCards>
+          {Object.keys(this.props.runs).map(this.renderRun.bind(this))}
+        </StyledCards>
       </div>
     );
   }
 
-  renderCard(card, index) {
-    const SpecifiedCard = card.component;
-    return <SpecifiedCard key={`card-${index}`} {...card.props} />;
-  }
-
-  addCard(card) {
-    this.setState({ cards: [...this.state.cards, card] });
+  renderRun(runId) {
+    const run = this.props.runs[runId];
+    return (
+      <Card
+        title={run.params.name}
+        isLoading={!run.result}
+        isError={run.result && run.result.isError}
+        key={`run-${runId}`}
+      >
+        <Plot {...run.result} />
+      </Card>
+    );
   }
 
   renderMenuItem(algorithm, index) {
@@ -132,14 +138,6 @@ export default class FeatureAnalysis extends Component {
 
   executeAlgorithm() {
     const { selectedAlgorithm } = this.state;
-    const cards = {
-      getPCA: Plot,
-      getDecisionTreeFeatures: Plot,
-      getNormalizedFeaturesE: Plot,
-      getNormalizedFeaturesS: Plot,
-      getFeatures: Plot
-    };
-
     const cancerTypes = this.props.dataSelection.tcgaTokens
       .filter(token => token.selected)
       .map(token => token.name);
@@ -150,23 +148,16 @@ export default class FeatureAnalysis extends Component {
       .filter(tissueType => tissueType.isHealthy && tissueType.selected)
       .map(tissueType => tissueType.name);
     const params = {
+      name: selectedAlgorithm.name,
       key: selectedAlgorithm.key,
       cancerTypes,
       sickTissueTypes,
       healthyTissueTypes,
-      // TODO: set parameters
       parameters: {
         ...this.state.params
       }
     };
-    // this.props.runAlgorithm(params);
-    this.addCard({
-      component: cards[selectedAlgorithm.key],
-      props: {
-        route: `/runAlgorithm`,
-        params
-      }
-    });
+    this.props.runAlgorithm(params);
   }
 }
 
