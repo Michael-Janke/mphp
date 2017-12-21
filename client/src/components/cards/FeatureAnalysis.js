@@ -35,7 +35,7 @@ export default class FeatureAnalysis extends Component {
             !this.props.algorithms.isError && (
               <StyledMenu>
                 <StyledOptions>
-                  <SelectField
+                  <StyledSelectField
                     floatingLabelText="Algorithm"
                     floatingLabelFixed={true}
                     hintText="Select algorithm..."
@@ -45,26 +45,28 @@ export default class FeatureAnalysis extends Component {
                     selectedMenuItemStyle={{ color: boringBlue }}
                   >
                     {this.props.algorithms.map(this.renderMenuItem)}
-                  </SelectField>
+                  </StyledSelectField>
                   {runnable
                     ? this.state.selectedAlgorithm.parameters.map(
                         this.renderParameter.bind(this)
                       )
                     : null}
                 </StyledOptions>
-                <StyledButton
-                  title={
-                    runnable
-                      ? `Run ${this.state.selectedAlgorithm.name}`
-                      : `Please select an algorithm`
-                  }
-                  label="Run"
-                  primary={true}
-                  onClick={() => {
-                    this.executeAlgorithm();
-                  }}
-                  disabled={!runnable}
-                />
+                <CardActions>
+                  <StyledButton
+                    title={
+                      runnable
+                        ? `Run ${this.state.selectedAlgorithm.name}`
+                        : `Please select an algorithm`
+                    }
+                    label="Run"
+                    primary={true}
+                    onClick={() => {
+                      this.executeAlgorithm();
+                    }}
+                    disabled={!runnable}
+                  />
+                </CardActions>
               </StyledMenu>
             )}
         </Card>
@@ -161,6 +163,11 @@ export default class FeatureAnalysis extends Component {
   }
 }
 
+const CardActions = styled.div`
+  display: flex;
+  flex-direction: row-reverse;
+`;
+
 const StyledButton = styled(RaisedButton)`
   && {
     margin: 12px;
@@ -180,7 +187,7 @@ const StyledCards = styled.div`
 
 const StyledMenu = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: space-between;
   margin: 16px;
 `;
@@ -188,6 +195,12 @@ const StyledMenu = styled.div`
 const StyledOptions = styled.div`
   display: flex;
   align-items: center;
+`;
+
+const StyledSelectField = styled(SelectField)`
+  button {
+    fill: ${props => props.theme.textColor} !important;
+  }
 `;
 
 const StyledTextField = styled(TextField)`
