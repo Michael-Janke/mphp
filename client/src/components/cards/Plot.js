@@ -2,7 +2,6 @@
 import loadScript from "load-script";
 import React, { Component } from "react";
 import createPlotlyComponent from "react-plotly.js/factory";
-import styled from "styled-components";
 
 import { statisticsColors } from "../../config/colors";
 import Card from "../Card";

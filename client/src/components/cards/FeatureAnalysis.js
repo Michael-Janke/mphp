@@ -3,7 +3,7 @@ import RaisedButton from "material-ui/RaisedButton";
 import SelectField from "material-ui/SelectField";
 import MenuItem from "material-ui/MenuItem";
 import TextField from "material-ui/TextField";
-import styled, { withTheme } from "styled-components";
+import styled from "styled-components";
 
 import { boringBlue } from "../../config/colors";
 import Card from "../Card";

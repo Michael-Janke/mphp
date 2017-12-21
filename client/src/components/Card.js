@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Card as _Card, CardTitle, CardText } from "material-ui/Card";
+import { Card as _Card, CardTitle } from "material-ui/Card";
 import Spinner from "./Spinner";
 import styled from "styled-components";
 
