@@ -1,22 +1,20 @@
 import React, { Component } from "react";
+import styled from "styled-components";
+
 import Card from "../Card";
 
-class SelectDataset extends Component {
+export default class SelectDataset extends Component {
   render() {
     return (
-      <Card
-        title="Experiment Information"
-        DataViewer={DataViewer}
-        viewerProps={{ ...this.props.data }}
-      />
+      <Card title="Experiment Information">
+        <StyledContent>Data Set: {this.props.data.dataset}</StyledContent>
+      </Card>
     );
   }
 }
 
-class DataViewer extends Component {
-  render() {
-    return <div>Data Set: {this.props.dataset}</div>;
-  }
-}
-
-export default SelectDataset;
+const StyledContent = styled.div`
+  display: inline-flex;
+  flex-direction: row;
+  margin: 16px;
+`;
