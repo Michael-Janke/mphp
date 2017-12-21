@@ -7,7 +7,7 @@ from sklearn.feature_selection import f_classif
 from sklearn.tree import DecisionTreeClassifier
 
 import utils.EA.config as c
-from utils.EA.fitness import fitness
+from utils.EA.fitness import fitness, evaluate
 from utils.EA.crossover import *
 from utils.EA.mutation import *
 from utils.EA.population import phenotype
@@ -104,6 +104,28 @@ class DimensionalityReducer:
         fitness_function = fitness(sick_X, sick.labels, healthy_X, healthy.labels)
         best, stat, stat_aver = ea_for_plot(c, c.chromo_size, fitness_function, crossover, mutation)
         indices = selected_genes[phenotype(best)]
+        return indices, sick.expressions[:, indices], healthy.expressions[:, indices]
+
+    def getFaturesBySFS(self, sick, healthy, k=3, n=5000, m=100):
+        # preselect 100 genes in sick data which do not separate healthy data well
+        selected_genes, _, _ = self.getNormalizedFeatures(sick,healthy,"exclude", m, n)
+
+        # first gene has highest score and will be selected first
+        indices = [selected_genes[0]]
+        # iteratively join the best next feature based on a fitness function until k features are found
+        for idx in range(1,k):
+            best_fitness = -10
+            best_gene = 0
+            for i in range(1,m):
+                gene = selected_genes[i]
+                fitness_score = evaluate(sick.expressions[:,indices + [gene]], sick.labels,\
+                                        healthy.expressions[:,indices + [gene]], healthy.labels)
+                if fitness_score > best_fitness:
+                    best_fitness = fitness_score
+                    best_gene = gene
+            indices.append(best_gene)
+            print("added new feature")
+
         return indices, sick.expressions[:, indices], healthy.expressions[:, indices]
 
 

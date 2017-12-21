@@ -31,7 +31,8 @@ print("got combined data")
 
 # %%
 # Feature Selection
-selected_genes, sick_X, healthy_X = dimReducer.getEAFeatures(sick,healthy)
+#selected_genes, sick_X, healthy_X = dimReducer.getEAFeatures(sick,healthy)
+selected_genes, sick_X, healthy_X = dimReducer.getFaturesBySFS(sick,healthy,10)
 print(selected_genes)
 
 #selected_genes = np.array([ 1178, 3349, 15737, 590, 10600, 232, 21125])
