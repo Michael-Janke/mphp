@@ -2,9 +2,10 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { updateName } from "../actions/experimentActions";
 import logo from "../assets/images/logo.png";
-import styled, { withTheme } from "styled-components";
+import styled from "styled-components";
 import EditableText from "./EditableText";
 import IconButton from "./IconButton";
+import { almostWhite } from "../config/colors";
 
 class Header extends Component {
   render() {
@@ -23,12 +24,12 @@ class Header extends Component {
             <IconButton
               tooltip="Open existing experiment"
               icon="open"
-              color={this.props.theme.almostWhite}
+              color={almostWhite}
             />
             <IconButton
               tooltip="Save experiment"
               icon="save"
-              color={this.props.theme.almostWhite}
+              color={almostWhite}
             />
           </StyledButtonContainer>
         </StyledExperimentHeader>
@@ -94,4 +95,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withTheme(Header));
+export default connect(mapStateToProps, mapDispatchToProps)(Header);

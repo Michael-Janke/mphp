@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import styled, { withTheme } from "styled-components";
+import styled from "styled-components";
 import IconButton from "./IconButton";
+import { almostWhite } from "../config/colors";
 
 class EditableText extends Component {
   constructor(props) {
@@ -41,7 +42,7 @@ class EditableText extends Component {
       <IconButton
         tooltip="Edit experiment name"
         icon="edit"
-        color={this.props.theme.almostWhite}
+        color={almostWhite}
         onClick={this.edit.bind(this)}
       />
     );
@@ -100,4 +101,4 @@ const StyledContainer = styled.div`
   align-items: center;
 `;
 
-export default withTheme(EditableText);
+export default EditableText;
