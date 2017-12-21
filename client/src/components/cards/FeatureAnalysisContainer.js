@@ -1,7 +1,8 @@
-import React, { Component } from "react";
 import { connect } from "react-redux";
-
-import { load } from "../../actions/featureAnalysisActions";
+import {
+  loadAlgorithms,
+  runAlgorithm
+} from "../../actions/featureAnalysisActions";
 import FeatureAnalysis from "./FeatureAnalysis";
 
 const mapStateToProps = state => {
@@ -14,7 +15,10 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     loadAlgorithms: () => {
-      dispatch(load());
+      dispatch(loadAlgorithms());
+    },
+    runAlgorithm: params => {
+      dispatch(runAlgorithm(params));
     }
   };
 };
