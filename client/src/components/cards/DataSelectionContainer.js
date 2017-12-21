@@ -1,6 +1,4 @@
-import React, { Component } from "react";
 import { connect } from "react-redux";
-
 import { load } from "../../actions/statisticsActions";
 import DataSelection from "./DataSelection";
 
