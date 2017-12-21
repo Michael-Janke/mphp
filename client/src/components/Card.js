@@ -5,29 +5,23 @@ import styled from "styled-components";
 
 const CARD_TITLE_HEIGHT = 15;
 
-class Card extends Component {
+export default class Card extends Component {
   render() {
-    const { title, isLoading, width } = this.props;
+    const { title, isLoading, width, isError } = this.props;
     return (
       <StyledCard zDepth={1} width={width}>
         <StyledCardTitle>
           <StyledTitleText>{title}</StyledTitleText>
           {isLoading ? <Spinner size={CARD_TITLE_HEIGHT} /> : null}
         </StyledCardTitle>
-        {isLoading ? null : this.renderContent()}
+        {isError ? (
+          <StyledError>
+            Sorry, there was an error fetching the data.
+          </StyledError>
+        ) : isLoading ? null : (
+          this.props.children
+        )}
       </StyledCard>
-    );
-  }
-
-  renderContent() {
-    const { DataViewer, viewerProps } = this.props;
-    const isError = viewerProps.data && viewerProps.data.isError;
-    return isError ? (
-      <StyledError>{`${viewerProps.data.error}`}</StyledError>
-    ) : (
-      <CardText>
-        <DataViewer {...viewerProps} />
-      </CardText>
     );
   }
 }
@@ -51,8 +45,6 @@ const StyledTitleText = styled.p`
   font-size: ${props => props.theme.h2};
 `;
 
-const StyledError = styled(CardText)`
-  color: red !important;
+const StyledError = styled.div`
+  color: red;
 `;
-
-export default Card;
