@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { load as loadStatistics } from "../actions/statisticsActions";
 import { loadAlgorithms, runAlgorithm } from "../actions/runActions";
 
-import Card from "./Card";
+import Run from "./Run";
 
 class Content extends Component {
   constructor(props) {
@@ -30,7 +30,7 @@ class Content extends Component {
         {Object.keys(runs).map(runId => {
           const run = runs[runId];
           return (
-            <Card
+            <Run
               key={runId}
               isLoading={!algorithms || !statistics || run.isLoading}
               isError={

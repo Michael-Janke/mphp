@@ -40,7 +40,7 @@ export default class InteractivePlot extends Component {
     const { data, geneNames } = this.props;
     const plotData = Object.keys(data).map((key, index) => {
       const cancerType = key.split("-")[0];
-      if (oldCancerType != cancerType) {
+      if (oldCancerType !== cancerType) {
         color = Color(statisticsColors[colorIndex++]);
         oldCancerType = cancerType;
         oldColor = color;
