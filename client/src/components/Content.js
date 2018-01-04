@@ -1,14 +1,12 @@
 import React, { Component } from "react";
-import DataSelection from "./cards/DataSelectionContainer";
-import FeatureAnalysis from "./cards/FeatureAnalysisContainer";
+import AlgorithmExecution from "./cards/AlgorithmExecutionContainer";
 import Results from "./cards/ResultsContainer";
 
 class Content extends Component {
   render() {
     return (
       <div className="content">
-        <DataSelection />
-        <FeatureAnalysis />
+        <AlgorithmExecution />
         <Results />
       </div>
     );

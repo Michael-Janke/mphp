@@ -12,7 +12,6 @@ import {
 } from "recharts";
 
 import { statisticsColors } from "../../config/colors";
-import Card from "../Card";
 import TcgaSelection from "../TcgaSelection";
 
 export default class DataSelection extends Component {
@@ -30,30 +29,24 @@ export default class DataSelection extends Component {
     };
 
     return (
-      <Card
-        title={"Data Selection"}
-        isLoading={!this.props.statistics}
-        isError={this.props.statistics && this.props.statistics.isError}
-      >
-        {this.props.statistics &&
-          !this.props.statistics.isError && (
-            <StyledContent>
-              <TcgaSelection data={this.props.statistics} />
-              <DiagramContaier>
-                <ResponsiveContainer height="100%" width="100%">
-                  <BarChart {...chartOptions}>
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <Tooltip />
-                    <Legend />
-                    {this.renderBars()}
-                  </BarChart>
-                </ResponsiveContainer>
-              </DiagramContaier>
-            </StyledContent>
-          )}
-      </Card>
+      this.props.statistics &&
+      !this.props.statistics.isError && (
+        <StyledContent>
+          <TcgaSelection data={this.props.statistics} />
+          <DiagramContaier>
+            <ResponsiveContainer height="100%" width="100%">
+              <BarChart {...chartOptions}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <CartesianGrid strokeDasharray="3 3" />
+                <Tooltip />
+                <Legend />
+                {this.renderBars()}
+              </BarChart>
+            </ResponsiveContainer>
+          </DiagramContaier>
+        </StyledContent>
+      )
     );
   }
 

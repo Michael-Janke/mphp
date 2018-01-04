@@ -6,70 +6,58 @@ import TextField from "material-ui/TextField";
 import styled from "styled-components";
 
 import { boringBlue } from "../../config/colors";
-import Card from "../Card";
 
-export default class FeatureAnalysis extends Component {
+export default class AlgorithmSelection extends Component {
   constructor(props) {
     super(props);
     this.state = {
       selectedAlgorithm: null,
       params: {}
     };
-    if (this.props.algorithms === null) {
-      this.props.loadAlgorithms();
-    }
   }
 
   render() {
     const runnable = this.state.selectedAlgorithm !== null;
 
     return (
-      <div className="feature-analysis">
-        <Card
-          title={"Feature Analysis"}
-          isLoading={!this.props.algorithms}
-          isError={this.props.algorithms && this.props.algorithms.isError}
-        >
-          {this.props.algorithms &&
-            !this.props.algorithms.isError && (
-              <StyledMenu>
-                <StyledOptions>
-                  <StyledSelectField
-                    floatingLabelText="Algorithm"
-                    floatingLabelFixed={true}
-                    hintText="Select algorithm..."
-                    value={runnable ? this.state.selectedAlgorithm.key : null}
-                    onChange={this.selectAlgorithm.bind(this)}
-                    autoWidth={true}
-                    selectedMenuItemStyle={{ color: boringBlue }}
-                  >
-                    {this.props.algorithms.map(this.renderMenuItem)}
-                  </StyledSelectField>
-                  {runnable
-                    ? this.state.selectedAlgorithm.parameters.map(
-                        this.renderParameter.bind(this)
-                      )
-                    : null}
-                </StyledOptions>
-                <CardActions>
-                  <StyledButton
-                    title={
-                      runnable
-                        ? `Run ${this.state.selectedAlgorithm.name}`
-                        : `Please select an algorithm`
-                    }
-                    label="Run"
-                    primary={true}
-                    onClick={() => {
-                      this.executeAlgorithm();
-                    }}
-                    disabled={!runnable}
-                  />
-                </CardActions>
-              </StyledMenu>
-            )}
-        </Card>
-      </div>
+      this.props.algorithms &&
+      !this.props.algorithms.isError && (
+        <StyledMenu>
+          <StyledOptions>
+            <StyledSelectField
+              floatingLabelText="Algorithm"
+              floatingLabelFixed={true}
+              hintText="Select algorithm..."
+              value={runnable ? this.state.selectedAlgorithm.key : null}
+              onChange={this.selectAlgorithm.bind(this)}
+              autoWidth={true}
+              selectedMenuItemStyle={{ color: boringBlue }}
+            >
+              {this.props.algorithms.map(this.renderMenuItem)}
+            </StyledSelectField>
+            {runnable
+              ? this.state.selectedAlgorithm.parameters.map(
+                  this.renderParameter.bind(this)
+                )
+              : null}
+          </StyledOptions>
+          <CardActions>
+            <StyledButton
+              title={
+                runnable
+                  ? `Run ${this.state.selectedAlgorithm.name}`
+                  : `Please select an algorithm`
+              }
+              label="Run"
+              primary={true}
+              onClick={() => {
+                this.executeAlgorithm();
+              }}
+              disabled={!runnable}
+            />
+          </CardActions>
+        </StyledMenu>
+      )
     );
   }
 
@@ -122,13 +110,13 @@ export default class FeatureAnalysis extends Component {
 
   executeAlgorithm() {
     const { selectedAlgorithm } = this.state;
-    const cancerTypes = this.props.dataSelection.tcgaTokens
+    const cancerTypes = this.props.tcgaTokens
       .filter(token => token.selected)
       .map(token => token.name);
-    const sickTissueTypes = this.props.dataSelection.tissueTypes
+    const sickTissueTypes = this.props.tissueTypes
       .filter(tissueType => !tissueType.isHealthy && tissueType.selected)
       .map(tissueType => tissueType.name);
-    const healthyTissueTypes = this.props.dataSelection.tissueTypes
+    const healthyTissueTypes = this.props.tissueTypes
       .filter(tissueType => tissueType.isHealthy && tissueType.selected)
       .map(tissueType => tissueType.name);
     const params = {
