@@ -4,7 +4,8 @@ import Results from "./Results";
 
 const mapStateToProps = state => {
   return {
-    ...state.featureAnalysis,
+    algorithms: state.algorithms,
+    runs: state.runs,
     dataSelection: state.dataSelection
   };
 };

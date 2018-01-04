@@ -2,11 +2,13 @@ import { combineReducers } from "redux";
 import { statistics } from "./statistics";
 import { dataSelection } from "./dataSelection";
 import { experiment } from "./experiment";
-import { featureAnalysis } from "./featureAnalysis";
+import { algorithms } from "./algorithms";
+import { runs } from "./runs";
 
 export default combineReducers({
   statistics,
   dataSelection,
   experiment,
-  featureAnalysis
+  algorithms,
+  runs
 });

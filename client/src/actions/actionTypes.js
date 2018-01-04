@@ -1,5 +1,4 @@
 export const LOAD_STATISTICS = "LOAD_STATISTICS";
-export const LOAD_PLOT = "LOAD_PLOT";
 export const LOAD_ALGORITHMS = "LOAD_ALGORITHMS";
 
 export const TOGGLE_TOKEN = "TOGGLE_TOKEN";
