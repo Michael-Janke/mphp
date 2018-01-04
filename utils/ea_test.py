@@ -10,6 +10,8 @@ from utils.EA.ea_utils import display_stat_1
 from utils.EA.population import phenotype
 import utils.EA.config as c
 
+from utils import Expressions
+
 print("import successful")
 
 # %%
@@ -34,12 +36,12 @@ if c.crossover == "uniform":
     crossover = uniform_crossover
 elif c.crossover == "two_points":
     crossover = two_points_crossover
-else: 
+else:
     crossover = one_point_crossover
 
 mutation = binary_mutation
 
-fitness_function = fitness(sick_X, sick.labels, healthy_X, healthy.labels)
+fitness_function = fitness(Expressions(sick_X, sick.labels), Expressions(healthy_X, healthy.labels))
 
 best, stat, stat_aver = ea_for_plot(c, chromo_size, fitness_function, crossover, mutation)
 

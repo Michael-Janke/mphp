@@ -3,6 +3,7 @@ import os
 import zipfile
 import sys
 from parse_dataset import parse_dataset
+from download_gene_names import download_gene_names
 from create_statistics import create_statistics
 #sys.path.insert(0, './parse_data_scripts')
 
@@ -25,6 +26,9 @@ urls = {
 		"url":"https://www.dropbox.com/s/l2bpf4lka8jxktg/LargeSet.zip?dl=1",
 		"parse": True,
 		"create_statistics": True,
+	},
+	"gene_names": {
+		"download_gene_names": True
 	}
 }
 
@@ -45,7 +49,7 @@ for dataset, url in urls.items():
 		else:
 			print("skip already downloaded " + dataset)
 
-	if not os.path.exists(path + "/subsets"):
+	if not os.path.exists(path + "/subsets") and "parse" in url:
 		if url["parse"]:
 			print("parse " + dataset)
 			parse_dataset(dataset)
@@ -54,7 +58,7 @@ for dataset, url in urls.items():
 	else:
 		print("already parsed " + dataset)
 
-	if not os.path.exists(path + "/statistics"):
+	if not os.path.exists(path + "/statistics") and "create_statistics" in url:
 		if url["create_statistics"]:
 			print("creating statistics for " + dataset)
 			create_statistics(dataset)
@@ -62,5 +66,10 @@ for dataset, url in urls.items():
 			print("skipping statistics for " + dataset)
 	else:
 		print("already created statistics for " + dataset)
+
+	if "download_gene_names" in url and url["download_gene_names"] and not os.path.exists(path):
+		os.makedirs(path)
+		download_gene_names(path)
+		print("downloaded genes names")
 
 	print("finished " + dataset)
