@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "concurrently": "^3.5.1",
     "load-script": "^1.0.0",
     "material-ui": "^0.19.4",
     "react": "^16.1.1",
@@ -18,7 +19,7 @@
     "tinycolor2": "^1.4.1"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "concurrently \"react-scripts start\" \"cd .. & python app.py\" -n \"client,server\" -c \"green,yellow\" --kill-others-on-fail ",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
