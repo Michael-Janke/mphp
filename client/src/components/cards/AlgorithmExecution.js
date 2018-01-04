@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Card from "../Card";
 import DataSelection from "./DataSelection";
-import FeatureAnalysis from "./FeatureAnalysis";
+import AlgorithmSelection from "./AlgorithmSelection";
 
 export default class AlgorithmExecution extends Component {
   constructor(props) {
@@ -37,10 +37,7 @@ export default class AlgorithmExecution extends Component {
           (this.props.algorithms && this.props.algorithms.isError)
         }
       >
-        <DataSelection
-          {...{ statistics, tcgaTokens, tissueTypes, loadStatistics }}
-        />
-        <FeatureAnalysis
+        <AlgorithmSelection
           {...{
             algorithms,
             tcgaTokens,
@@ -48,6 +45,9 @@ export default class AlgorithmExecution extends Component {
             loadAlgorithms,
             runAlgorithm
           }}
+        />
+        <DataSelection
+          {...{ statistics, tcgaTokens, tissueTypes, loadStatistics }}
         />
       </Card>
     );

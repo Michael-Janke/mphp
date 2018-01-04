@@ -7,7 +7,7 @@ import styled from "styled-components";
 
 import { boringBlue } from "../../config/colors";
 
-export default class FeatureAnalysis extends Component {
+export default class AlgorithmSelection extends Component {
   constructor(props) {
     super(props);
     this.state = {
