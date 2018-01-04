@@ -7,10 +7,10 @@ export function loadAlgorithms() {
       dispatch(_load(algorithms));
     });
 
-  function _load(algorithms) {
+  function _load(data) {
     return {
       type: types.LOAD_ALGORITHMS,
-      ...algorithms
+      algorithms: data.isError ? data : data.algorithms
     };
   }
 }
