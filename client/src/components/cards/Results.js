@@ -37,8 +37,9 @@ const StyledCard = styled(Card)`
 `;
 
 const StyledRoot = styled.div`
-  display: inline-flex;
+  display: flex;
   width: 100%;
+  flex-wrap: wrap;
 `;
 
 const StyledContent = styled.div`
