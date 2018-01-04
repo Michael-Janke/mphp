@@ -30,8 +30,8 @@ const StyledCard = styled(_Card)`
   width: ${props => (props.fitContent ? "fit-content" : null)};
   margin: ${props => props.theme.mediumSpace};
   padding: ${props => props.theme.mediumSpace};
-  padding-top: ${props => props.theme.smallSpace};
-  padding-bottom: ${props => props.theme.smallSpace};
+  padding-top: ${props => props.theme.smallerSpace};
+  padding-bottom: ${props => props.theme.smallerSpace};
 `;
 
 const StyledCardTitle = styled(CardTitle)`

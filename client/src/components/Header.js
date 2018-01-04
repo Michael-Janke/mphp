@@ -20,23 +20,36 @@ class Header extends Component {
             text={this.props.experimentName}
             onChange={this.props.updateExperimentName}
           />
-          <StyledButtonContainer>
-            <IconButton
-              tooltip="Open existing experiment"
-              icon="open"
-              color={almostWhite}
-            />
-            <IconButton
-              tooltip="Save experiment"
-              icon="save"
-              color={almostWhite}
-            />
-          </StyledButtonContainer>
+          <div>
+            <StyledRightContainer>
+              <StyledText>{this.props.dataset}</StyledText>
+              <StyledSpacer />
+              <StyledSpacer>|</StyledSpacer>
+              <StyledSpacer />
+              <IconButton
+                tooltip="Open existing experiment"
+                icon="open"
+                color={almostWhite}
+              />
+              <StyledSpacer />
+              <IconButton
+                tooltip="Save experiment"
+                icon="save"
+                color={almostWhite}
+              />
+            </StyledRightContainer>
+          </div>
         </StyledExperimentHeader>
       </StyledHeaderContainer>
     );
   }
 }
+
+const StyledSpacer = styled.div`
+  margin-left: 3px;
+  margin-right: 3px;
+  color: ${props => props.theme.almostWhite};
+`;
 
 const StyledHeaderContainer = styled.div`
   display: flex;
@@ -75,15 +88,26 @@ const StyledLogo = styled.img`
   height: 45px;
 `;
 
-const StyledButtonContainer = styled.div`
+const StyledText = styled.p`
+  color: ${props => props.theme.almostWhite};
+  padding: ${props => props.theme.smallSpace};
+  margin: 0;
+  text-align: right;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 200px;
+`;
+
+const StyledRightContainer = styled.div`
   display: flex;
-  justify-content: flex-end;
-  width: 20%;
+  align-items: center;
 `;
 
 const mapStateToProps = state => {
   return {
-    experimentName: state.experiment.name
+    experimentName: state.experiment.name,
+    dataset: state.experiment.dataset
   };
 };
 

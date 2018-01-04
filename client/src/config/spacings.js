@@ -1,4 +1,5 @@
-export const smallSpace = "6px";
+export const smallerSpace = "6px";
+export const smallSpace = "9px";
 export const mediumSpace = "12px";
 export const largeSpace = "24px";
 
