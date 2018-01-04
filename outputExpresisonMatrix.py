@@ -4,7 +4,7 @@ from pprint import pprint
 from utils.DataLoader import DataLoader
 from utils.DimensionalityReducer import DimensionalityReducer
 from utils.DataNormalizer import DataNormalizer
-from utils.Analyzer import Analyzer
+from validation.Analyzer import Analyzer
 from utils.plot import plotScatter
 
 from utils import Expressions
@@ -22,7 +22,7 @@ print("got combined data")
 
 # %%
 # Feature Selection
-selected_genes, sick_X, healthy_X = dimReducer.getFaturesBySFS(sick,healthy,3)
+selected_genes, sick_X, healthy_X = dimReducer.getFeaturesBySFS(sick,healthy,3)
 print(selected_genes)
 
 sick_reduced = Expressions(sick_X, sick.labels)
@@ -33,7 +33,9 @@ plotScatter(sick_X, sick.labels, gene_labels[selected_genes])
 
 print("HEALTHY REDUCED")
 plotScatter(healthy_X,healthy.labels, gene_labels[selected_genes])
+#%%
 
+pprint(analyzer.computeFeatureValidation(sick, healthy, selected_genes))
 
 #%%
 expression_matrix = analyzer.computeExpressionMatrix(sick_reduced, healthy, selected_genes)
