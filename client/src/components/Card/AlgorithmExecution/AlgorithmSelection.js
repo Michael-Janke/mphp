@@ -5,7 +5,7 @@ import MenuItem from "material-ui/MenuItem";
 import TextField from "material-ui/TextField";
 import styled from "styled-components";
 
-import { boringBlue } from "../../config/colors";
+import { boringBlue } from "../../../config/colors";
 
 export default class AlgorithmSelection extends Component {
   constructor(props) {
@@ -18,7 +18,6 @@ export default class AlgorithmSelection extends Component {
 
   render() {
     const runnable = this.state.selectedAlgorithm !== null;
-
     return (
       this.props.algorithms &&
       !this.props.algorithms.isError && (
@@ -129,7 +128,7 @@ export default class AlgorithmSelection extends Component {
         ...this.state.params
       }
     };
-    this.props.runAlgorithm(params);
+    this.props.runAlgorithm(this.props.runId, params);
   }
 }
 

@@ -3,7 +3,7 @@ import loadScript from "load-script";
 import React, { Component } from "react";
 import createPlotlyComponent from "react-plotly.js/factory";
 
-import { statisticsColors } from "../../config/colors";
+import { statisticsColors } from "../../../config/colors";
 
 let Plot;
 loadScript("https://cdn.plot.ly/plotly-latest.min.js", function(err, script) {

@@ -11,8 +11,8 @@ import {
   Legend
 } from "recharts";
 
-import { statisticsColors } from "../../config/colors";
-import TcgaSelection from "../TcgaSelection";
+import { statisticsColors } from "../../../config/colors";
+import TcgaSelection from "../../TcgaSelection";
 
 export default class DataSelection extends Component {
   constructor(props) {
@@ -33,7 +33,7 @@ export default class DataSelection extends Component {
       !this.props.statistics.isError && (
         <StyledContent>
           <TcgaSelection data={this.props.statistics} />
-          <DiagramContaier>
+          <DiagramContainer>
             <ResponsiveContainer height="100%" width="100%">
               <BarChart {...chartOptions}>
                 <XAxis dataKey="name" />
@@ -44,7 +44,7 @@ export default class DataSelection extends Component {
                 {this.renderBars()}
               </BarChart>
             </ResponsiveContainer>
-          </DiagramContaier>
+          </DiagramContainer>
         </StyledContent>
       )
     );
@@ -90,6 +90,6 @@ const StyledContent = styled.div`
   display: flex;
 `;
 
-const DiagramContaier = styled.div`
+const DiagramContainer = styled.div`
   width: 100%;
 `;

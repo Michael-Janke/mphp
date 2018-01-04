@@ -1,33 +1,46 @@
 import React, { Component } from "react";
 import { Card as _Card, CardTitle } from "material-ui/Card";
-import Spinner from "./Spinner";
 import styled from "styled-components";
+
+import Spinner from "../Spinner";
+import AlgorithmExecution from "./AlgorithmExecution";
+import AlgorithmResult from "./AlgorithmResult";
 
 const CARD_TITLE_HEIGHT = 15;
 
 export default class Card extends Component {
   render() {
-    const { title, isLoading, width, isError, className } = this.props;
+    const { isLoading } = this.props;
     return (
-      <StyledCard className={className} zDepth={1} width={width}>
+      <StyledCard zDepth={1}>
         <StyledCardTitle>
-          <StyledTitleText>{title}</StyledTitleText>
+          <StyledTitleText>
+            {this.props.params.name || "Execute Algorithm"}
+          </StyledTitleText>
           {isLoading ? <Spinner size={CARD_TITLE_HEIGHT} /> : null}
         </StyledCardTitle>
-        {isError ? (
-          <StyledError>
-            Sorry, there was an error fetching the data.
-          </StyledError>
-        ) : isLoading ? null : (
-          this.props.children
-        )}
+        {this.renderBody()}
       </StyledCard>
+    );
+  }
+
+  renderBody() {
+    const { isError, isLoading, result } = this.props;
+    if (isLoading) return null;
+    if (isError) {
+      return (
+        <StyledError>Sorry, there was an error fetching the data.</StyledError>
+      );
+    }
+    return result === null ? (
+      <AlgorithmExecution {...this.props} />
+    ) : (
+      <AlgorithmResult {...this.props} />
     );
   }
 }
 
 const StyledCard = styled(_Card)`
-  width: ${props => (props.fitContent ? "fit-content" : null)};
   margin: ${props => props.theme.mediumSpace};
   padding: ${props => props.theme.mediumSpace};
   padding-top: ${props => props.theme.smallerSpace};

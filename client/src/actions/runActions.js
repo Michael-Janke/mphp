@@ -15,17 +15,23 @@ export function loadAlgorithms() {
   }
 }
 
-export function runAlgorithm(params) {
+export function createRun() {
   return dispatch => {
     const id = Date.now();
-    dispatch({ type: types.CREATE_RUN, id, params });
+    dispatch({ type: types.CREATE_RUN, id });
+  };
+}
+
+export function runAlgorithm(id, params) {
+  return dispatch => {
+    dispatch({ type: types.START_ALGORITHM, id, params });
     postRequest("/runAlgorithm", {
       algorithm: params
     }).then(response => dispatch(_runAlgorithm(id, response)));
 
     function _runAlgorithm(id, result) {
       return {
-        type: types.RUN_ALGORITHM,
+        type: types.ALGORITHM_DONE,
         id,
         result
       };
