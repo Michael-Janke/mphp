@@ -9,6 +9,8 @@ class DataLoader:
         self.dataset = dataset
         self.data, self.cancer_types, self.sample_types = self.readData(dataset)
         self.gene_labels, self.statistics = self.readGenesAndStatistics(dataset)
+        self.gene_names_map = self.readGeneNamesMap()
+        self.gene_names = self.mapGeneLabelsToGeneNames(self.gene_labels)
 
     def readData(self, dataset):
         data = {}
@@ -39,6 +41,19 @@ class DataLoader:
         statistics = np.load(statistics_file)
 
         return gene_labels, statistics
+
+    def readGeneNamesMap(self):
+        return np.load('data/gene_names/gene_names.npy').item()
+
+    def mapGeneLabelsToGeneNames(self, labels):
+        mapfunc = lambda gene: self.gene_names_map[int(gene[4:])]
+        return np.vectorize(mapfunc)(labels)
+
+    def getGeneNamesTable(self):
+        return self.gene_names
+
+    def getGeneNames(self):
+        return self.gene_names
 
     def getGeneLabels(self):
         return self.gene_labels

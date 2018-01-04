@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 export default class GeneExploration extends Component {
   render() {
+    const { genes, geneNames } = this.props.result;
     return (
       <div>
         <h3>Gene Exploration</h3>
@@ -11,13 +12,14 @@ export default class GeneExploration extends Component {
           clusters:
         </p>
         <StyledList>
-          {this.props.result.genes.map(gene => (
+          {
+            genes.map((gene, i) => (
             <StyledItem key={gene}>
               <a
-                href={`https://www.proteinatlas.org/search/${gene}`}
+                href={`https://www.proteinatlas.org/${gene}`}
                 target="_blank"
               >
-                {gene}
+                {geneNames[i]}
               </a>
             </StyledItem>
           ))}

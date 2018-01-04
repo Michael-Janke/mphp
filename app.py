@@ -13,47 +13,13 @@ app = Flask(__name__)
 CORS(app)
 dataLoader = DataLoader("dataset4")
 gene_labels = dataLoader.getGeneLabels()
+gene_names = dataLoader.getGeneNames()
 dimReducer = DimensionalityReducer()
 analyzer = Analyzer()
-
 
 @app.route('/')
 def hello_world():
     return 'Hello World!'
-
-
-@app.route('/data', methods=["GET"])
-def getData():
-    luad_thca = dataLoader.getData(["sick", "healthy"], ["LUAD", "THCA"])
-    indices, X = dimReducer.getFeatures(luad_thca, 20)
-
-    response = {
-        'data': X.tolist(),
-        'labels': luad_thca.labels.tolist(),
-        'genes': gene_labels[indices].tolist(),
-    }
-
-    return json.dumps(response)
-
-
-@app.route('/plot', methods=["GET"])
-def getPlotData():
-    healthy = dataLoader.getData(["healthy"], ["THCA", "LUAD"])
-    sick = dataLoader.getData(["sick"], ["THCA", "LUAD"])
-    indices, s_data, _ = dimReducer.getNormalizedFeatures(
-        sick, healthy, "exclude", 3)
-
-    data = {}
-    for label in np.unique(sick.labels):
-        data[label] = s_data[sick.labels == label, :].T.tolist()
-
-    response = {
-        'data': data,
-        'genes': gene_labels[indices].tolist(),
-    }
-
-    return json.dumps(response)
-
 
 @app.route("/algorithms", methods=["GET"])
 def algorithms():
@@ -141,7 +107,6 @@ def algorithms():
                 "parameters": []
             }
         ],
-
     }
 
     return json.dumps(response)
@@ -214,6 +179,7 @@ def runSpecificAlgorithm():
         'data': responseData,
         'genes': gene_labels[gene_indices].tolist(),
         'expressionMatrix': expressionMatrix,
+        'geneNames': gene_names[gene_indices].tolist(),
     }
     return json.dumps(response)
 
@@ -226,4 +192,4 @@ def getStatistics():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, use_reloader=True)
+    app.run(host='0.0.0.0', debug=True, use_reloader=True, threaded=True)

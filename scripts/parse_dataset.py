@@ -2,7 +2,7 @@
 # coding: utf-8
 
 import os
-import numpy
+import numpy as np
 from glob import glob
 
 def parse_dataset(name):
@@ -18,19 +18,21 @@ def parse_dataset(name):
     # please set PATH constants
 
     data_file.seek(0)
-    gene_labels = numpy.genfromtxt(data_file, delimiter=",", max_rows=1, dtype=numpy.unicode)[1:]
+    gene_labels = np.genfromtxt(data_file, delimiter=",", max_rows=1, dtype=np.unicode)[1:]
+    trim_quotes = np.vectorize(lambda x: x[1:-1])
+    gene_labels = trim_quotes(gene_labels)
 
     feature_count = gene_labels.shape[0]
     data_file.seek(0)
     row_count = sum(1 for line in data_file)
 
     meta_file = open(META_DATA_PATH, "rb")
-    meta_data = numpy.genfromtxt(meta_file, delimiter=",", dtype=numpy.unicode)[:,1:]
+    meta_data = np.genfromtxt(meta_file, delimiter=",", dtype=np.unicode)[:,1:]
 
     data_file.seek(0)
-    data = numpy.empty((row_count-1, feature_count), dtype = numpy.float32)
-    cancer_labels = numpy.transpose([row.replace('"', '') for row in meta_data[1]]) #meta data has same order, so we just set the meta_data column 2 as label
-    sample_types = numpy.transpose([row.replace('"', '') for row in meta_data[2]]) #meta data has same order, so we just set the meta_data column 2 as label
+    data = np.empty((row_count-1, feature_count), dtype = np.float32)
+    cancer_labels = np.transpose([row.replace('"', '') for row in meta_data[1]]) #meta data has same order, so we just set the meta_data column 2 as label
+    sample_types = np.transpose([row.replace('"', '') for row in meta_data[2]]) #meta data has same order, so we just set the meta_data column 2 as label
 
     previous_cancer_label = cancer_labels[0]
     for index, cancer_label in enumerate(cancer_labels):
@@ -51,7 +53,7 @@ def parse_dataset(name):
         if progress != progress_now:
             print("%s%% parsed (%d)" % (progress_now, irow), flush=True, end="\r")
         progress = progress_now
-    print("parsing finished", flush=True)
+    print("---parsing finished---", flush=True)
 
     data_file.close()
     meta_file.close()
@@ -63,8 +65,8 @@ def parse_dataset(name):
         os.makedirs(SUBSET_PATH)
 
     for cancer_label in set(cancer_labels):
-        indices = numpy.where(cancer_labels == cancer_label)[0][1:]
-        numpy.save(SUBSET_PATH + cancer_label, data[indices])
-        numpy.save(SUBSET_PATH + cancer_label + "_meta_data", sample_types[indices])
+        indices = np.where(cancer_labels == cancer_label)[0][1:]
+        np.save(SUBSET_PATH + cancer_label, data[indices])
+        np.save(SUBSET_PATH + cancer_label + "_meta_data", sample_types[indices])
 
-    numpy.save(SUBSET_PATH + "gene_labels", gene_labels)
+    np.save(SUBSET_PATH + "gene_labels", gene_labels)

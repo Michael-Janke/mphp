@@ -3,6 +3,7 @@ import os
 import zipfile
 import sys
 from parse_dataset import parse_dataset
+from download_gene_names import download_gene_names
 from create_statistics import create_statistics
 #sys.path.insert(0, './parse_data_scripts')
 
@@ -25,6 +26,9 @@ urls = {
 		"url":"https://www.dropbox.com/s/l2bpf4lka8jxktg/LargeSet.zip?dl=1",
 		"parse": True,
 		"create_statistics": True,
+	},
+	"gene_names": {
+		"download_gene_names": True
 	}
 }
 
@@ -35,32 +39,37 @@ for dataset, url in urls.items():
 	path = "data/" + dataset
 	if "url" in url:
 		if not os.path.exists(path):
-			print("download " + dataset)
+			print("download " + dataset, flush=True)
 			os.makedirs(path)
 			urllib.request.urlretrieve(url["url"], path + "/download.zip")
-			print("unzip " + dataset)
+			print("unzip " + dataset, flush=True)
 			with zipfile.ZipFile(path + "/download.zip","r") as zip_ref:
 				zip_ref.extractall(path)
 			os.remove(path + "/download.zip")
 		else:
-			print("skip already downloaded " + dataset)
+			print("skip already downloaded " + dataset, flush=True)
 
-	if not os.path.exists(path + "/subsets"):
+	if not os.path.exists(path + "/subsets") and "parse" in url:
 		if url["parse"]:
-			print("parse " + dataset)
+			print("parse " + dataset, flush=True)
 			parse_dataset(dataset)
 		else:
-			print("parser for " + dataset + " not implemented yet. Stay tuned!")
+			print("parser for " + dataset + " not implemented yet. Stay tuned!", flush=True)
 	else:
-		print("already parsed " + dataset)
+		print("already parsed " + dataset, flush=True)
 
-	if not os.path.exists(path + "/statistics"):
+	if not os.path.exists(path + "/statistics") and "create_statistics" in url:
 		if url["create_statistics"]:
-			print("creating statistics for " + dataset)
+			print("creating statistics for " + dataset, flush=True)
 			create_statistics(dataset)
 		else:
-			print("skipping statistics for " + dataset)
+			print("skipping statistics for " + dataset, flush=True)
 	else:
-		print("already created statistics for " + dataset)
+		print("already created statistics for " + dataset, flush=True)
 
-	print("finished " + dataset)
+	if "download_gene_names" in url and url["download_gene_names"] and not os.path.exists(path):
+		os.makedirs(path)
+		download_gene_names(path)
+		print("downloaded genes names", flush=True)
+
+	print("finished " + dataset, flush=True)
