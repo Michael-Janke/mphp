@@ -96,6 +96,7 @@ const StyledInput = styled.input`
 `;
 
 const StyledContainer = styled.div`
+  overflow: hidden;
   display: flex;
   flex: 1;
   align-items: center;
