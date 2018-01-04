@@ -33,11 +33,11 @@ export default class InteractivePlot extends Component {
   }
 
   render() {
-    const { data, genes } = this.props;
     let oldCancerType,
       oldColor,
       color,
       colorIndex = 0;
+    const { data, geneNames } = this.props;
     const plotData = Object.keys(data).map((key, index) => {
       const cancerType = key.split("-")[0];
       if (oldCancerType != cancerType) {
@@ -75,13 +75,13 @@ export default class InteractivePlot extends Component {
       },
       scene: {
         xaxis: {
-          title: genes[0]
+          title: geneNames[0]
         },
         yaxis: {
-          title: genes[1]
+          title: geneNames[1]
         },
         zaxis: {
-          title: genes[2]
+          title: geneNames[2]
         }
       },
       legend: {
