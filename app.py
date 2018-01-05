@@ -6,7 +6,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from utils.DataLoader import DataLoader
 from utils.DimensionalityReducer import DimensionalityReducer
-from utils.Analyzer import Analyzer
+from validation.Analyzer import Analyzer
 from utils import Expressions
 
 app = Flask(__name__)
