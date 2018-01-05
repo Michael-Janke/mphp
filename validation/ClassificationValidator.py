@@ -1,4 +1,5 @@
 import numpy as np
+
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
@@ -36,9 +37,9 @@ class ClassificationValidator():
             clf = self.classifier_table[c]()
             
             scoring = {
-                'precision': make_scorer(precision_score, average='micro'),
-                'recall': make_scorer(recall_score, average='micro'),
-                'f1': make_scorer(f1_score, average='micro'),
+                'precision': make_scorer(precision_score, average='macro'),
+                'recall': make_scorer(recall_score, average='macro'),
+                'f1': make_scorer(f1_score, average='macro'),
             }
             
             le = LabelEncoder()
