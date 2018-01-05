@@ -1,11 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { load as loadStatistics } from "../actions/statisticsActions";
-import {
-  loadAlgorithms,
-  runAlgorithm,
-  updateAlgorithm
-} from "../actions/runActions";
+import { loadStatistics, loadAlgorithms } from "../actions/contextActions";
+import { runAlgorithm, updateAlgorithm } from "../actions/runActions";
 
 import Run from "./Run";
 

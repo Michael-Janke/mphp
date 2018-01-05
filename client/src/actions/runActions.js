@@ -1,20 +1,6 @@
 import * as types from "./actionTypes";
-import request, { postRequest } from "./_request";
+import { postRequest } from "./_request";
 import { isHealthy } from "../utils";
-
-export function loadAlgorithms() {
-  return dispatch =>
-    request("/algorithms").then(algorithms => {
-      dispatch(_load(algorithms));
-    });
-
-  function _load(data) {
-    return {
-      type: types.LOAD_ALGORITHMS,
-      algorithms: data.isError ? data : data.algorithms
-    };
-  }
-}
 
 export function createRun({ tcgaTokens, tissueTypes }) {
   return dispatch => {
