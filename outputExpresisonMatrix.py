@@ -40,9 +40,3 @@ pprint(analyzer.computeFeatureValidation(sick, healthy, selected_genes))
 #%%
 expression_matrix = analyzer.computeExpressionMatrix(sick_reduced, healthy, selected_genes)
 pprint(expression_matrix)
-
-
-# %%
-from utils.EA.fitness import distance_evaluate
-fitness = distance_evaluate(sick_reduced.expressions, sick.labels, healthy_reduced.expressions, healthy.labels)
-fitness

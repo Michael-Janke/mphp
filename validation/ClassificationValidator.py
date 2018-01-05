@@ -8,6 +8,7 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import cross_validate
 from sklearn.metrics import make_scorer, precision_score, recall_score, f1_score
+from imblearn.metrics import geometric_mean_score
 
 class ClassificationValidator():
 
@@ -35,6 +36,7 @@ class ClassificationValidator():
                 'precision': make_scorer(precision_score, average='micro'),
                 'recall': make_scorer(recall_score, average='micro'),
                 'f1': make_scorer(f1_score, average='micro'),
+                'gmean': make_scorer(geometric_mean_score),
             }
             
             le = LabelEncoder()
@@ -54,5 +56,7 @@ class ClassificationValidator():
                     'std':  scores['test_f1'].std(),
                 },
             }
+            print(scores['test_gmean'])
+            print(scores['test_gmean'].mean())
             result[c] = score_dict
         return result
