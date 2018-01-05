@@ -39,7 +39,7 @@ class Content extends Component {
                 (algorithms && algorithms.isError)
               }
               runId={runId}
-              params={run.params}
+              algorithm={run.algorithm}
               result={run.result}
               algorithms={algorithms}
               statistics={statistics}

@@ -10,12 +10,12 @@ const CARD_TITLE_HEIGHT = 15;
 
 export default class Card extends Component {
   render() {
-    const { isLoading } = this.props;
+    const { isLoading, algorithm } = this.props;
     return (
       <StyledCard zDepth={1}>
         <StyledCardTitle>
           <StyledTitleText>
-            {this.props.params.name || "Execute Algorithm"}
+            {algorithm.name || "Execute Algorithm"}
           </StyledTitleText>
           {isLoading ? <Spinner size={CARD_TITLE_HEIGHT} /> : null}
         </StyledCardTitle>

@@ -42,14 +42,14 @@ export default class AlgorithmExecution extends Component {
   }
 
   getSelectedAlgorithm() {
-    const { key } = this.props.params;
+    const { key } = this.props.algorithm;
     return !key
       ? null
       : this.props.algorithms.find(algorithm => algorithm.key === key);
   }
 
   executeAlgorithm() {
-    this.props.runAlgorithm(this.props.runId, this.props.params);
+    this.props.runAlgorithm(this.props.runId, this.props.algorithm);
   }
 }
 

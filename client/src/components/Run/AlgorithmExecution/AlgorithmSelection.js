@@ -7,13 +7,6 @@ import styled from "styled-components";
 import { boringBlue } from "../../../config/colors";
 
 export default class AlgorithmSelection extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      params: {},
-      selectedAlgorithm: null
-    };
-  }
   render() {
     const { algorithms, selectedAlgorithm, isRunnable } = this.props;
     return (
@@ -70,7 +63,7 @@ export default class AlgorithmSelection extends Component {
 
   changeParameter(event, index, key) {
     const updatedParams = {
-      ...this.props.params.parameters,
+      ...this.props.algorithm.parameters,
       [event.target.id]: parseInt(event.target.value, 10)
     };
     this.props.updateRun(

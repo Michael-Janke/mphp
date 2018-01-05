@@ -1,6 +1,6 @@
 import * as types from "../actions/actionTypes";
 
-const emptyRun = { params: {}, isLoading: false, result: null };
+const emptyRun = { algorithm: {}, isLoading: false, result: null };
 
 const initialState = {
   [Date.now()]: { ...emptyRun }
@@ -12,11 +12,11 @@ export function runs(state = initialState, action = {}) {
       return { ...state, [action.id]: { ...emptyRun } };
     case types.UPDATE_RUN:
       return updateRun(state, action, {
-        params: action.params
+        algorithm: action.algorithm
       });
     case types.START_ALGORITHM:
       return updateRun(state, action, {
-        params: action.params,
+        algorithm: action.algorithm,
         isLoading: true
       });
     case types.ALGORITHM_DONE:

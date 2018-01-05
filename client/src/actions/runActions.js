@@ -22,18 +22,18 @@ export function createRun() {
   };
 }
 
-export function updateRun(id, params) {
+export function updateRun(id, algorithm) {
   return dispatch => {
-    dispatch({ type: types.UPDATE_RUN, id, params });
+    dispatch({ type: types.UPDATE_RUN, id, algorithm });
   };
 }
 
-export function runAlgorithm(id, params) {
+export function runAlgorithm(id, algorithm) {
   return dispatch => {
-    dispatch({ type: types.START_ALGORITHM, id, params });
-    postRequest("/runAlgorithm", {
-      algorithm: params
-    }).then(response => dispatch(_runAlgorithm(id, response)));
+    dispatch({ type: types.START_ALGORITHM, id, algorithm });
+    postRequest("/runAlgorithm", { algorithm }).then(response =>
+      dispatch(_runAlgorithm(id, response))
+    );
 
     function _runAlgorithm(id, result) {
       return {
