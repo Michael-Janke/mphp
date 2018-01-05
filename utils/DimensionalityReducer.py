@@ -153,7 +153,7 @@ class DimensionalityReducer:
             sick_binary = Expressions(sick.expressions, s_labels)
             healhty_binary = Expressions(healhty.expressions, h_labels)
 
-            indices, _, _ = self.getNormalizedFeatures(sick_binary, healhty_binary, "substract")
+            indices, _, _ = self.getFeaturesBySFS(sick_binary, healhty_binary, 3)
 
             features[label] = indices
         
