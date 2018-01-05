@@ -34,11 +34,13 @@ print("got combined data")
 features = dimReducer.getOneAgainstRestFeatures(sick,healthy)
 pprint(features)
 
-results = analyzer.computeFeatureValidationOneAgainstRest(sick, healthy, features)
-pprint(results)
+#results = analyzer.computeFeatureValidationOneAgainstRest(sick, healthy, features)
+#pprint(results)
 
 
-
+# %%
+evaluation = classVal.evaluateOneAgainstRest(sick, healthy, features)
+pprint(evaluation)
 
 
 
