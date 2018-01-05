@@ -49,7 +49,7 @@ export default class DataSelection extends Component {
     ];
 
     return tcgaTokens.map(tcgaToken => {
-      const result = { name: tcgaToken.name };
+      const result = { name: tcgaToken };
       tissueTypes.forEach(tissueType => {
         result[tissueType] = statistics[tcgaToken][tissueType];
       });
