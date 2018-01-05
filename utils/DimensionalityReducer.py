@@ -139,3 +139,32 @@ class DimensionalityReducer:
         indices = tree.feature_importances_.argsort(
         )[-k:][::-1]  # indices of k greatest values
         return indices, data.expressions[:, indices]
+
+
+    ####### 1 vs Rest #######
+
+    def getOneAgainstRestFeatures(self, sick, healhty):
+        features = {}
+        for label in np.unique(sick.labels):
+            label = label.split("-")[0]
+            s_labels = self.binarize_labels(sick.labels, label)
+            h_labels = self.binarize_labels(healhty.labels, label)
+
+            sick_binary = Expressions(sick.expressions, s_labels)
+            healhty_binary = Expressions(healhty.expressions, h_labels)
+
+            indices, _, _ = self.getNormalizedFeatures(sick_binary, healhty_binary, "substract")
+
+            features[label] = indices
+        
+        return features
+
+
+    ####### UTILS #######
+
+    def binarize_labels(self, labels, selected_label):
+        new_labels = np.zeros_like(labels)
+        indices = np.flatnonzero(np.core.defchararray.find(labels,selected_label)!=-1)
+        new_labels[indices] = 1
+
+        return new_labels

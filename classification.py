@@ -32,9 +32,14 @@ print("got combined data")
 # %%
 # Feature Selection
 #selected_genes, sick_X, healthy_X = dimReducer.getEAFeatures(sick,healthy)
-selected_genes, sick_X, healthy_X = dimReducer.getFeaturesBySFS(sick,healthy,3)
-print(selected_genes)
+#selected_genes, sick_X, healthy_X = dimReducer.getFeaturesBySFS(sick,healthy,3)
+#print(selected_genes)
 
+
+features = dimReducer.getOneAgainstRestFeatures(sick,healthy)
+pprint(features)
+
+# %%
 sick_reduced = Expressions(sick_X, sick.labels)
 healthy_reduced = Expressions(healthy_X, healthy.labels)
 
