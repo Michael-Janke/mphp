@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { load as loadStatistics } from "../actions/statisticsActions";
-import { loadAlgorithms, runAlgorithm } from "../actions/runActions";
+import { loadAlgorithms, runAlgorithm, updateRun } from "../actions/runActions";
 
 import Run from "./Run";
 
@@ -23,7 +23,8 @@ class Content extends Component {
       statistics,
       tcgaTokens,
       tissueTypes,
-      runAlgorithm
+      runAlgorithm,
+      updateRun
     } = this.props;
     return (
       <div className="content">
@@ -45,6 +46,7 @@ class Content extends Component {
               tcgaTokens={tcgaTokens}
               tissueTypes={tissueTypes}
               runAlgorithm={runAlgorithm}
+              updateRun={updateRun}
             />
           );
         })}
@@ -73,6 +75,9 @@ const mapDispatchToProps = dispatch => {
     },
     runAlgorithm: (runId, params) => {
       dispatch(runAlgorithm(runId, params));
+    },
+    updateRun: (runId, params) => {
+      dispatch(updateRun(runId, params));
     }
   };
 };
