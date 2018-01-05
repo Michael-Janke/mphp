@@ -10,29 +10,33 @@ export function runs(state = initialState, action = {}) {
   switch (action.type) {
     case types.CREATE_RUN:
       return { ...state, [action.id]: { ...emptyRun } };
+    case types.UPDATE_RUN:
+      return updateRun(state, action, {
+        params: action.params
+      });
     case types.START_ALGORITHM:
-      return Object.keys(state).includes(`${action.id}`)
-        ? {
-            ...state,
-            [action.id]: {
-              ...state[action.id],
-              params: action.params,
-              isLoading: true
-            }
-          }
-        : state;
+      return updateRun(state, action, {
+        params: action.params,
+        isLoading: true
+      });
     case types.ALGORITHM_DONE:
-      return Object.keys(state).includes(`${action.id}`)
-        ? {
-            ...state,
-            [action.id]: {
-              ...state[action.id],
-              isLoading: false,
-              result: action.result
-            }
-          }
-        : state;
+      return updateRun(state, action, {
+        isLoading: false,
+        result: action.result
+      });
     default:
       return state;
   }
+}
+
+function updateRun(state, action, updates) {
+  return Object.keys(state).includes(`${action.id}`)
+    ? {
+        ...state,
+        [action.id]: {
+          ...state[action.id],
+          ...updates
+        }
+      }
+    : state;
 }

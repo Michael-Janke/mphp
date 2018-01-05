@@ -22,6 +22,12 @@ export function createRun() {
   };
 }
 
+export function updateRun(id, params) {
+  return dispatch => {
+    dispatch({ type: types.UPDATE_RUN, id, params });
+  };
+}
+
 export function runAlgorithm(id, params) {
   return dispatch => {
     dispatch({ type: types.START_ALGORITHM, id, params });

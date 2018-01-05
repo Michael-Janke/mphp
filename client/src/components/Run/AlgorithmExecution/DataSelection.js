@@ -12,16 +12,9 @@ import {
 } from "recharts";
 
 import { statisticsColors } from "../../../config/colors";
-import TcgaSelection from "../../TcgaSelection";
+import TcgaSelection from "../TcgaSelection";
 
 export default class DataSelection extends Component {
-  constructor(props) {
-    super(props);
-    if (this.props.statistics === null) {
-      this.props.loadStatistics();
-    }
-  }
-
   render() {
     const chartOptions = {
       data: this.parseData(),

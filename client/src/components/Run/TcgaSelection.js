@@ -9,7 +9,7 @@ import { connect } from "react-redux";
 import {
   toggleTcgaToken,
   toggleTissueType
-} from "../actions/datasetSelectionActions";
+} from "../../actions/datasetSelectionActions";
 
 class TcgaSelection extends PureComponent {
   constructor(props) {
