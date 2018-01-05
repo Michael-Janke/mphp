@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { updateName } from "../actions/experimentActions";
+import { createRun } from "../actions/runActions";
 import logo from "../assets/images/logo.png";
 import styled from "styled-components";
 import EditableText from "./EditableText";
@@ -36,6 +37,12 @@ class Header extends Component {
                 tooltip="Save experiment"
                 icon="save"
                 color={almostWhite}
+              />
+              <IconButton
+                tooltip="Save experiment"
+                icon="add"
+                color={almostWhite}
+                onClick={this.props.createRun}
               />
             </StyledRightContainer>
           </div>
@@ -115,6 +122,9 @@ const mapDispatchToProps = dispatch => {
   return {
     updateExperimentName: newName => {
       dispatch(updateName(newName));
+    },
+    createRun: () => {
+      dispatch(createRun());
     }
   };
 };
