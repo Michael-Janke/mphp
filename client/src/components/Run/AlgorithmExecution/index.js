@@ -7,21 +7,16 @@ import AlgorithmSelection from "./AlgorithmSelection";
 
 export default class AlgorithmExecution extends Component {
   render() {
-    const selectedAlgorithm = this.getSelectedAlgorithm();
     const isRunnable = this.isRunnable();
     return (
       <div>
-        <AlgorithmSelection
-          selectedAlgorithm={selectedAlgorithm}
-          isRunnable={isRunnable}
-          {...this.props}
-        />
+        <AlgorithmSelection {...this.props} />
         <DataSelection {...this.props} />
         <CardActions>
           <StyledButton
             title={
               isRunnable
-                ? `Run ${selectedAlgorithm.name}`
+                ? `Run ${this.props.algorithm.name}`
                 : `Please select an algorithm`
             }
             label="Run"
@@ -37,14 +32,7 @@ export default class AlgorithmExecution extends Component {
   }
 
   isRunnable() {
-    return this.getSelectedAlgorithm() !== null;
-  }
-
-  getSelectedAlgorithm() {
-    const { key } = this.props.algorithm;
-    return !key
-      ? null
-      : this.props.algorithms.find(algorithm => algorithm.key === key);
+    return typeof this.props.algorithm.key !== "undefined";
   }
 
   executeAlgorithm() {

@@ -5,11 +5,10 @@ import TextField from "material-ui/TextField";
 import styled from "styled-components";
 
 import { boringBlue } from "../../../config/colors";
-import { isHealthy } from "../../../utils";
 
 export default class AlgorithmSelection extends Component {
   render() {
-    const { algorithms, selectedAlgorithm, isRunnable } = this.props;
+    const { algorithms, algorithm } = this.props;
     return (
       <StyledMenu>
         <StyledOptions>
@@ -17,16 +16,17 @@ export default class AlgorithmSelection extends Component {
             floatingLabelText="Algorithm"
             floatingLabelFixed={true}
             hintText="Select algorithm..."
-            value={isRunnable ? selectedAlgorithm.key : null}
+            value={algorithm.key || null}
             onChange={this.selectAlgorithm.bind(this)}
             autoWidth={true}
             selectedMenuItemStyle={{ color: boringBlue }}
           >
             {algorithms.map(this.renderMenuItem)}
           </StyledSelectField>
-          {isRunnable
-            ? selectedAlgorithm.parameters.map(this.renderParameter.bind(this))
-            : null}
+          {algorithm.key &&
+            this.algorithmDescription().parameters.map(
+              this.renderParameter.bind(this)
+            )}
         </StyledOptions>
       </StyledMenu>
     );
@@ -59,20 +59,17 @@ export default class AlgorithmSelection extends Component {
   }
 
   changeParameter(event, index, key) {
+    const { algorithm, runId, updateAlgorithm } = this.props;
     const updatedParams = {
-      ...this.props.algorithm.parameters,
+      ...algorithm.parameters,
       [event.target.id]: parseInt(event.target.value, 10)
     };
-    this.props.updateRun(
-      this.props.runId,
-      this.buildParams({ parameters: updatedParams })
-    );
+    updateAlgorithm(runId, { ...algorithm, parameters: updatedParams });
   }
 
   selectAlgorithm(event, index, key) {
-    const updatedAlgorithm = this.props.algorithms.find(
-      algorithm => algorithm.key === key
-    );
+    const { algorithm, runId, updateAlgorithm } = this.props;
+    const updatedAlgorithm = this.algorithmDescription(key);
     const updatedValues = {
       name: updatedAlgorithm.name,
       key: updatedAlgorithm.key,
@@ -80,32 +77,14 @@ export default class AlgorithmSelection extends Component {
         return { ...reducedParams, [param.key]: param.default };
       }, {})
     };
-    this.props.updateRun(this.props.runId, this.buildParams(updatedValues));
+    updateAlgorithm(runId, { ...algorithm, ...updatedValues });
   }
 
-  buildParams(updatedValues = {}) {
-    const { tcgaTokens, tissueTypes, selectedAlgorithm } = this.props;
-    const cancerTypes = tcgaTokens
-      .filter(token => token.selected)
-      .map(token => token.name);
-    const sickTissueTypes = tissueTypes
-      .filter(tissueType => !isHealthy(tissueType) && tissueType.selected)
-      .map(tissueType => tissueType.name);
-    const healthyTissueTypes = tissueTypes
-      .filter(tissueType => isHealthy(tissueType) && tissueType.selected)
-      .map(tissueType => tissueType.name);
-
-    return selectedAlgorithm === null
-      ? { ...updatedValues, cancerTypes, sickTissueTypes, healthyTissueTypes }
-      : {
-          name: selectedAlgorithm.name,
-          key: selectedAlgorithm.key,
-          cancerTypes,
-          sickTissueTypes,
-          healthyTissueTypes,
-          parameters: selectedAlgorithm.parameters,
-          ...updatedValues
-        };
+  algorithmDescription(algorithmKey) {
+    algorithmKey = algorithmKey || this.props.algorithm.key;
+    return this.props.algorithms.find(
+      algorithm => algorithm.key === algorithmKey
+    );
   }
 }
 

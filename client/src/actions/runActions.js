@@ -23,16 +23,16 @@ export function createRun({ tcgaTokens, tissueTypes }) {
   };
 }
 
-export function updateRun(id, algorithm) {
+export function updateAlgorithm(id, algorithm) {
   return dispatch => {
-    dispatch({ type: types.UPDATE_RUN, id, algorithm });
+    dispatch({ type: types.UPDATE_ALGORITHM, id, algorithm });
   };
 }
 
 export function toggleTcgaToken(id, algorithm, tcgaToken) {
   return dispatch => {
     dispatch({
-      type: types.UPDATE_RUN,
+      type: types.UPDATE_ALGORITHM,
       id,
       algorithm: {
         ...algorithm,
@@ -45,7 +45,7 @@ export function toggleTcgaToken(id, algorithm, tcgaToken) {
 export function toggleTissueType(id, algorithm, tissueType) {
   return dispatch => {
     dispatch({
-      type: types.UPDATE_RUN,
+      type: types.UPDATE_ALGORITHM,
       id,
       algorithm: {
         ...algorithm,

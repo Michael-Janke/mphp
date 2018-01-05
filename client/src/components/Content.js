@@ -1,7 +1,11 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { load as loadStatistics } from "../actions/statisticsActions";
-import { loadAlgorithms, runAlgorithm, updateRun } from "../actions/runActions";
+import {
+  loadAlgorithms,
+  runAlgorithm,
+  updateAlgorithm
+} from "../actions/runActions";
 
 import Run from "./Run";
 
@@ -18,34 +22,26 @@ class Content extends Component {
   }
 
   render() {
-    const { runs, runAlgorithm, updateRun } = this.props;
-    const {
-      algorithms,
-      statistics,
-      tissueTypes,
-      tcgaTokens
-    } = this.props.context;
+    const { runs, context, runAlgorithm, updateAlgorithm } = this.props;
+    const { algorithms, statistics } = context;
     return (
       <div className="content">
         {Object.keys(runs).map(runId => {
-          const run = runs[runId];
+          const { algorithm, result, isLoading } = runs[runId];
           return (
             <Run
               key={runId}
-              isLoading={!algorithms || !statistics || run.isLoading}
+              isLoading={!algorithms || !statistics || isLoading}
               isError={
                 (statistics && statistics.isError) ||
                 (algorithms && algorithms.isError)
               }
               runId={runId}
-              algorithm={run.algorithm}
-              result={run.result}
-              algorithms={algorithms}
-              statistics={statistics}
-              tcgaTokens={tcgaTokens}
-              tissueTypes={tissueTypes}
+              algorithm={algorithm}
+              result={result}
               runAlgorithm={runAlgorithm}
-              updateRun={updateRun}
+              updateAlgorithm={updateAlgorithm}
+              {...context}
             />
           );
         })}
@@ -72,8 +68,8 @@ const mapDispatchToProps = dispatch => {
     runAlgorithm: (runId, params) => {
       dispatch(runAlgorithm(runId, params));
     },
-    updateRun: (runId, params) => {
-      dispatch(updateRun(runId, params));
+    updateAlgorithm: (runId, params) => {
+      dispatch(updateAlgorithm(runId, params));
     }
   };
 };

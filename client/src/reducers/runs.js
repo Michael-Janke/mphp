@@ -22,7 +22,7 @@ export function runs(state = initialState, action = {}) {
       }, {});
     case types.CREATE_RUN:
       return { ...state, [action.id]: preselectData(emptyRun, action) };
-    case types.UPDATE_RUN:
+    case types.UPDATE_ALGORITHM:
       return updateRun(state, action, {
         algorithm: action.algorithm
       });
