@@ -2,6 +2,7 @@
 import loadScript from "load-script";
 import React, { Component } from "react";
 import createPlotlyComponent from "react-plotly.js/factory";
+import Color from "tinycolor2";
 
 import { statisticsColors } from "../../config/colors";
 
@@ -32,8 +33,25 @@ export default class InteractivePlot extends Component {
   }
 
   render() {
-    const { data, genes } = this.props;
+    let oldCancerType,
+      oldColor,
+      color,
+      colorIndex = 0;
+    const { data, geneNames } = this.props;
     const plotData = Object.keys(data).map((key, index) => {
+      const cancerType = key.split("-")[0];
+      if (oldCancerType != cancerType) {
+        color = Color(statisticsColors[colorIndex++]);
+        oldCancerType = cancerType;
+        oldColor = color;
+      } else {
+        if (key.split("-")[1].includes("N")) {
+          color = oldColor.spin(12).lighten(7);
+        } else {
+          color = oldColor.spin(-12).darken(7);
+        }
+        oldColor = color;
+      }
       return {
         type: "scatter3d",
         mode: "markers",
@@ -42,12 +60,8 @@ export default class InteractivePlot extends Component {
         y: data[key][1],
         z: data[key][2],
         marker: {
-          size: 4,
-          color: statisticsColors[index],
-          line: {
-            color: "black",
-            width: 0.1
-          },
+          size: 5,
+          color: color.toString(),
           opacity: 1
         }
       };
@@ -61,13 +75,13 @@ export default class InteractivePlot extends Component {
       },
       scene: {
         xaxis: {
-          title: genes[0]
+          title: geneNames[0]
         },
         yaxis: {
-          title: genes[1]
+          title: geneNames[1]
         },
         zaxis: {
-          title: genes[2]
+          title: geneNames[2]
         }
       },
       legend: {

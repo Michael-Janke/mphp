@@ -11,46 +11,12 @@ app = Flask(__name__)
 CORS(app)
 dataLoader = DataLoader("dataset4")
 gene_labels = dataLoader.getGeneLabels()
+gene_names = dataLoader.getGeneNames()
 dimReducer = DimensionalityReducer()
-
 
 @app.route('/')
 def hello_world():
     return 'Hello World!'
-
-
-@app.route('/data', methods=["GET"])
-def getData():
-    luad_thca = dataLoader.getData(["sick", "healthy"], ["LUAD", "THCA"])
-    indices, X = dimReducer.getFeatures(luad_thca, 20)
-
-    response = {
-        'data': X.tolist(),
-        'labels': luad_thca.labels.tolist(),
-        'genes': gene_labels[indices].tolist(),
-    }
-
-    return json.dumps(response)
-
-
-@app.route('/plot', methods=["GET"])
-def getPlotData():
-    healthy = dataLoader.getData(["healthy"], ["THCA", "LUAD"])
-    sick = dataLoader.getData(["sick"], ["THCA", "LUAD"])
-    indices, s_data, _ = dimReducer.getNormalizedFeatures(
-        sick, healthy, "exclude", 3)
-
-    data = {}
-    for label in np.unique(sick.labels):
-        data[label] = s_data[sick.labels == label, :].T.tolist()
-
-    response = {
-        'data': data,
-        'genes': gene_labels[indices].tolist(),
-    }
-
-    return json.dumps(response)
-
 
 @app.route("/algorithms", methods=["GET"])
 def algorithms():
@@ -133,12 +99,11 @@ def algorithms():
                 "key": "getFeatures"
             },
             {
-            "name": "Sequential Forward Selection (normalized)",
-            "key": "getFeaturesBySFS",
-            "parameters": []
+                "name": "Sequential Forward Selection (normalized)",
+                "key": "getFeaturesBySFS",
+                "parameters": []
             }
         ],
-
     }
 
     return json.dumps(response)
@@ -198,6 +163,7 @@ def runSpecificAlgorithm():
     response = {
         'data': responseData,
         'genes': gene_labels[gene_indices].tolist(),
+        'geneNames': gene_names[gene_indices].tolist(),
     }
     return json.dumps(response)
 
