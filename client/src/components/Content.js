@@ -8,24 +8,23 @@ import Run from "./Run";
 class Content extends Component {
   constructor(props) {
     super(props);
-    if (this.props.algorithms === null) {
+    const { algorithms, statistics } = this.props.context;
+    if (algorithms === null) {
       this.props.loadAlgorithms();
     }
-    if (this.props.statistics === null) {
+    if (statistics === null) {
       this.props.loadStatistics();
     }
   }
 
   render() {
+    const { runs, runAlgorithm, updateRun } = this.props;
     const {
-      runs,
       algorithms,
       statistics,
-      tcgaTokens,
       tissueTypes,
-      runAlgorithm,
-      updateRun
-    } = this.props;
+      tcgaTokens
+    } = this.props.context;
     return (
       <div className="content">
         {Object.keys(runs).map(runId => {
@@ -58,10 +57,7 @@ class Content extends Component {
 const mapStateToProps = state => {
   return {
     runs: state.runs,
-    algorithms: state.algorithms,
-    statistics: state.statistics,
-    tcgaTokens: state.dataSelection.tcgaTokens,
-    tissueTypes: state.dataSelection.tissueTypes
+    context: state.context
   };
 };
 

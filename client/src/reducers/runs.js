@@ -1,6 +1,11 @@
 import * as types from "../actions/actionTypes";
+import { isHealthy } from "../utils";
 
-const emptyRun = { algorithm: {}, isLoading: false, result: null };
+const emptyRun = {
+  algorithm: { cancerTypes: [], healthyTissueTypes: [], sickTissueTypes: [] },
+  isLoading: false,
+  result: null
+};
 
 const initialState = {
   [Date.now()]: { ...emptyRun }
@@ -8,8 +13,15 @@ const initialState = {
 
 export function runs(state = initialState, action = {}) {
   switch (action.type) {
+    case types.LOAD_STATISTICS:
+      return Object.keys(state).reduce((reducedState, runId) => {
+        return {
+          ...reducedState,
+          [runId]: preselectData(state[runId], action)
+        };
+      }, {});
     case types.CREATE_RUN:
-      return { ...state, [action.id]: { ...emptyRun } };
+      return { ...state, [action.id]: preselectData(emptyRun, action) };
     case types.UPDATE_RUN:
       return updateRun(state, action, {
         algorithm: action.algorithm
@@ -39,4 +51,27 @@ function updateRun(state, action, updates) {
         }
       }
     : state;
+}
+
+function preselectData(run, { tcgaTokens, tissueTypes }) {
+  const preselectedTokens = ["THCA", "LUAD"];
+  const preselectedTissues = ["NT", "TP"];
+  const healthyTissueTypes = tissueTypes.filter(
+    tissueType =>
+      isHealthy(tissueType) && preselectedTissues.includes(tissueType)
+  );
+  const sickTissueTypes = tissueTypes.filter(
+    tissueType =>
+      !isHealthy(tissueType) && preselectedTissues.includes(tissueType)
+  );
+  return {
+    ...run,
+    algorithm: {
+      cancerTypes: tcgaTokens.filter(token =>
+        preselectedTokens.includes(token)
+      ),
+      healthyTissueTypes,
+      sickTissueTypes
+    }
+  };
 }

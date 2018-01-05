@@ -42,7 +42,9 @@ class Header extends Component {
                 tooltip="Save experiment"
                 icon="add"
                 color={almostWhite}
-                onClick={this.props.createRun}
+                onClick={() => {
+                  this.props.createRun(this.props.context);
+                }}
               />
             </StyledRightContainer>
           </div>
@@ -114,7 +116,8 @@ const StyledRightContainer = styled.div`
 const mapStateToProps = state => {
   return {
     experimentName: state.experiment.name,
-    dataset: state.experiment.dataset
+    dataset: state.experiment.dataset,
+    context: state.context
   };
 };
 
@@ -123,8 +126,8 @@ const mapDispatchToProps = dispatch => {
     updateExperimentName: newName => {
       dispatch(updateName(newName));
     },
-    createRun: () => {
-      dispatch(createRun());
+    createRun: context => {
+      dispatch(createRun(context));
     }
   };
 };

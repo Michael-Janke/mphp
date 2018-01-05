@@ -5,38 +5,35 @@ import TextField from "material-ui/TextField";
 import styled from "styled-components";
 
 import { boringBlue } from "../../../config/colors";
+import { isHealthy } from "../../../utils";
 
 export default class AlgorithmSelection extends Component {
   render() {
     const { algorithms, selectedAlgorithm, isRunnable } = this.props;
     return (
-      algorithms &&
-      !algorithms.isError && (
-        <StyledMenu>
-          <StyledOptions>
-            <StyledSelectField
-              floatingLabelText="Algorithm"
-              floatingLabelFixed={true}
-              hintText="Select algorithm..."
-              value={isRunnable ? selectedAlgorithm.key : null}
-              onChange={this.selectAlgorithm.bind(this)}
-              autoWidth={true}
-              selectedMenuItemStyle={{ color: boringBlue }}
-            >
-              {algorithms.map(this.renderMenuItem)}
-            </StyledSelectField>
-            {isRunnable
-              ? selectedAlgorithm.parameters.map(
-                  this.renderParameter.bind(this)
-                )
-              : null}
-          </StyledOptions>
-        </StyledMenu>
-      )
+      <StyledMenu>
+        <StyledOptions>
+          <StyledSelectField
+            floatingLabelText="Algorithm"
+            floatingLabelFixed={true}
+            hintText="Select algorithm..."
+            value={isRunnable ? selectedAlgorithm.key : null}
+            onChange={this.selectAlgorithm.bind(this)}
+            autoWidth={true}
+            selectedMenuItemStyle={{ color: boringBlue }}
+          >
+            {algorithms.map(this.renderMenuItem)}
+          </StyledSelectField>
+          {isRunnable
+            ? selectedAlgorithm.parameters.map(this.renderParameter.bind(this))
+            : null}
+        </StyledOptions>
+      </StyledMenu>
     );
   }
 
   renderMenuItem(algorithm, index) {
+    // TODO only render if sufficient cancer and tissue types are selected (see #61)
     return (
       <MenuItem
         key={`algorithm-option-${index}`}
@@ -92,10 +89,10 @@ export default class AlgorithmSelection extends Component {
       .filter(token => token.selected)
       .map(token => token.name);
     const sickTissueTypes = tissueTypes
-      .filter(tissueType => !tissueType.isHealthy && tissueType.selected)
+      .filter(tissueType => !isHealthy(tissueType) && tissueType.selected)
       .map(tissueType => tissueType.name);
     const healthyTissueTypes = tissueTypes
-      .filter(tissueType => tissueType.isHealthy && tissueType.selected)
+      .filter(tissueType => isHealthy(tissueType) && tissueType.selected)
       .map(tissueType => tissueType.name);
 
     return selectedAlgorithm === null

@@ -8,9 +8,15 @@ export function load() {
     });
 
   function _load(statistics) {
+    const tcgaTokens = Object.keys(statistics).map(token => token);
+    const tissueTypes = Object.keys(statistics[tcgaTokens[0]]).map(
+      tissueType => tissueType
+    );
     return {
       type: types.LOAD_STATISTICS,
-      statistics
+      statistics,
+      tcgaTokens,
+      tissueTypes
     };
   }
 }

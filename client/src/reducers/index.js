@@ -1,14 +1,10 @@
 import { combineReducers } from "redux";
-import { statistics } from "./statistics";
-import { dataSelection } from "./dataSelection";
+import { context } from "./context";
 import { experiment } from "./experiment";
-import { algorithms } from "./algorithms";
 import { runs } from "./runs";
 
 export default combineReducers({
-  statistics,
-  dataSelection,
+  context,
   experiment,
-  algorithms,
   runs
 });

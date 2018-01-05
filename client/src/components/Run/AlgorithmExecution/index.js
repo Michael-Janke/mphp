@@ -7,7 +7,6 @@ import AlgorithmSelection from "./AlgorithmSelection";
 
 export default class AlgorithmExecution extends Component {
   render() {
-    const { statistics, tcgaTokens, tissueTypes } = this.props;
     const selectedAlgorithm = this.getSelectedAlgorithm();
     const isRunnable = this.isRunnable();
     return (
@@ -17,7 +16,7 @@ export default class AlgorithmExecution extends Component {
           isRunnable={isRunnable}
           {...this.props}
         />
-        <DataSelection {...{ statistics, tcgaTokens, tissueTypes }} />
+        <DataSelection {...this.props} />
         <CardActions>
           <StyledButton
             title={
