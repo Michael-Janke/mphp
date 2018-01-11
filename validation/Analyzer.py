@@ -2,34 +2,24 @@ import numpy as np
 from validation.ClusterValidator import ClusterValidator
 from validation.ClassificationValidator import ClassificationValidator
 from utils.EA.fitness import evaluate, distance_evaluate
-from utils import Expressions
+from utils import Expressions, binarize_labels
 
 class Analyzer:
     def __init__(self):
         pass
-
-    def binarize_labels(self, labels, selected_label):
-        new_labels = np.zeros_like(labels)
-        indices = np.flatnonzero(np.core.defchararray.find(labels,selected_label)!=-1)
-        new_labels[indices] = 1
-
-        return new_labels
-
+    
     def computeFeatureValidationOneAgainstRest(self, sick, healthy, selected_genes_dict):
         results = {}
         for label, genes in selected_genes_dict.items():
-            s_labels = self.binarize_labels(sick.labels, label)
+            s_labels = binarize_labels(sick.labels, label)
             sick_binary = Expressions(sick.expressions, s_labels)
 
             if healthy == "":
-                evaluation = self.computeFeatureValidation(sick_binary, "", genes)
+                results[label] = self.computeFeatureValidation(sick_binary, "", genes)
             else:
-                h_labels = self.binarize_labels(healthy.labels, label)
+                h_labels = binarize_labels(healthy.labels, label)
                 healthy_binary = Expressions(healthy.expressions, h_labels)            
-
-                evaluation = self.computeFeatureValidation(sick_binary, healthy_binary, genes)
-            
-            results[label] = evaluation
+                results[label] = self.computeFeatureValidation(sick_binary, healthy_binary, genes)
 
         return results
 

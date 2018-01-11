@@ -13,7 +13,7 @@ from utils.EA.mutation import *
 from utils.EA.population import phenotype
 from utils.EA.algorithm import ea_for_plot
 
-from utils import Expressions
+from utils import Expressions, binarize_labels
 
 class DimensionalityReducer:
     ####### PCA #######
@@ -147,14 +147,14 @@ class DimensionalityReducer:
         features = {}
         for label in np.unique(sick.labels):
             label = label.split("-")[0]
-            s_labels = self.binarize_labels(sick.labels, label)
+            s_labels = binarize_labels(sick.labels, label)
             sick_binary = Expressions(sick.expressions, s_labels)
 
             if healhty == "":
                 indices, _ = self.getFeatures(sick_binary, k)
 
             else:
-                h_labels = self.binarize_labels(healhty.labels, label)
+                h_labels = binarize_labels(healhty.labels, label)
                 healhty_binary = Expressions(healhty.expressions, h_labels)
 
                 if method == "ea":
@@ -167,13 +167,3 @@ class DimensionalityReducer:
             features[label] = indices
         
         return features
-
-
-    ####### UTILS #######
-
-    def binarize_labels(self, labels, selected_label):
-        new_labels = np.zeros_like(labels)
-        indices = np.flatnonzero(np.core.defchararray.find(labels,selected_label)!=-1)
-        new_labels[indices] = 1
-
-        return new_labels
