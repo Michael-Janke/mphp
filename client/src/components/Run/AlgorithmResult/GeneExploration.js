@@ -16,15 +16,13 @@ export default class GeneExploration extends Component {
     return (
       <div>
         <h3>
-          {expressionMatrix === null
-            ? "Gene Exploration"
-            : "Gene Expression Levels"}
+          {!expressionMatrix ? "Gene Exploration" : "Gene Expression Levels"}
         </h3>
         <p>
           The following genes were especially relevant for discriminating the
           clusters:
         </p>
-        {expressionMatrix === null ? (
+        {!expressionMatrix ? (
           <StyledList>
             {genes.map((gene, i) => (
               <StyledItem key={gene}>
