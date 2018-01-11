@@ -38,8 +38,9 @@ class Header extends Component {
                 icon="save"
                 color={almostWhite}
               />
+              <StyledSpacer />
               <IconButton
-                tooltip="Save experiment"
+                tooltip="Add Card"
                 icon="add"
                 color={almostWhite}
                 onClick={() => {
