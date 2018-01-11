@@ -11,7 +11,7 @@ def fitness(sick, healthy):
         # select features and only pass this data to evaluate
         sick_reduced = Expressions(sick.expressions[:,pheno], sick.labels)
         healthy_reduced = Expressions(healthy.expressions[:,pheno], healthy.labels)
-        return evaluate(sick_reduced, healthy_reduced)
+        return distance_evaluate(sick_reduced, healthy_reduced)
     return fitness_
 
 def evaluate(sick, healthy):

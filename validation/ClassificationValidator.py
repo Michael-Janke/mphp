@@ -1,3 +1,5 @@
+import numpy as np
+
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
@@ -8,6 +10,9 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import cross_validate
 from sklearn.metrics import make_scorer, precision_score, recall_score, f1_score
+from imblearn.metrics import geometric_mean_score
+
+from utils import Expressions
 
 class ClassificationValidator():
 
@@ -32,9 +37,9 @@ class ClassificationValidator():
             clf = self.classifier_table[c]()
             
             scoring = {
-                'precision': make_scorer(precision_score, average='micro'),
-                'recall': make_scorer(recall_score, average='micro'),
-                'f1': make_scorer(f1_score, average='micro'),
+                'precision': make_scorer(precision_score, average='macro'),
+                'recall': make_scorer(recall_score, average='macro'),
+                'f1': make_scorer(f1_score, average='macro'),
             }
             
             le = LabelEncoder()
@@ -54,5 +59,33 @@ class ClassificationValidator():
                     'std':  scores['test_f1'].std(),
                 },
             }
+            #print(scores['test_gmean'])
+            #print(scores['test_gmean'].mean())
             result[c] = score_dict
         return result
+
+    def evaluateOneAgainstRest(self, sick, healthy, selected_genes_dict):
+        results = {}
+        for label, genes in selected_genes_dict.items():
+            s_labels = self.binarize_labels(sick.labels, label)
+            h_labels = self.binarize_labels(healthy.labels, label)
+
+            sick_binary = Expressions(sick.expressions[:,genes], s_labels)
+            healthy_binary = Expressions(healthy.expressions[:,genes], h_labels)
+
+            sick_results = self.evaluate(sick_binary, ["DecisionTree"])
+            healthy_results = self.evaluate(healthy_binary, ["DecisionTree"])
+
+            results[label] = {
+                "sick": sick_results,
+                "healthy": healthy_results,
+            }
+
+        return results
+
+    def binarize_labels(self, labels, selected_label):
+        new_labels = np.zeros_like(labels)
+        indices = np.flatnonzero(np.core.defchararray.find(labels,selected_label)!=-1)
+        new_labels[indices] = 1
+
+        return new_labels
