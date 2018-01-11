@@ -8,7 +8,7 @@ from utils.plot import plotScatter
 
 from utils import Expressions
 
-
+from validation.Analyzer import Analyzer
 from validation.ClusterValidator import ClusterValidator
 from validation.ClassificationValidator import ClassificationValidator
 
@@ -18,22 +18,40 @@ print("Imported modules")
 
 dataLoader = DataLoader("dataset4")
 dimReducer = DimensionalityReducer()
+analyzer = Analyzer()
 
 clusVal = ClusterValidator()
 classVal = ClassificationValidator()
 print("data loaded")
 
 #%%
-healthy = dataLoader.getData(["healthy"], ["THCA","LUAD"])
-sick = dataLoader.getData(["sick"], ["THCA","LUAD"])
+healthy = dataLoader.getData(["healthy"], ["THCA","LUAD","GBM"])
+sick = dataLoader.getData(["sick"], ["THCA","LUAD","GBM"])
 gene_labels = dataLoader.getGeneLabels()
 print("got combined data")
+
+# %%
+features = dimReducer.getOneAgainstRestFeatures(sick,healthy)
+pprint(features)
+
+#results = analyzer.computeFeatureValidationOneAgainstRest(sick, healthy, features)
+#pprint(results)
+
+
+# %%
+evaluation = classVal.evaluateOneAgainstRest(sick, healthy, features)
+pprint(evaluation)
+
+
+
+
 
 # %%
 # Feature Selection
 #selected_genes, sick_X, healthy_X = dimReducer.getEAFeatures(sick,healthy)
 selected_genes, sick_X, healthy_X = dimReducer.getFeaturesBySFS(sick,healthy,3)
 print(selected_genes)
+
 
 sick_reduced = Expressions(sick_X, sick.labels)
 healthy_reduced = Expressions(healthy_X, healthy.labels)

@@ -98,9 +98,9 @@ class DimensionalityReducer:
 
     ####### MULTI-VARIATE FEATURE SELECTION #######
 
-    def getEAFeatures(self, sick, healthy):
+    def getEAFeatures(self, sick, healthy, normalization="substract"):
         # preselect features to reduce runtime
-        selected_genes, sick_X, healthy_X = self.getNormalizedFeatures(sick,healthy,"substract", c.chromo_size, c.chromo_size)
+        selected_genes, sick_X, healthy_X = self.getNormalizedFeatures(sick,healthy,normalization, c.chromo_size, c.chromo_size)
         crossover = one_point_crossover
         mutation = binary_mutation
         fitness_function = fitness(Expressions(sick_X, sick.labels), Expressions(healthy_X, healthy.labels))
@@ -108,9 +108,9 @@ class DimensionalityReducer:
         indices = selected_genes[phenotype(best)]
         return indices, sick.expressions[:, indices], healthy.expressions[:, indices]
 
-    def getFeaturesBySFS(self, sick, healthy, k=3, n=5000, m=100):
+    def getFeaturesBySFS(self, sick, healthy, k=3, n=5000, m=100, normalization="exclude"):
         # preselect 100 genes in sick data which do not separate healthy data well
-        selected_genes, _, _ = self.getNormalizedFeatures(sick,healthy,"exclude", m, n)
+        selected_genes, _, _ = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
 
         # first gene has highest score and will be selected first
         indices = [selected_genes[0]]
@@ -139,3 +139,37 @@ class DimensionalityReducer:
         indices = tree.feature_importances_.argsort(
         )[-k:][::-1]  # indices of k greatest values
         return indices, data.expressions[:, indices]
+
+
+    ####### 1 vs Rest #######
+
+    def getOneAgainstRestFeatures(self, sick, healhty, k=3, method="sfs", normalization="exclude"):
+        features = {}
+        for label in np.unique(sick.labels):
+            label = label.split("-")[0]
+            s_labels = self.binarize_labels(sick.labels, label)
+            h_labels = self.binarize_labels(healhty.labels, label)
+
+            sick_binary = Expressions(sick.expressions, s_labels)
+            healhty_binary = Expressions(healhty.expressions, h_labels)
+
+            if method == "ea":
+                indices, _, _ = self.getEAFeatures(sick_binary, healhty_binary, normalization)
+            elif method == "norm":
+                indices, _, _ = self.getNormalizedFeatures(sick_binary, healhty_binary, normalization, k)
+            else:
+                indices, _, _ = self.getFeaturesBySFS(sick_binary, healhty_binary, k, normalization=normalization)
+
+            features[label] = indices
+        
+        return features
+
+
+    ####### UTILS #######
+
+    def binarize_labels(self, labels, selected_label):
+        new_labels = np.zeros_like(labels)
+        indices = np.flatnonzero(np.core.defchararray.find(labels,selected_label)!=-1)
+        new_labels[indices] = 1
+
+        return new_labels

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import styled from "styled-components";
 import { loadStatistics, loadAlgorithms } from "../actions/contextActions";
 import { runAlgorithm, updateAlgorithm } from "../actions/runActions";
 
@@ -21,7 +22,7 @@ class Content extends Component {
     const { runs, context, runAlgorithm, updateAlgorithm } = this.props;
     const { algorithms, statistics } = context;
     return (
-      <div className="content">
+      <StyledRoot className="content">
         {Object.keys(runs).map(runId => {
           const { algorithm, result, isLoading } = runs[runId];
           return (
@@ -41,10 +42,18 @@ class Content extends Component {
             />
           );
         })}
-      </div>
+      </StyledRoot>
     );
   }
 }
+
+const StyledRoot = styled.div`
+  overflow: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 150px;
+`;
 
 const mapStateToProps = state => {
   return {
