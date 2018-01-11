@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { updateName } from "../actions/experimentActions";
+import { createRun } from "../actions/runActions";
 import logo from "../assets/images/logo.png";
 import styled from "styled-components";
 import EditableText from "./EditableText";
@@ -20,23 +21,45 @@ class Header extends Component {
             text={this.props.experimentName}
             onChange={this.props.updateExperimentName}
           />
-          <StyledButtonContainer>
-            <IconButton
-              tooltip="Open existing experiment"
-              icon="open"
-              color={almostWhite}
-            />
-            <IconButton
-              tooltip="Save experiment"
-              icon="save"
-              color={almostWhite}
-            />
-          </StyledButtonContainer>
+          <div>
+            <StyledRightContainer>
+              <StyledText>{this.props.dataset}</StyledText>
+              <StyledSpacer />
+              <StyledSpacer>|</StyledSpacer>
+              <StyledSpacer />
+              <IconButton
+                tooltip="Open existing experiment"
+                icon="open"
+                color={almostWhite}
+              />
+              <StyledSpacer />
+              <IconButton
+                tooltip="Save experiment"
+                icon="save"
+                color={almostWhite}
+              />
+              <StyledSpacer />
+              <IconButton
+                tooltip="Add Card"
+                icon="add"
+                color={almostWhite}
+                onClick={() => {
+                  this.props.createRun(this.props.context);
+                }}
+              />
+            </StyledRightContainer>
+          </div>
         </StyledExperimentHeader>
       </StyledHeaderContainer>
     );
   }
 }
+
+const StyledSpacer = styled.div`
+  margin-left: 3px;
+  margin-right: 3px;
+  color: ${props => props.theme.almostWhite};
+`;
 
 const StyledHeaderContainer = styled.div`
   position: absolute;
@@ -45,7 +68,9 @@ const StyledHeaderContainer = styled.div`
   width: 100%;
   z-index: 9001; /* The z-index is over 9000! */
   transform: ${props =>
-    props.minimized ? "translateY(-75px)" : "translateY(0px)"};
+    props.minimized
+      ? `translateY(-${props.theme.headerHeight})`
+      : `translateY(0px)`};
   transition: transform 0.5s;
   overflow: hidden;
 `;
@@ -79,15 +104,27 @@ const StyledLogo = styled.img`
   height: 45px;
 `;
 
-const StyledButtonContainer = styled.div`
+const StyledText = styled.p`
+  color: ${props => props.theme.almostWhite};
+  padding: ${props => props.theme.smallSpace};
+  margin: 0;
+  text-align: right;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 200px;
+`;
+
+const StyledRightContainer = styled.div`
   display: flex;
-  justify-content: flex-end;
-  width: 20%;
+  align-items: center;
 `;
 
 const mapStateToProps = state => {
   return {
-    experimentName: state.experiment.name
+    experimentName: state.experiment.name,
+    dataset: state.experiment.dataset,
+    context: state.context
   };
 };
 
@@ -95,6 +132,9 @@ const mapDispatchToProps = dispatch => {
   return {
     updateExperimentName: newName => {
       dispatch(updateName(newName));
+    },
+    createRun: context => {
+      dispatch(createRun(context));
     }
   };
 };

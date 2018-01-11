@@ -75,8 +75,8 @@ class EditableText extends Component {
 const StyledExperimentName = styled.div`
   color: ${props => props.theme.almostWhite};
   font-size: ${props => props.theme.h2};
-  overflow: hidden;
   white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
 `;
 
@@ -96,8 +96,9 @@ const StyledInput = styled.input`
 `;
 
 const StyledContainer = styled.div`
-  width: 80%;
+  overflow: hidden;
   display: flex;
+  flex: 1;
   align-items: center;
 `;
 

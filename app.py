@@ -6,6 +6,8 @@ from flask import Flask, request
 from flask_cors import CORS
 from utils.DataLoader import DataLoader
 from utils.DimensionalityReducer import DimensionalityReducer
+from validation.Analyzer import Analyzer
+from utils import Expressions
 
 app = Flask(__name__)
 CORS(app)
@@ -13,6 +15,7 @@ dataLoader = DataLoader("dataset4")
 gene_labels = dataLoader.getGeneLabels()
 gene_names = dataLoader.getGeneNames()
 dimReducer = DimensionalityReducer()
+analyzer = Analyzer()
 
 @app.route('/')
 def hello_world():
@@ -108,6 +111,7 @@ def algorithms():
 
     return json.dumps(response)
 
+
 @app.route("/runAlgorithm", methods=["POST"])
 def runSpecificAlgorithm():
     # POST key, parameters, cancerTypes, healthyTissueTypes, sickTissueTypes
@@ -133,6 +137,8 @@ def runSpecificAlgorithm():
     data = dataLoader.getData(
         algorithm["healthyTissueTypes"] + algorithm["sickTissueTypes"], algorithm["cancerTypes"])
 
+    calcExpressionMatrix = False
+
     if key == "getPCA":
         _, X, gene_indices = dimReducer.getPCA(
             data.expressions, algorithm["parameters"]["n_components"], algorithm["parameters"]["n_features_per_component"])
@@ -143,10 +149,12 @@ def runSpecificAlgorithm():
         gene_indices, X, Y = dimReducer.getNormalizedFeaturesE(
             sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"], "chi2")
         X = np.vstack((X, Y))
+        calcExpressionMatrix = True
     elif key == "getNormalizedFeaturesS":
         gene_indices, X, Y = dimReducer.getNormalizedFeaturesS(
             sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"], "chi2")
         X = np.vstack((X, Y))
+        calcExpressionMatrix = True
     elif key == "getFeatures":
         gene_indices, X = dimReducer.getFeatures(
             data, algorithm["parameters"]["k"])
@@ -154,15 +162,23 @@ def runSpecificAlgorithm():
         gene_indices, X, Y = dimReducer.getFeaturesBySFS(
             sick, healthy)
         X = np.vstack((X, Y))
-
+        calcExpressionMatrix = True
 
     responseData = {}
     for label in np.unique(data.labels):
         responseData[label] = X[data.labels == label, :].T.tolist()
 
+    # calculate expression matrix
+    expressionMatrix = None
+    if calcExpressionMatrix:
+        sick_reduced = Expressions(X, sick.labels)
+        expressionMatrix = analyzer.computeExpressionMatrix(
+            sick_reduced, healthy, gene_indices)
+
     response = {
         'data': responseData,
         'genes': gene_labels[gene_indices].tolist(),
+        'expressionMatrix': expressionMatrix,
         'geneNames': gene_names[gene_indices].tolist(),
     }
     return json.dumps(response)
