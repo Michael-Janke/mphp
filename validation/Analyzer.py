@@ -64,9 +64,11 @@ class Analyzer:
             sick_X = sick.expressions[sick.labels==cancertype+"-sick"]
             for i in range(sick_X.shape[1]):
                 U_high, p_high = mannwhitneyu(sick_X[:,i], healthy_X[:,i], alternative="greater")
-                U_low, p_low = mannwhitneyu(sick_X, healthy_X, alternative="less")
-                expressions[cancertype].append("greater" if p_high < 0.05 else "less" if p_low < 0.05 else "unchangend")
+                U_low,  p_low  = mannwhitneyu(sick_X[:,i], healthy_X[:,i], alternative="less")
+                expressions[cancertype].append("greater" if p_high < 0.01 else "less" if p_low < 0.01 else "unchanged")
+                print(p_low, p_high)
                 print(np.mean(sick_X[:,i]), np.mean(healthy_X[:,i]))
+            print("====")
         return expressions
 
     def computeExpressionThresholds(self, healthy, selected_genes):
