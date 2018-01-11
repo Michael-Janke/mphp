@@ -22,25 +22,27 @@ class Content extends Component {
     const { algorithms, statistics } = context;
     return (
       <div className="content">
-        {Object.keys(runs).map(runId => {
-          const { algorithm, result, isLoading } = runs[runId];
-          return (
-            <Run
-              key={runId}
-              isLoading={!algorithms || !statistics || isLoading}
-              isError={
-                (statistics && statistics.isError) ||
-                (algorithms && algorithms.isError)
-              }
-              runId={runId}
-              algorithm={algorithm}
-              result={result}
-              runAlgorithm={runAlgorithm}
-              updateAlgorithm={updateAlgorithm}
-              {...context}
-            />
-          );
-        })}
+        {Object.keys(runs)
+          .reverse()
+          .map(runId => {
+            const { algorithm, result, isLoading } = runs[runId];
+            return (
+              <Run
+                key={runId}
+                isLoading={!algorithms || !statistics || isLoading}
+                isError={
+                  (statistics && statistics.isError) ||
+                  (algorithms && algorithms.isError)
+                }
+                runId={runId}
+                algorithm={algorithm}
+                result={result}
+                runAlgorithm={runAlgorithm}
+                updateAlgorithm={updateAlgorithm}
+                {...context}
+              />
+            );
+          })}
       </div>
     );
   }
