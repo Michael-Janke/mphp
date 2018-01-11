@@ -66,9 +66,10 @@ class Analyzer:
                 if healthy_X.shape[0] < 20:
                     #h = np.concatenate((healthy_X[:,i],healthy_X[:,i],healthy_X[:,i],healthy_X[:,i],healthy_X[:,i],healthy_X[:,i]), axis=0)
                     #print(h.shape)
-                    #U_high, p_high = mannwhitneyu(sick_X[:,i], h, alternative="greater")
-                    #U_low,  p_low  = mannwhitneyu(sick_X[:,i], h, alternative="less")
-                    expressions[cancertype].append("cant compute")
+                    U_high, p_high = mannwhitneyu(sick_X[:,i], healthy_X[:,i], alternative="greater")
+                    U_low,  p_low  = mannwhitneyu(sick_X[:,i], healthy_X[:,i], alternative="less")
+                    expression = "greater" if p_high < 0.01 else "less" if p_low < 0.01 else "unchanged"
+                    expressions[cancertype].append("cant compute - " + expression)
                 else:
                     U_high, p_high = mannwhitneyu(sick_X[:,i], healthy_X[:,i], alternative="greater")
                     U_low,  p_low  = mannwhitneyu(sick_X[:,i], healthy_X[:,i], alternative="less")
