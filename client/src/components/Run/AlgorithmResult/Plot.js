@@ -4,7 +4,7 @@ import React, { Component } from "react";
 import createPlotlyComponent from "react-plotly.js/factory";
 import Color from "tinycolor2";
 
-import { statisticsColors } from "../../config/colors";
+import { statisticsColors } from "../../../config/colors";
 
 let Plot;
 loadScript("https://cdn.plot.ly/plotly-latest.min.js", function(err, script) {
@@ -40,7 +40,7 @@ export default class InteractivePlot extends Component {
     const { data, geneNames } = this.props;
     const plotData = Object.keys(data).map((key, index) => {
       const cancerType = key.split("-")[0];
-      if (oldCancerType != cancerType) {
+      if (oldCancerType !== cancerType) {
         color = Color(statisticsColors[colorIndex++]);
         oldCancerType = cancerType;
         oldColor = color;
