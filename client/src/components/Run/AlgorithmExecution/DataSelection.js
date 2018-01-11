@@ -24,18 +24,20 @@ export default class DataSelection extends Component {
     return (
       <StyledContent>
         <TcgaSelection {...this.props} />
-        <DiagramContainer>
-          <ResponsiveContainer height="100%" width="100%">
-            <BarChart {...chartOptions}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <CartesianGrid strokeDasharray="3 3" />
-              <Tooltip />
-              <Legend />
-              {this.renderBars()}
-            </BarChart>
-          </ResponsiveContainer>
-        </DiagramContainer>
+        {this.props.disabled ? null : (
+          <DiagramContainer>
+            <ResponsiveContainer height="100%" width="100%">
+              <BarChart {...chartOptions}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <CartesianGrid strokeDasharray="3 3" />
+                <Tooltip />
+                <Legend />
+                {this.renderBars()}
+              </BarChart>
+            </ResponsiveContainer>
+          </DiagramContainer>
+        )}
       </StyledContent>
     );
   }

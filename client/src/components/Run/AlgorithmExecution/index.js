@@ -13,19 +13,21 @@ export default class AlgorithmExecution extends Component {
         <AlgorithmSelection {...this.props} />
         <DataSelection {...this.props} />
         <CardActions>
-          <StyledButton
-            title={
-              isRunnable
-                ? `Run ${this.props.algorithm.name}`
-                : `Please select an algorithm`
-            }
-            label="Run"
-            primary={true}
-            onClick={() => {
-              this.executeAlgorithm();
-            }}
-            disabled={!isRunnable}
-          />
+          {this.props.disabled ? null : (
+            <StyledButton
+              title={
+                isRunnable
+                  ? `Run ${this.props.algorithm.name}`
+                  : `Please select an algorithm`
+              }
+              label="Run"
+              primary={true}
+              onClick={() => {
+                this.executeAlgorithm();
+              }}
+              disabled={!isRunnable}
+            />
+          )}
         </CardActions>
       </div>
     );

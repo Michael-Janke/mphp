@@ -32,10 +32,11 @@ export default class Card extends Component {
         <StyledError>Sorry, there was an error fetching the data.</StyledError>
       );
     }
-    return result === null ? (
-      <AlgorithmExecution {...this.props} />
-    ) : (
-      <AlgorithmResult {...this.props} />
+    return (
+      <div>
+        <AlgorithmExecution {...this.props} disabled={result != null} />
+        {result != null ? <AlgorithmResult {...this.props} /> : null}
+      </div>
     );
   }
 }

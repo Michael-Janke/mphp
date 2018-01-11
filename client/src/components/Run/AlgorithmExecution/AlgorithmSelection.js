@@ -20,12 +20,13 @@ export default class AlgorithmSelection extends Component {
             onChange={this.selectAlgorithm.bind(this)}
             autoWidth={true}
             selectedMenuItemStyle={{ color: boringBlue }}
+            disabled={this.props.disabled}
           >
             {algorithms.map(this.renderMenuItem)}
           </StyledSelectField>
           {algorithm.key &&
             this.algorithmDescription().parameters.map(
-              this.renderParameter.bind(this)
+              this.renderParameter.bind(this, this.props.disabled)
             )}
         </StyledOptions>
       </StyledMenu>
@@ -43,7 +44,7 @@ export default class AlgorithmSelection extends Component {
     );
   }
 
-  renderParameter(parameter, index) {
+  renderParameter(disabled, parameter, index) {
     return (
       <StyledTextField
         key={parameter.key}
@@ -54,6 +55,7 @@ export default class AlgorithmSelection extends Component {
         floatingLabelFixed={true}
         type="number"
         onChange={this.changeParameter.bind(this)}
+        disabled={disabled}
       />
     );
   }

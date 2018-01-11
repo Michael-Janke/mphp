@@ -10,7 +10,7 @@ import { isHealthy } from "../../../utils";
 
 class TcgaSelection extends PureComponent {
   render() {
-    const { tcgaTokens, tissueTypes, algorithm } = this.props;
+    const { tcgaTokens, tissueTypes, algorithm, disabled } = this.props;
     const healthyTissueTypes = tissueTypes.filter(tissueType =>
       isHealthy(tissueType)
     );
@@ -24,42 +24,56 @@ class TcgaSelection extends PureComponent {
       <StyledRoot>
         <StyledList>
           <Subheader>Cancer Types</Subheader>
-          {tcgaTokens.map(tcgaToken => (
-            <StyledButton
-              label={tcgaToken}
-              key={tcgaToken}
-              value={tcgaToken}
-              onClick={() => this.transferTcgaToken(tcgaToken)}
-              selected={algorithm.cancerTypes.includes(tcgaToken)}
-              primary={algorithm.cancerTypes.includes(tcgaToken)}
-            />
-          ))}
+          {tcgaTokens.map(
+            tcgaToken =>
+              disabled && !algorithm.cancerTypes.includes(tcgaToken) ? null : (
+                <StyledButton
+                  label={tcgaToken}
+                  key={tcgaToken}
+                  value={tcgaToken}
+                  onClick={() => this.transferTcgaToken(tcgaToken)}
+                  selected={algorithm.cancerTypes.includes(tcgaToken)}
+                  primary={algorithm.cancerTypes.includes(tcgaToken)}
+                  disabled={disabled}
+                />
+              )
+          )}
         </StyledList>
         <StyledList>
           <Subheader>Healthy Tissue</Subheader>
-          {healthyTissueTypes.map(tissueType => (
-            <StyledButton
-              label={tissueType}
-              key={tissueType}
-              value={tissueType}
-              onClick={() => this.transferTissueType(tissueType)}
-              selected={selectedHealthyTissueTypes.includes(tissueType)}
-              primary={selectedHealthyTissueTypes.includes(tissueType)}
-            />
-          ))}
+          {healthyTissueTypes.map(
+            tissueType =>
+              disabled &&
+              !selectedHealthyTissueTypes.includes(tissueType) ? null : (
+                <StyledButton
+                  label={tissueType}
+                  key={tissueType}
+                  value={tissueType}
+                  onClick={() => this.transferTissueType(tissueType)}
+                  selected={selectedHealthyTissueTypes.includes(tissueType)}
+                  primary={selectedHealthyTissueTypes.includes(tissueType)}
+                  disabled={disabled}
+                />
+              )
+          )}
         </StyledList>
         <StyledList>
           <Subheader>Sick Tissue</Subheader>
-          {sickTissueTypes.map(tissueType => (
-            <StyledButton
-              label={tissueType}
-              key={tissueType}
-              value={tissueType}
-              onClick={() => this.transferTissueType(tissueType)}
-              selected={selectedSickTissueTypes.includes(tissueType)}
-              primary={selectedSickTissueTypes.includes(tissueType)}
-            />
-          ))}
+          {sickTissueTypes.map(
+            tissueType =>
+              disabled &&
+              !selectedSickTissueTypes.includes(tissueType) ? null : (
+                <StyledButton
+                  label={tissueType}
+                  key={tissueType}
+                  value={tissueType}
+                  onClick={() => this.transferTissueType(tissueType)}
+                  selected={selectedSickTissueTypes.includes(tissueType)}
+                  primary={selectedSickTissueTypes.includes(tissueType)}
+                  disabled={disabled}
+                />
+              )
+          )}
         </StyledList>
       </StyledRoot>
     );
@@ -89,6 +103,9 @@ const StyledButton = styled(RaisedButton)`
       props.selected
         ? props.theme.boringBlue
         : props.theme.lightGray} !important;
+  }
+  button:disabled {
+    background: ${props => props.theme.lightGray} !important;
   }
 `;
 
