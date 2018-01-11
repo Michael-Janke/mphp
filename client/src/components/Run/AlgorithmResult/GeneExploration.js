@@ -43,7 +43,7 @@ export default class GeneExploration extends Component {
               <TableRow>
                 <TableHeaderColumn />
                 {genes.map((gene, i) => (
-                  <TableHeaderColumn>
+                  <TableHeaderColumn key={gene}>
                     <a
                       href={`https://www.proteinatlas.org/${gene}`}
                       target="_blank"
@@ -58,11 +58,11 @@ export default class GeneExploration extends Component {
               {Object.entries(expressionMatrix).map(
                 ([cancerType, expressions]) => {
                   return (
-                    <TableRow>
+                    <TableRow key={cancerType}>
                       <TableHeaderColumn>{cancerType}</TableHeaderColumn>
-                      {expressions.map(item => {
+                      {expressions.map((item, index) => {
                         return (
-                          <TableRowColumn>
+                          <TableRowColumn key={`${cancerType}-${index}`}>
                             {item
                               .replace("unchanged", "o")
                               .replace("mid-lower", "-")
