@@ -47,6 +47,7 @@ injectGlobal`
     padding: 0;
     font-family: "Roboto";
     background-color: #EEE;
+    overflow-y: hidden;
   }
 `;
 

@@ -37,7 +37,6 @@ const StyledCard = styled(Card)`
 `;
 
 const StyledRoot = styled.div`
-  display: inline-flex;
   width: 100%;
 `;
 

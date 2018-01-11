@@ -6,7 +6,7 @@ import Card from "../Card";
 export default class SelectDataset extends Component {
   render() {
     return (
-      <Card title="Experiment Information">
+      <Card className={this.props.className} title="Experiment Information">
         <StyledContent>Data Set: {this.props.data.dataset}</StyledContent>
       </Card>
     );

@@ -10,7 +10,7 @@ import { almostWhite } from "../config/colors";
 class Header extends Component {
   render() {
     return (
-      <StyledHeaderContainer>
+      <StyledHeaderContainer minimized={this.props.minimized}>
         <StyledHeader>
           <StyledLogo src={logo} />
           <StyledTitle>Clustered Gene Analysis</StyledTitle>
@@ -39,10 +39,14 @@ class Header extends Component {
 }
 
 const StyledHeaderContainer = styled.div`
+  position: absolute;
   display: flex;
   flex-direction: column;
   width: 100%;
   z-index: 9001; /* The z-index is over 9000! */
+  transform: ${props =>
+    props.minimized ? "translateY(-75px)" : "translateY(0px)"};
+  transition: transform 0.5s;
   overflow: hidden;
 `;
 
