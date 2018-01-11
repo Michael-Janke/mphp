@@ -31,9 +31,12 @@ class Analyzer:
 
     def computeFeatureValidation(self, sick, healthy, selected_genes):
         sick_reduced = Expressions(sick.expressions[:,selected_genes], sick.labels)
-        healthy_reduced = Expressions(healthy.expressions[:, selected_genes], healthy.labels)
-
         sick = self.assembleValidationOutput(sick_reduced)
+
+        if healthy == "":
+            return sick
+
+        healthy_reduced = Expressions(healthy.expressions[:, selected_genes], healthy.labels)
         healthy = self.assembleValidationOutput(healthy_reduced)
 
         classificationFitness = evaluate(sick_reduced, healthy_reduced)
