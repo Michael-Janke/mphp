@@ -19,12 +19,16 @@ class Analyzer:
         results = {}
         for label, genes in selected_genes_dict.items():
             s_labels = self.binarize_labels(sick.labels, label)
-            h_labels = self.binarize_labels(healthy.labels, label)
-
             sick_binary = Expressions(sick.expressions, s_labels)
-            healthy_binary = Expressions(healthy.expressions, h_labels)            
 
-            evaluation = self.computeFeatureValidation(sick_binary, healthy_binary, genes)
+            if healthy == "":
+                evaluation = self.computeFeatureValidation(sick_binary, "", genes)
+            else:
+                h_labels = self.binarize_labels(healthy.labels, label)
+                healthy_binary = Expressions(healthy.expressions, h_labels)            
+
+                evaluation = self.computeFeatureValidation(sick_binary, healthy_binary, genes)
+            
             results[label] = evaluation
 
         return results

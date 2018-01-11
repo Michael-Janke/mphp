@@ -15,8 +15,8 @@ dimReducer = DimensionalityReducer()
 analyzer = Analyzer()
 print("data loaded")
 
-healthy = dataLoader.getData(["healthy"], ["THCA","LUAD"])
-sick = dataLoader.getData(["sick"], ["THCA","LUAD"])
+healthy = dataLoader.getData(["healthy"], ["THCA","LUAD","KIRC"])
+sick = dataLoader.getData(["sick"], ["THCA","LUAD","KIRC"])
 gene_labels = dataLoader.getGeneLabels()
 print("got combined data")
 
@@ -43,7 +43,15 @@ pprint(expression_matrix)
 
 
 #%%
+########## SICK OR HEALTHY DATA ONLY ##########
 features, data_reduced_X = dimReducer.getFeatures(healthy, 3)
 data_reduced = Expressions(data_reduced_X, healthy.labels)
 validation = analyzer.computeFeatureValidation(healthy, '', features)
 pprint(validation)
+
+
+# %%
+features = dimReducer.getOneAgainstRestFeatures(healthy, '', 3)
+pprint(features)
+results = analyzer.computeFeatureValidationOneAgainstRest(healthy, '', features)
+pprint(results)

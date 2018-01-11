@@ -148,17 +148,21 @@ class DimensionalityReducer:
         for label in np.unique(sick.labels):
             label = label.split("-")[0]
             s_labels = self.binarize_labels(sick.labels, label)
-            h_labels = self.binarize_labels(healhty.labels, label)
-
             sick_binary = Expressions(sick.expressions, s_labels)
-            healhty_binary = Expressions(healhty.expressions, h_labels)
 
-            if method == "ea":
-                indices, _, _ = self.getEAFeatures(sick_binary, healhty_binary, normalization)
-            elif method == "norm":
-                indices, _, _ = self.getNormalizedFeatures(sick_binary, healhty_binary, normalization, k)
+            if healhty == "":
+                indices, _ = self.getFeatures(sick_binary, k)
+
             else:
-                indices, _, _ = self.getFeaturesBySFS(sick_binary, healhty_binary, k, normalization=normalization)
+                h_labels = self.binarize_labels(healhty.labels, label)
+                healhty_binary = Expressions(healhty.expressions, h_labels)
+
+                if method == "ea":
+                    indices, _, _ = self.getEAFeatures(sick_binary, healhty_binary, normalization)
+                elif method == "norm":
+                    indices, _, _ = self.getNormalizedFeatures(sick_binary, healhty_binary, normalization, k)
+                else:
+                    indices, _, _ = self.getFeaturesBySFS(sick_binary, healhty_binary, k, normalization=normalization)
 
             features[label] = indices
         

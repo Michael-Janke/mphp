@@ -68,18 +68,20 @@ class ClassificationValidator():
         results = {}
         for label, genes in selected_genes_dict.items():
             s_labels = self.binarize_labels(sick.labels, label)
-            h_labels = self.binarize_labels(healthy.labels, label)
-
             sick_binary = Expressions(sick.expressions[:,genes], s_labels)
-            healthy_binary = Expressions(healthy.expressions[:,genes], h_labels)
-
             sick_results = self.evaluate(sick_binary, ["DecisionTree"])
-            healthy_results = self.evaluate(healthy_binary, ["DecisionTree"])
 
-            results[label] = {
-                "sick": sick_results,
-                "healthy": healthy_results,
-            }
+            if healthy == "":
+                results[label] = sick_results
+            else:
+                h_labels = self.binarize_labels(healthy.labels, label)
+                healthy_binary = Expressions(healthy.expressions[:,genes], h_labels)
+                healthy_results = self.evaluate(healthy_binary, ["DecisionTree"])
+
+                results[label] = {
+                    "sick": sick_results,
+                    "healthy": healthy_results,
+                }
 
         return results
 
