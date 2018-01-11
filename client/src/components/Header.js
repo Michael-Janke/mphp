@@ -67,7 +67,9 @@ const StyledHeaderContainer = styled.div`
   width: 100%;
   z-index: 9001; /* The z-index is over 9000! */
   transform: ${props =>
-    props.minimized ? "translateY(-75px)" : "translateY(0px)"};
+    props.minimized
+      ? `translateY(-${props.theme.headerHeight})`
+      : `translateY(0px)`};
   transition: transform 0.5s;
   overflow: hidden;
 `;

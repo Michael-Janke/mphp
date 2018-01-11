@@ -20,6 +20,7 @@ class App extends Component {
         <ScrollableArea
           innerRef={comp => (this.scrollableArea = comp)}
           onScroll={this.handleScroll}
+          headerMinimized={this.state.minimize}
         >
           <Content />
         </ScrollableArea>
@@ -46,6 +47,13 @@ const ScrollableArea = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
+  position: relative;
+  top: ${props => props.theme.totalHeaderHeight};
+  transform: ${props =>
+    props.headerMinimized
+      ? `translateY(-${props.theme.headerHeight})`
+      : `translateY(0px)`};
+  transition: transform 0.5s;
 `;
 
 export default App;
