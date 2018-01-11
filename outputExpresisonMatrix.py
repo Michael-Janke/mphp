@@ -38,7 +38,7 @@ validation = analyzer.computeFeatureValidation(sick, healthy, selected_genes)
 pprint(validation)
 
 #%%
-expression_matrix = analyzer.computeExpressionMatrix(sick_reduced, healthy, selected_genes)
+expression_matrix = analyzer.computeExpressionMatrix(sick_reduced, healthy_reduced, selected_genes)
 pprint(expression_matrix)
 
 
