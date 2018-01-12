@@ -1,7 +1,14 @@
 import json
 import numpy as np
 import base64
+import urllib
+import xml.etree.ElementTree as ET
+import rdflib
+import shutil
 
+from SPARQLWrapper import SPARQLWrapper, JSON
+from pprint import pprint
+from xml.dom.minidom import parse, parseString
 from flask import Flask, request
 from flask_cors import CORS
 from utils.DataLoader import DataLoader
@@ -20,6 +27,73 @@ analyzer = Analyzer()
 @app.route('/')
 def hello_world():
     return 'Hello World!'
+
+@app.route('/testGenes', methods=["POST"])
+def testGene():
+    data = request.get_json()["genes"]
+    genes = data["genes"]
+    response = {}
+
+    #DisGeNet - move down to individual gene
+    sparql = SPARQLWrapper('http://rdf.disgenet.org/sparql/')
+    sparql.setQuery("""
+    SELECT DISTINCT
+        ?gda
+        <http://identifiers.org/ncbigene/1356> as ?gene
+        ?score
+        ?disease
+        ?diseaselabel
+        ?diseasename
+        ?semanticType
+    WHERE {
+        ?gda sio:SIO_000628 <http://identifiers.org/ncbigene/1356>, ?disease ;
+            sio:SIO_000253 ?source ;
+            sio:SIO_000216 ?scoreIRI .
+        ?disease sio:SIO_000008 ?semanticType .
+        ?disease a ncit:C7057 .
+        ?scoreIRI sio:SIO_000300 ?score .
+        FILTER regex(?source, "UNIPROT|CTD_human")
+        FILTER (?score >= 0.2)
+        ?disease dcterms:title ?diseasename .
+        ?disease rdfs:label ?diseaselabel
+    }
+    ORDER BY DESC(?score)
+    """)
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    print(results)
+
+    for gene in genes:
+
+        #protein Atlas - TODO: save xml as file and only load new if we don't have it yet
+        proteinAtlas = False
+        try:
+
+            url = 'https://www.proteinatlas.org/'+ gene +'.xml'
+            file_name = 'data/proteinatlas/'+ gene +'.xml'
+
+            if not os.path.isfile(fname):
+                with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+                    shutil.copyfileobj(response, out_file)
+
+            f = open(file_name, 'r')
+            xml = f.read()
+            f.close()
+            dom = parseString(xml.read())
+            proteinClass = dom.getElementsByTagName('proteinClass')
+            for c in proteinClass:
+                if c.attributes['name'].value == "Cancer-related genes":
+                    proteinAtlas = True
+        except:
+            print("Error accessing proteinatlas for gene: " + gene)
+
+
+        #for result in results["results"]["bindings"]:
+        #    print(result["label"]["value"])
+
+        response[gene] = {'proteinAtlas': proteinAtlas, 'disgenet': results}
+
+    return json.dumps(response)
 
 @app.route("/algorithms", methods=["GET"])
 def algorithms():

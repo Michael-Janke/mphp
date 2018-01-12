@@ -10,8 +10,16 @@ import {
 } from "material-ui/Table";
 
 export default class GeneExploration extends Component {
+  constructor(props) {
+    super(props);
+    if (!props.runs[props.runId].geneResults) {
+      this.props.testGenes(props.runId, { genes: props.result.genes });
+    }
+  }
+
   render() {
     const { genes, geneNames, expressionMatrix } = this.props.result;
+    console.log(this.props.runs[this.props.runId].geneResults);
 
     return (
       <div>

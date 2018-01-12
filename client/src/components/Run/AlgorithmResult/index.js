@@ -3,17 +3,17 @@ import styled from "styled-components";
 
 import Plot from "./Plot";
 import Evaluation from "./Evaluation";
-import GeneExploration from "./GeneExploration";
+import GeneExploration from "./GeneExplorationContainer";
 
 export default class Results extends Component {
   render() {
-    const { result } = this.props;
+    const { result, runId } = this.props;
     return (
       <div>
         <StyledContent>
           <Plot {...result} />
           <Evaluation />
-          <GeneExploration result={result} />
+          <GeneExploration runId={runId} result={result} />
         </StyledContent>
       </div>
     );

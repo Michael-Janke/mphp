@@ -68,3 +68,19 @@ function arrayToggle(array, element) {
     ? array.filter(anElement => element !== anElement)
     : [...array, element];
 }
+
+export function testGenes(id, params) {
+  return dispatch => {
+    postRequest("/testGenes", {
+      genes: params
+    }).then(response => dispatch(_testGenes(id, response)));
+
+    function _testGenes(id, result) {
+      return {
+        type: types.GENE_RESULTS,
+        id,
+        result
+      };
+    }
+  };
+}
