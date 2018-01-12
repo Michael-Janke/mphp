@@ -38,62 +38,66 @@ export default class InteractivePlot extends Component {
       color,
       colorIndex = 0;
     const { data, geneNames } = this.props;
-    const plotData = Object.keys(data).map((key, index) => {
-      const cancerType = key.split("-")[0];
-      if (oldCancerType !== cancerType) {
-        color = Color(statisticsColors[colorIndex++]);
-        oldCancerType = cancerType;
-        oldColor = color;
-      } else {
-        if (key.split("-")[1].includes("N")) {
-          color = oldColor.spin(12).lighten(7);
+    let plotData, plotLayout;
+    if (data && geneNames) {
+      plotData = Object.keys(data).map((key, index) => {
+        const cancerType = key.split("-")[0];
+        if (oldCancerType !== cancerType) {
+          color = Color(statisticsColors[colorIndex++]);
+          oldCancerType = cancerType;
+          oldColor = color;
         } else {
-          color = oldColor.spin(-12).darken(7);
+          if (key.split("-")[1].includes("N")) {
+            color = oldColor.spin(12).lighten(7);
+          } else {
+            color = oldColor.spin(-12).darken(7);
+          }
+          oldColor = color;
         }
-        oldColor = color;
-      }
-      return {
-        type: "scatter3d",
-        mode: "markers",
-        name: key,
-        x: data[key][0],
-        y: data[key][1],
-        z: data[key][2],
-        marker: {
-          size: 5,
-          color: color.toString(),
-          opacity: 1
+        return {
+          type: "scatter3d",
+          mode: "markers",
+          name: key,
+          x: data[key][0],
+          y: data[key][1],
+          z: data[key][2],
+          marker: {
+            size: 5,
+            color: color.toString(),
+            opacity: 1
+          }
+        };
+      });
+
+      plotLayout = {
+        margin: {
+          l: 0,
+          r: 0,
+          b: 0,
+          t: 0
+        },
+        scene: {
+          xaxis: {
+            title: geneNames[0]
+          },
+          yaxis: {
+            title: geneNames[1]
+          },
+          zaxis: {
+            title: geneNames[2]
+          }
+        },
+        legend: {
+          yanchor: "middle",
+          y: 0.7
         }
       };
-    });
-    const plotLayout = {
-      margin: {
-        l: 0,
-        r: 0,
-        b: 0,
-        t: 0
-      },
-      scene: {
-        xaxis: {
-          title: geneNames[0]
-        },
-        yaxis: {
-          title: geneNames[1]
-        },
-        zaxis: {
-          title: geneNames[2]
-        }
-      },
-      legend: {
-        yanchor: "middle",
-        y: 0.7
-      }
-    };
+    }
 
     return (
       <div>
         <h3>Visualization</h3>
-        <Plot data={plotData} layout={plotLayout} />
+        {plotData && plotLayout && <Plot data={plotData} layout={plotLayout} />}
       </div>
     );
   }

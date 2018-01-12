@@ -17,9 +17,11 @@ gene_names = dataLoader.getGeneNames()
 dimReducer = DimensionalityReducer()
 analyzer = Analyzer()
 
+
 @app.route('/')
 def hello_world():
     return 'Hello World!'
+
 
 @app.route("/algorithms", methods=["GET"])
 def algorithms():
@@ -148,11 +150,13 @@ def runSpecificAlgorithm():
     elif key == "getNormalizedFeaturesE":
         gene_indices, X, Y = dimReducer.getNormalizedFeaturesE(
             sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"], "chi2")
+        sick_response = X
         X = np.vstack((X, Y))
         calcExpressionMatrix = True
     elif key == "getNormalizedFeaturesS":
         gene_indices, X, Y = dimReducer.getNormalizedFeaturesS(
             sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"], "chi2")
+        sick_response = X
         X = np.vstack((X, Y))
         calcExpressionMatrix = True
     elif key == "getFeatures":
@@ -161,6 +165,7 @@ def runSpecificAlgorithm():
     elif key == "getFeaturesBySFS":
         gene_indices, X, Y = dimReducer.getFeaturesBySFS(
             sick, healthy)
+        sick_response = X
         X = np.vstack((X, Y))
         calcExpressionMatrix = True
 
@@ -171,15 +176,20 @@ def runSpecificAlgorithm():
     # calculate expression matrix
     expressionMatrix = None
     if calcExpressionMatrix:
-        sick_reduced = Expressions(X, sick.labels)
+        sick_reduced = Expressions(sick_response, sick.labels)
+        healthy_reduced = Expressions(Y, healthy.labels)
         expressionMatrix = analyzer.computeExpressionMatrix(
-            sick_reduced, healthy, gene_indices)
+            sick_reduced, healthy_reduced, gene_indices)
+
+    # evaluation
+    evaluation = analyzer.computeFeatureValidation(sick, healthy, gene_indices)
 
     response = {
         'data': responseData,
         'genes': gene_labels[gene_indices].tolist(),
         'expressionMatrix': expressionMatrix,
         'geneNames': gene_names[gene_indices].tolist(),
+        'evaluation': evaluation,
     }
     return json.dumps(response)
 
