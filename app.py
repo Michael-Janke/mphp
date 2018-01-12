@@ -181,11 +181,15 @@ def runSpecificAlgorithm():
         expressionMatrix = analyzer.computeExpressionMatrix(
             sick_reduced, healthy_reduced, gene_indices)
 
+    # evaluation
+    evaluation = analyzer.computeFeatureValidation(sick, healthy, gene_indices)
+
     response = {
         'data': responseData,
         'genes': gene_labels[gene_indices].tolist(),
         'expressionMatrix': expressionMatrix,
         'geneNames': gene_names[gene_indices].tolist(),
+        'evaluation': evaluation,
     }
     return json.dumps(response)
 
