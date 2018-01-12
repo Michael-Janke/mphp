@@ -48,16 +48,34 @@ export function toggleTissueType(id, algorithm, tissueType) {
 
 export function runAlgorithm(id, algorithm) {
   return dispatch => {
-    dispatch({ type: types.START_ALGORITHM, id, algorithm });
-    postRequest("/runAlgorithm", { algorithm }).then(response =>
-      dispatch(_runAlgorithm(id, response))
-    );
+    dispatch(startAlgorithm(id, algorithm));
+    postRequest("/runAlgorithm", { algorithm })
+      .then(response => dispatch(algorithmDone(id, response)))
+      .then(() => dispatch(startEvaluation(id)))
+      .then(() => postRequest("/evaluation", { ...algorithm }))
+      .then(response => dispatch(evaluationDone(id, response)));
 
-    function _runAlgorithm(id, result) {
+    function startAlgorithm(id, algorithm) {
+      return { type: types.START_ALGORITHM, id, algorithm };
+    }
+
+    function algorithmDone(id, result) {
       return {
         type: types.ALGORITHM_DONE,
         id,
         result
+      };
+    }
+
+    function startEvaluation(id) {
+      return { type: types.START_EVALUATION, id };
+    }
+
+    function evaluationDone(id, evaluation) {
+      return {
+        type: types.EVALUATION_DONE,
+        id,
+        evaluation
       };
     }
   };

@@ -4,7 +4,9 @@ import { isHealthy } from "../utils";
 const emptyRun = {
   algorithm: { cancerTypes: [], healthyTissueTypes: [], sickTissueTypes: [] },
   isLoading: false,
-  result: null
+  result: null,
+  isEvaluating: false,
+  evaluation: null
 };
 
 const initialState = {
@@ -35,6 +37,15 @@ export function runs(state = initialState, action = {}) {
       return updateRun(state, action, {
         isLoading: false,
         result: action.result
+      });
+    case types.START_EVALUATION:
+      return updateRun(state, action, {
+        isEvaluating: true
+      });
+    case types.EVALUATION_DONE:
+      return updateRun(state, action, {
+        isEvaluating: false,
+        evaluation: action.evaluation
       });
     default:
       return state;
