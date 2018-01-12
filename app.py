@@ -134,10 +134,13 @@ def runSpecificAlgorithm():
 
     sick = dataLoader.getData(
         algorithm["sickTissueTypes"], algorithm["cancerTypes"])
+    sick = dataLoader.replaceLabels(sick)
     healthy = dataLoader.getData(
         algorithm["healthyTissueTypes"], algorithm["cancerTypes"])
+    healthy = dataLoader.replaceLabels(healthy)
     data = dataLoader.getData(
         algorithm["healthyTissueTypes"] + algorithm["sickTissueTypes"], algorithm["cancerTypes"])
+    data = dataLoader.replaceLabels(data)
 
     calcExpressionMatrix = False
 
