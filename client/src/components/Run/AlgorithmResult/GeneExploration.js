@@ -62,11 +62,10 @@ export default class GeneExploration extends Component {
                         return (
                           <TableRowColumn key={`${cancerType}-${index}`}>
                             {item
+                              .replace("cant compute - ", "**")
                               .replace("unchanged", "o")
-                              .replace("mid-lower", "-")
-                              .replace("mid-higher", "+")
-                              .replace("lower", "--")
-                              .replace("higher", "++")}
+                              .replace("less", "-")
+                              .replace("greater", "+")}
                           </TableRowColumn>
                         );
                       })}
