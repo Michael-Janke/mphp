@@ -22,13 +22,13 @@ class DataLoader:
 
         all_sample_types = np.load("data/"+dataset+"/statistics/sample_types.npy").astype("str")
         files = glob("data/"+dataset+"/subsets/*_count_data.npy")
-        meta_data_files = glob("data/"+dataset+"/subsets/*meta_data.npy")
+        meta_data_files = glob("data/"+dataset+"/subsets/*_meta_data.npy")
         files = list(set(files)-set(meta_data_files))
         for file in files:
-            cancer_type = ntpath.basename(file).split(".")[0].split("-")[1]
+            cancer_type = re.search(".*-(.*)_count_data.npy", file).group(1)
             cancer_types.append(cancer_type)
             gene_data = np.load(file)
-            meta_data = np.load(file.replace(".npy", "_meta_data.npy"))
+            meta_data = np.load(file.replace("_count_data.npy","_meta_data.npy"))
             sample_types = np.unique(meta_data).astype('str')
             data[cancer_type] = {}
             for sample_type in sample_types:
