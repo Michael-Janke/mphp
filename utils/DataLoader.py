@@ -20,12 +20,10 @@ class DataLoader:
         data = {}
         cancer_types = []
 
-        all_sample_types = np.load(
-            "data/" + dataset + "/statistics/sample_types.npy").astype("str")
-        files = glob("data/" + dataset + "/subsets/TCGA*")
-        meta_data_files = glob("data/" + dataset +
-                               "/subsets/TCGA*meta_data.npy")
-        files = list(set(files) - set(meta_data_files))
+        all_sample_types = np.load("data/"+dataset+"/statistics/sample_types.npy").astype("str")
+        files = glob("data/"+dataset+"/subsets/*_count_data.npy")
+        meta_data_files = glob("data/"+dataset+"/subsets/*meta_data.npy")
+        files = list(set(files)-set(meta_data_files))
         for file in files:
             cancer_type = ntpath.basename(file).split(".")[0].split("-")[1]
             cancer_types.append(cancer_type)
@@ -40,7 +38,7 @@ class DataLoader:
         return data, cancer_types, all_sample_types
 
     def readGenesAndStatistics(self, dataset):
-        gene_file = "data/" + dataset + "/subsets/gene_labels.npy"
+        gene_file = glob("data/"+dataset+"/subsets/*-gene_labels.npy")[0]
         gene_labels = np.load(gene_file)
 
         statistics_file = "data/" + dataset + "/statistics/counts.npy"
