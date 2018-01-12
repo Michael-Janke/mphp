@@ -11,7 +11,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import cross_validate
 from sklearn.metrics import make_scorer, precision_score, recall_score, f1_score
 
-from utils import Expressions, binarize_labels
+from utils import Expressions, binarize_labels, ignore_warnings
 
 class ClassificationValidator():
 
@@ -26,8 +26,10 @@ class ClassificationValidator():
             "BoostedTrees": AdaBoostClassifier
         }
 
+    @ignore_warnings
     def evaluate(self, data, classifier):
         result = {}
+
         if "*" in classifier:
             classifier = self.classifier_table.keys()
         for c in classifier:

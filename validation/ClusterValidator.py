@@ -2,6 +2,7 @@ from sklearn import metrics
 
 from sklearn.cluster import KMeans
 from sklearn.cluster import AgglomerativeClustering
+from utils import ignore_warnings
 
 class ClusterValidator():
     def __init__(self):
@@ -19,6 +20,7 @@ class ClusterValidator():
         "fowlkes_mallows": metrics.fowlkes_mallows_score
         }
 
+    @ignore_warnings
     def evaluate(self, data, algorithms, measures):
         result = {}
         if "*" in algorithms:

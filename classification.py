@@ -37,11 +37,13 @@ pprint(features)
 #results = analyzer.computeFeatureValidationOneAgainstRest(sick, healthy, features)
 #pprint(results)
 
+expressions = analyzer.computeExpressionMatrixOneAgainstRest(sick, healthy, features)
+pprint(expressions)
+
 
 # %%
 evaluation = classVal.evaluateOneAgainstRest(sick, healthy, features)
 pprint(evaluation)
-
 
 
 
