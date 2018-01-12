@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_val_score
-from utils import Expressions
+from utils import Expressions, ignore_warnings
 
 from utils.EA.population import phenotype
 
@@ -14,6 +14,7 @@ def fitness(sick, healthy):
         return distance_evaluate(sick_reduced, healthy_reduced)
     return fitness_
 
+@ignore_warnings
 def evaluate(sick, healthy):
     clf = DecisionTreeClassifier()
 

@@ -1,5 +1,7 @@
 import collections
 import numpy as np
+import warnings
+from functools import wraps
 
 class Expressions:
     def __init__(self, expressions, labels):
@@ -12,3 +14,12 @@ def binarize_labels(labels, selected_label):
     new_labels[indices] = 1
 
     return new_labels
+
+def ignore_warnings(f):
+    @wraps(f)
+    def inner(*args, **kwargs):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("ignore")
+            response = f(*args, **kwargs)
+        return response
+    return inner
