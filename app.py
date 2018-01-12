@@ -190,6 +190,21 @@ def runSpecificAlgorithm():
     return json.dumps(response)
 
 
+@app.route("/evaluation", methods=["POST"])
+def evaluate():
+    # POST cancerTypes, healthyTissueTypes, sickTissueTypes
+    requestData = request.get_json()
+    sick = dataLoader.getData(
+        requestData["sickTissueTypes"], requestData["cancerTypes"])
+    healthy = dataLoader.getData(
+        requestData["healthyTissueTypes"], requestData["cancerTypes"])
+
+    print(healthy)
+    features = dimReducer.getOneAgainstRestFeatures(sick,healthy)
+    response = analyzer.computeFeatureValidationOneAgainstRest(sick, healthy, features)
+    return json.dumps(response)
+
+
 @app.route('/statistics', methods=["GET"])
 def getStatistics():
     statistics = dataLoader.getStatistics()
