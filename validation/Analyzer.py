@@ -56,6 +56,17 @@ class Analyzer:
         clustering = clusVal.evaluate(X, ["*"], ["*"])
         return {"classifictation": classification, "clustering": clustering}
 
+    
+    def computeExpressionMatrixOneAgainstRest(self, sick, healthy, selected_genes_dict):
+        results = {}
+        for label, genes in selected_genes_dict.items():
+            sick_reduced = Expressions(sick.expressions[:,genes], sick.labels)
+            healthy_reduced = Expressions(healthy.expressions[:,genes], healthy.labels)
+
+            results[label] = self.computeExpressionMatrix(sick_reduced, healthy_reduced, genes)
+
+        return results
+
     def computeExpressionMatrix(self, sick, healthy, selected_genes):
         expressions = defaultdict(list)
         for label in np.unique(sick.labels):
