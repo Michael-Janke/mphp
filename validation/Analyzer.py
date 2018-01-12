@@ -3,11 +3,15 @@ from validation.ClusterValidator import ClusterValidator
 from validation.ClassificationValidator import ClassificationValidator
 from utils.EA.fitness import evaluate, distance_evaluate
 from utils import Expressions, binarize_labels
+from collections import defaultdict
+
+from numpy.core.defchararray import find
+from scipy.stats import mannwhitneyu
 
 class Analyzer:
     def __init__(self):
         pass
-    
+
     def computeFeatureValidationOneAgainstRest(self, sick, healthy, selected_genes_dict):
         results = {}
         for label, genes in selected_genes_dict.items():
@@ -18,7 +22,7 @@ class Analyzer:
                 results[label] = self.computeFeatureValidation(sick_binary, "", genes)
             else:
                 h_labels = binarize_labels(healthy.labels, label)
-                healthy_binary = Expressions(healthy.expressions, h_labels)            
+                healthy_binary = Expressions(healthy.expressions, h_labels)
                 results[label] = self.computeFeatureValidation(sick_binary, healthy_binary, genes)
 
         return results
@@ -53,32 +57,27 @@ class Analyzer:
         return {"classifictation": classification, "clustering": clustering}
 
     def computeExpressionMatrix(self, sick, healthy, selected_genes):
-        levels = self.computeExpressionThresholds(healthy, selected_genes)
-
-        expression_matrix = {}
+        expressions = defaultdict(list)
         for label in np.unique(sick.labels):
-            indices = np.where(sick.labels == label)
-            # compute median for each label and gene
-            medians = np.median(sick.expressions[indices,], axis=1).tolist()[0]
-            expressions = []
-
-            for index, median in enumerate(medians):
-                #compare median with thresholds
-                thresholds = levels[label[0:4]][selected_genes[index]]
-                if median < thresholds[0]:
-                    expressions.append("lower")
-                elif median < thresholds[1]:
-                    expressions.append("mid-lower")
-                elif median < thresholds[2]:
-                    expressions.append("unchanged")
-                elif median < thresholds[3]:
-                    expressions.append("mid-higher")
+            cancertype = label.split("-")[0]
+            healthy_X = healthy.expressions[healthy.labels==cancertype+"-healthy"]
+            sick_X = sick.expressions[sick.labels==cancertype+"-sick"]
+            for i in range(sick_X.shape[1]):
+                if healthy_X.shape[0] < 20:
+                    #h = np.concatenate((healthy_X[:,i],healthy_X[:,i],healthy_X[:,i],healthy_X[:,i],healthy_X[:,i],healthy_X[:,i]), axis=0)
+                    #print(h.shape)
+                    U_high, p_high = mannwhitneyu(sick_X[:,i], healthy_X[:,i], alternative="greater")
+                    U_low,  p_low  = mannwhitneyu(sick_X[:,i], healthy_X[:,i], alternative="less")
+                    expression = "greater" if p_high < 0.01 else "less" if p_low < 0.01 else "unchanged"
+                    expressions[cancertype].append("cant compute - " + expression)
                 else:
-                    expressions.append("higher")
-
-            expression_matrix[label] = expressions
-
-        return expression_matrix
+                    U_high, p_high = mannwhitneyu(sick_X[:,i], healthy_X[:,i], alternative="greater")
+                    U_low,  p_low  = mannwhitneyu(sick_X[:,i], healthy_X[:,i], alternative="less")
+                    expressions[cancertype].append("greater" if p_high < 0.01 else "less" if p_low < 0.01 else "unchanged")
+                    #print(p_low, p_high)
+                    #print(np.mean(sick_X[:,i]), np.mean(healthy_X[:,i]))
+            #print("====")
+        return expressions
 
     def computeExpressionThresholds(self, healthy, selected_genes):
         levels = {}

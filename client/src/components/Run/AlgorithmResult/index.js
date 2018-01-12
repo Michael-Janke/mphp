@@ -10,11 +10,15 @@ export default class Results extends Component {
     const { result, runId } = this.props;
     return (
       <div>
-        <StyledContent>
-          <Plot {...result} />
-          <Evaluation />
-          <GeneExploration runId={runId} result={result} />
-        </StyledContent>
+        {!result.isError ? (
+          <StyledContent>
+            <Plot {...result} />
+            <Evaluation />
+            <GeneExploration runId={runId} result={result} />
+          </StyledContent>
+        ) : (
+          <div>Server error</div>
+        )}
       </div>
     );
   }

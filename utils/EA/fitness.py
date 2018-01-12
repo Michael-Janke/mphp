@@ -43,9 +43,7 @@ def distance_evaluate(sick, healthy):
     return fitness
 
 def compute_cluster_distance(data):
-    normalized_data = np.copy(data.expressions)
-    for index in range(normalized_data.shape[1]):
-        normalized_data[:, index] /= np.max(normalized_data[:,index])
+    normalized_data = data.expressions / np.max(data.expressions, axis=0)
 
     centers = []
     deviations = []
