@@ -5,9 +5,7 @@ import os
 import numpy as np
 from glob import glob
 
-def parse_dataset(name):
-    print("Started to parse dataset")
-    print(name)
+def parse_tcga_dataset(name):
 
     PATH = "data/" + name + "/"
     DATA_PATH, META_DATA_PATH = glob(PATH + "TCGA*") #eliminate TCGA?
@@ -65,8 +63,8 @@ def parse_dataset(name):
         os.makedirs(SUBSET_PATH)
 
     for cancer_label in set(cancer_labels):
-        indices = np.where(cancer_labels == cancer_label)[0][1:]
-        np.save(SUBSET_PATH + cancer_label, data[indices])
+        indices = np.where(cancer_labels == cancer_label)[0][:]
+        np.save(SUBSET_PATH + cancer_label + "_count_data", data[indices])
         np.save(SUBSET_PATH + cancer_label + "_meta_data", sample_types[indices])
 
-    np.save(SUBSET_PATH + "gene_labels", gene_labels)
+    np.save(SUBSET_PATH + "TCGA-gene_labels", gene_labels)
