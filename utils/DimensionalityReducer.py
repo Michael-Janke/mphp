@@ -7,7 +7,7 @@ from sklearn.feature_selection import f_classif
 from sklearn.tree import DecisionTreeClassifier
 
 import utils.EA.config as c
-from utils.EA.fitness import fitness, evaluate, distance_evaluate
+from utils.EA.fitness import fitness, evaluate, distance_evaluate, combined_fitness, classification_fitness, clustering_fitness
 from utils.EA.crossover import *
 from utils.EA.mutation import *
 from utils.EA.population import phenotype
@@ -120,7 +120,7 @@ class DimensionalityReducer:
             best_gene = 0
             for i in range(1,m):
                 gene = selected_genes[i]
-                fitness_score = evaluate(Expressions(sick.expressions[:,indices + [gene]], sick.labels),\
+                fitness_score = combined_fitness(Expressions(sick.expressions[:,indices + [gene]], sick.labels),\
                                         Expressions(healthy.expressions[:,indices + [gene]], healthy.labels))
                 if fitness_score > best_fitness:
                     best_fitness = fitness_score
@@ -165,5 +165,5 @@ class DimensionalityReducer:
                     indices, _, _ = self.getFeaturesBySFS(sick_binary, healhty_binary, k, normalization=normalization)
 
             features[label] = indices
-        
+
         return features
