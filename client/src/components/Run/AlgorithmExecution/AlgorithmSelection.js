@@ -49,7 +49,9 @@ export default class AlgorithmSelection extends Component {
       <StyledTextField
         key={parameter.key}
         id={parameter.key}
-        defaultValue={parameter.default}
+        value={
+          this.props.algorithm.parameters[parameter.key] || parameter.default
+        }
         hintText={parameter.default}
         floatingLabelText={parameter.name}
         floatingLabelFixed={true}
