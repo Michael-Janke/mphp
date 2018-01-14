@@ -145,7 +145,7 @@ def runSpecificAlgorithm():
     healthy = dataLoader.getData(healthy_tissue_types, cancer_types)
     healthy = dataLoader.replaceLabels(healthy)
 
-    data = dataLoader.getData(healthy_tissue_types + sick_tissue_types, cancer_types)
+    data = dataLoader.getData(sick_tissue_types + healthy_tissue_types, cancer_types)
     data = dataLoader.replaceLabels(data)
 
     calc_expression_matrix = False
