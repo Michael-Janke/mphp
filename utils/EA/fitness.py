@@ -14,7 +14,7 @@ def fitness(sick, healthy):
         if pheno.shape[0] > 10:
             return -10
 
-        return distance_fitness(sick, healthy, pheno)
+        return combined_fitness(sick, healthy, pheno)
     return fitness_
 
 
