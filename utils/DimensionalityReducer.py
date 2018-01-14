@@ -7,7 +7,7 @@ from sklearn.feature_selection import f_classif
 from sklearn.tree import DecisionTreeClassifier
 
 import utils.EA.config as c
-from utils.EA.fitness import fitness, evaluate, distance_evaluate
+from utils.EA.fitness import fitness, distance_fitness, combined_fitness, classification_fitness, clustering_fitness
 from utils.EA.crossover import *
 from utils.EA.mutation import *
 from utils.EA.population import phenotype
@@ -41,7 +41,7 @@ class DimensionalityReducer:
 
         gene_indices = np.unique(gene_indices)
 
-        return pca, X, gene_indices
+        return gene_indices
 
 
     ####### FEATURE SELECTION BY STATISTICS #######
@@ -53,13 +53,14 @@ class DimensionalityReducer:
         # [::-1] reverses an 1d array in numpy
         indices = selector.scores_.argsort()[-k:][::-1]
 
-        return indices, data.expressions[:, indices]
+        return indices
 
     def getNormalizedFeatures(self, sick, healthy, normalization, k=20, n=5000, m="chi2"):
         options = {
             'substract': self.getNormalizedFeaturesS,
             'exclude': self.getNormalizedFeaturesE,
         }
+        
         return options[normalization](sick, healthy, k, n, m)
 
     def getNormalizedFeaturesS(self, sick, healthy, k, n, m):
@@ -75,7 +76,7 @@ class DimensionalityReducer:
         # subtract healthy scores from sick scores (this is the normalization here)
         indices = (sick_scores - healthy_scores).argsort()[-k:][::-1]
 
-        return indices, sick.expressions[:, indices], healthy.expressions[:, indices]
+        return indices
 
     def getNormalizedFeaturesE(self, sick, healthy, k, n, m):
         selector = SelectKBest(self.method_table[m], k=n)
@@ -93,24 +94,26 @@ class DimensionalityReducer:
         # sort selected features by score
         indices = features[selector.scores_[features].argsort()[-k:][::-1]]
 
-        return indices, sick.expressions[:, indices], healthy.expressions[:, indices]
-
+        return indices
 
     ####### MULTI-VARIATE FEATURE SELECTION #######
 
     def getEAFeatures(self, sick, healthy, normalization="substract"):
         # preselect features to reduce runtime
-        selected_genes, sick_X, healthy_X = self.getNormalizedFeatures(sick,healthy,normalization, c.chromo_size, c.chromo_size)
+        selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, c.chromo_size, c.chromo_size)
+
         crossover = one_point_crossover
         mutation = binary_mutation
-        fitness_function = fitness(Expressions(sick_X, sick.labels), Expressions(healthy_X, healthy.labels))
-        best, stat, stat_aver = ea_for_plot(c, c.chromo_size, fitness_function, crossover, mutation)
+        fitness_function = fitness(sick, healthy)
+        
+        best, _, _ = ea_for_plot(c, c.chromo_size, fitness_function, crossover, mutation)
         indices = selected_genes[phenotype(best)]
-        return indices, sick.expressions[:, indices], healthy.expressions[:, indices]
+
+        return indices
 
     def getFeaturesBySFS(self, sick, healthy, k=3, n=5000, m=100, normalization="exclude"):
         # preselect 100 genes in sick data which do not separate healthy data well
-        selected_genes, _, _ = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
+        selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
 
         # first gene has highest score and will be selected first
         indices = [selected_genes[0]]
@@ -120,15 +123,16 @@ class DimensionalityReducer:
             best_gene = 0
             for i in range(1,m):
                 gene = selected_genes[i]
-                fitness_score = evaluate(Expressions(sick.expressions[:,indices + [gene]], sick.labels),\
-                                        Expressions(healthy.expressions[:,indices + [gene]], healthy.labels))
+                
+                fitness_score = combined_fitness(sick, healthy, indices + [gene])
+
                 if fitness_score > best_fitness:
                     best_fitness = fitness_score
                     best_gene = gene
             indices.append(best_gene)
             print("added new feature")
 
-        return indices, sick.expressions[:, indices], healthy.expressions[:, indices]
+        return indices
 
 
     ####### EMBEDDED FEATURE SELECTION #######
@@ -136,9 +140,8 @@ class DimensionalityReducer:
     def getDecisionTreeFeatures(self, data, k=20):
         tree = DecisionTreeClassifier()
         tree.fit(data.expressions, data.labels)
-        indices = tree.feature_importances_.argsort(
-        )[-k:][::-1]  # indices of k greatest values
-        return indices, data.expressions[:, indices]
+        indices = tree.feature_importances_.argsort()[-k:][::-1]  # indices of k greatest values
+        return indices
 
 
     ####### 1 vs Rest #######
@@ -151,19 +154,19 @@ class DimensionalityReducer:
             sick_binary = Expressions(sick.expressions, s_labels)
 
             if healhty == "":
-                indices, _ = self.getFeatures(sick_binary, k)
+                indices = self.getFeatures(sick_binary, k)
 
             else:
                 h_labels = binarize_labels(healhty.labels, label)
                 healhty_binary = Expressions(healhty.expressions, h_labels)
 
                 if method == "ea":
-                    indices, _, _ = self.getEAFeatures(sick_binary, healhty_binary, normalization)
+                    indices = self.getEAFeatures(sick_binary, healhty_binary, normalization)
                 elif method == "norm":
-                    indices, _, _ = self.getNormalizedFeatures(sick_binary, healhty_binary, normalization, k)
+                    indices = self.getNormalizedFeatures(sick_binary, healhty_binary, normalization, k)
                 else:
-                    indices, _, _ = self.getFeaturesBySFS(sick_binary, healhty_binary, k, normalization=normalization)
+                    indices = self.getFeaturesBySFS(sick_binary, healhty_binary, k, normalization=normalization)
 
             features[label] = indices
-        
+
         return features
