@@ -1,6 +1,6 @@
 import json
 import numpy as np
-import base64
+import re
 
 from flask import Flask, request
 from flask_cors import CORS
@@ -194,7 +194,11 @@ def runSpecificAlgorithm():
         'geneNames': gene_names[gene_indices].tolist(),
         'evaluation': evaluation,
     }
-    return json.dumps(response)
+
+    # workaround to replace NaN by null
+    jsonResponse = json.dumps(response)
+    regex = re.compile(r'\bNaN\b')
+    return re.sub(regex, 'null', jsonResponse)
 
 
 @app.route('/statistics', methods=["GET"])
