@@ -37,6 +37,8 @@ class Analyzer:
 
         class_fitness = classification_fitness(sick, healthy, selected_genes)
         clus_fitness = clustering_fitness(sick, healthy, selected_genes)
+        comb_fitness = combined_fitness(sick, healthy, selected_genes)
+        dist_fitness = distance_fitness(sick, healthy, selected_genes)
 
         return {
             "sick": sick_validation,
@@ -44,6 +46,8 @@ class Analyzer:
             "fitness": {
                 "classificationFitness": class_fitness,
                 "clusteringFitness": clus_fitness,
+                "distanceFitness": dist_fitness,
+                "combinedFitness": comb_fitness,
             }
         }
 
