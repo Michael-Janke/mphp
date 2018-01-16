@@ -172,16 +172,18 @@ def runSpecificAlgorithm():
 
     
     X = data.expressions[:, gene_indices]
+    labels = data.labels
 
     # calculate expression matrix
     expression_matrix = None
     if calc_expression_matrix:        
         X = np.vstack((sick.expressions[:, gene_indices], healthy.expressions[:, gene_indices]))
+        labels = np.hstack((sick.labels, healthy.labels))
         expression_matrix = analyzer.computeExpressionMatrix(sick, healthy, gene_indices)
 
     response_data = {}
-    for label in np.unique(data.labels):
-        response_data[label] = X[data.labels == label, :].T.tolist()
+    for label in np.unique(labels):
+        response_data[label] = X[labels == label, :].T.tolist()
 
     # evaluation
     evaluation = analyzer.computeFeatureValidation(sick, healthy, gene_indices)
