@@ -15,17 +15,17 @@ dimReducer = DimensionalityReducer()
 analyzer = Analyzer()
 print("data loaded")
 
-
-# %%
-healthy = dataLoader.getData(["healthy"], ["THCA","LUAD"])
-sick = dataLoader.getData(["sick"], ["THCA","LUAD"])
+healthy = dataLoader.getData(["healthy"], ["THCA","LUAD","KIRC"])
+sick = dataLoader.getData(["sick"], ["THCA","LUAD","KIRC"])
 gene_labels = dataLoader.getGeneLabels()
 print("got combined data")
 
 # %%
 # Feature Selection
-selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3)
+#selected_genes, sick_X, healthy_X = dimReducer.getFeaturesBySFS(sick,healthy,k=3, method="sfs")
+selected_genes= dimReducer.getOneAgainstRestFeatures(sick,healthy,k=3, method="sfs")
 print(selected_genes)
+analyzer.computeFeatureValidationOneAgainstRest(sick, healthy, selected_genes)
 
 print("SICK REDUCED")
 plotScatter(sick, selected_genes, gene_labels)

@@ -17,17 +17,17 @@ class ClassificationValidator():
 
     def __init__(self):
         self.classifier_table = {
-            "svm": SVC,
-            "logisticRegression": LogisticRegression,
-            "decisionTree": DecisionTreeClassifier,
-            "naiveBayes": GaussianNB,
-            "knn": KNeighborsClassifier,
-            "randomForest": RandomForestClassifier,
-            "boostedTrees": AdaBoostClassifier
+            #"SVM": SVC,
+            #"LogisticRegression": LogisticRegression,
+            "DecisionTree": DecisionTreeClassifier,
+            #"naivebayes": GaussianNB,
+            #"knn": KNeighborsClassifier,
+            #"RandomForest": RandomForestClassifier,
+            #"BoostedTrees": AdaBoostClassifier
         }
 
     @ignore_warnings
-    def evaluate(self, data, genes, classifier):
+    def evaluate(self, data, classifier, true_label=""):
         result = {}
 
         if "*" in classifier:
@@ -42,9 +42,12 @@ class ClassificationValidator():
                 'recall': make_scorer(recall_score, average='macro'),
                 'f1': make_scorer(f1_score, average='macro'),
             }
-
-            le = LabelEncoder()
-            labels = le.fit_transform(data.labels)
+            labels = None
+            if not true_label:
+                le = LabelEncoder()
+                labels = le.fit_transform(data.labels)
+            else:
+                labels = binarize_labels(data.labels, true_label)
             scores = cross_validate(clf, data.expressions[:,genes], labels, cv=5, scoring=scoring, return_train_score=False)
             score_dict = {
                 'precision': {
@@ -62,24 +65,24 @@ class ClassificationValidator():
             }
             result[c] = score_dict
         return result
-
-    def evaluateOneAgainstRest(self, sick, healthy, selected_genes_dict):
-        results = {}
-        for label, genes in selected_genes_dict.items():
-            s_labels = binarize_labels(sick.labels, label)
-            sick_binary = Expressions(sick.expressions, s_labels)
-            sick_results = self.evaluate(sick_binary, genes, ["DecisionTree"])
-
-            if healthy == "":
-                results[label] = sick_results
-            else:
-                h_labels = binarize_labels(healthy.labels, label)
-                healthy_binary = Expressions(healthy.expressions, h_labels)
-                healthy_results = self.evaluate(healthy_binary, genes, ["DecisionTree"])
-
-                results[label] = {
-                    "sick": sick_results,
-                    "healthy": healthy_results,
-                }
-
-        return results
+    #
+    # def evaluateOneAgainstRest(self, sick, healthy, selected_genes_dict):
+    #     results = {}
+    #     for label, genes in selected_genes_dict.items():
+    #         s_labels = binarize_labels(sick.labels, label)
+    #         sick_binary = Expressions(sick.expressions[:,genes], s_labels)
+    #         sick_results = self.evaluate(sick_binary, ["DecisionTree"])
+    #
+    #         if healthy == "":
+    #             results[label] = sick_results
+    #         else:
+    #             h_labels = binarize_labels(healthy.labels, label)
+    #             healthy_binary = Expressions(healthy.expressions[:,genes], h_labels)
+    #             healthy_results = self.evaluate(healthy_binary, ["DecisionTree"])
+    #
+    #             results[label] = {
+    #                 "sick": sick_results,
+    #                 "healthy": healthy_results,
+    #             }
+    #
+    #     return results

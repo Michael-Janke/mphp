@@ -59,8 +59,13 @@ class DimensionalityReducer:
             'substract': self.getNormalizedFeaturesS,
             'exclude': self.getNormalizedFeaturesE,
         }
+<<<<<<< HEAD
         
         return options[normalization](sick, healthy, k, n, m, returnMultipleSets)
+=======
+
+        return options[normalization](sick, healthy, k, n, m)
+>>>>>>> cd6bfb495db5b62423476fa4da29243df435e7a3
 
     def getNormalizedFeaturesS(self, sick, healthy, k, n, m, returnMultipleSets = False):
         selector = SelectKBest(self.method_table[m], k="all")
@@ -100,14 +105,14 @@ class DimensionalityReducer:
 
     ####### MULTI-VARIATE FEATURE SELECTION #######
 
-    def getEAFeatures(self, sick, healthy, normalization="substract", fitness="distance", returnMultipleSets = False):
+    def getEAFeatures(self, sick, healthy, normalization="substract", returnMultipleSets = False, true_label=""):
         # preselect features to reduce runtime
         selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, c.chromo_size, c.chromo_size)
 
         crossover = one_point_crossover
         mutation = binary_mutation
         fitness_function = fitness_module.fitness(sick, healthy, fitness)
-        
+
         best, sets, _, _ = ea_for_plot(c, c.chromo_size, fitness_function, crossover, mutation)
 
         if not returnMultipleSets:
@@ -116,10 +121,15 @@ class DimensionalityReducer:
 
         return [selected_genes[feature_set] for feature_set in sets]
 
-    def getFeaturesBySFS(self, sick, healthy, k=3, n=5000, m=100, normalization="exclude", fitness="combined", returnMultipleSets = False):
+    def getFeaturesBySFS(self, sick, healthy, k=3, n=5000, m=100, normalization="exclude", fitness="combined", returnMultipleSets = False, true_label=""):
         # preselect 100 genes in sick data which do not separate healthy data well
         selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
 
+<<<<<<< HEAD
+=======
+        bestSet = self.getFeatureSetBySFS(sick, healthy, selected_genes, k, fitness, true_label=true_label)
+
+>>>>>>> cd6bfb495db5b62423476fa4da29243df435e7a3
         if not returnMultipleSets:
             return self.getFeatureSetBySFS(sick, healthy, selected_genes, k, fitness)
 
@@ -130,7 +140,7 @@ class DimensionalityReducer:
 
         return sets
 
-    def getFeatureSetBySFS(self, sick, healthy, genes, k, fitness):
+    def getFeatureSetBySFS(self, sick, healthy, genes, k, fitness, true_label=""):
         # first gene has highest score and will be selected first
         indices = [genes[0]]
         # iteratively join the best next feature based on a fitness function until k features are found
@@ -143,7 +153,7 @@ class DimensionalityReducer:
                     continue
 
                 fitness_function = fitness_module.get_fitness_function_name(fitness)
-                fitness_score = getattr(fitness_module, fitness_function)(sick, healthy, indices + [gene])
+                fitness_score = getattr(fitness_module, fitness_function)(sick, healthy, indices + [gene], true_label=true_label)
 
                 if fitness_score > best_fitness:
                     best_fitness = fitness_score
@@ -164,29 +174,29 @@ class DimensionalityReducer:
 
     ####### 1 vs Rest #######
 
-    def getOneAgainstRestFeatures(self, sick, healhty, k=3, method="sfs", normalization="exclude", fitness="combined"):
+    def getOneAgainstRestFeatures(self, sick, healthy, k=3, method="sfs", normalization="exclude", fitness="combined"):
         features = {}
         for label in np.unique(sick.labels):
             label = label.split("-")[0]
             s_labels = binarize_labels(sick.labels, label)
             sick_binary = Expressions(sick.expressions, s_labels)
 
-            if healhty == "":
+            if healthy == "":
                 if method == "tree":
                     indices = self.getDecisionTreeFeatures(sick_binary, k)
                 else:
                     indices = self.getFeatures(sick_binary, k)
 
             else:
-                h_labels = binarize_labels(healhty.labels, label)
-                healhty_binary = Expressions(healhty.expressions, h_labels)
+                h_labels = binarize_labels(healthy.labels, label)
+                healthy_binary = Expressions(healthy.expressions, h_labels)
 
                 if method == "ea":
-                    indices = self.getEAFeatures(sick_binary, healhty_binary, normalization, fitness=fitness)
+                    indices = self.getEAFeatures(sick, healthy, normalization, fitness=fitness, true_label=label)
                 elif method == "norm":
-                    indices = self.getNormalizedFeatures(sick_binary, healhty_binary, normalization, k)
+                    indices = self.getNormalizedFeatures(sick_binary, healthy_binary, normalization, k)
                 else:
-                    indices = self.getFeaturesBySFS(sick_binary, healhty_binary, k, normalization=normalization, fitness=fitness)
+                    indices = self.getFeaturesBySFS(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
 
             features[label] = indices
 
