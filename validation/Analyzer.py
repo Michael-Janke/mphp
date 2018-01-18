@@ -56,9 +56,9 @@ class Analyzer:
         classVal = ClassificationValidator()
         classification = classVal.evaluate(X, selected_genes, ["*"])
         clustering = clusVal.evaluate(X, selected_genes, ["*"], ["*"])
-        return {"classifictation": classification, "clustering": clustering}
+        return {"classification": classification, "clustering": clustering}
 
-    
+
     def computeExpressionMatrixOneAgainstRest(self, sick, healthy, selected_genes_dict):
         results = {}
         for label, genes in selected_genes_dict.items():

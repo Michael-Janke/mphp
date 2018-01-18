@@ -14,7 +14,7 @@ import { lightGray, slightlyBoringBlue } from "../../../config/colors";
 
 export default class GeneExploration extends Component {
   render() {
-    const { genes, geneNames, expressionMatrix } = this.props.result;
+    const { genes, geneNames, expressionMatrix } = this.props;
 
     return (
       <div>

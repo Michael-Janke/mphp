@@ -17,13 +17,13 @@ class ClassificationValidator():
 
     def __init__(self):
         self.classifier_table = {
-            "SVM": SVC,
-            "LogisticRegression": LogisticRegression,
-            "DecisionTree": DecisionTreeClassifier,
-            "naivebayes": GaussianNB,
+            "svm": SVC,
+            "logisticRegression": LogisticRegression,
+            "decisionTree": DecisionTreeClassifier,
+            "naiveBayes": GaussianNB,
             "knn": KNeighborsClassifier,
-            "RandomForest": RandomForestClassifier,
-            "BoostedTrees": AdaBoostClassifier
+            "randomForest": RandomForestClassifier,
+            "boostedTrees": AdaBoostClassifier
         }
 
     @ignore_warnings
@@ -36,27 +36,27 @@ class ClassificationValidator():
             if not c in self.classifier_table:
                 continue
             clf = self.classifier_table[c]()
-            
+
             scoring = {
                 'precision': make_scorer(precision_score, average='macro'),
                 'recall': make_scorer(recall_score, average='macro'),
                 'f1': make_scorer(f1_score, average='macro'),
             }
-            
+
             le = LabelEncoder()
             labels = le.fit_transform(data.labels)
             scores = cross_validate(clf, data.expressions[:,genes], labels, cv=5, scoring=scoring, return_train_score=False)
             score_dict = {
                 'precision': {
-                    'mean': scores['test_precision'].mean(), 
+                    'mean': scores['test_precision'].mean(),
                     'std':  scores['test_precision'].std(),
                 },
                 'recall': {
-                    'mean': scores['test_recall'].mean(), 
+                    'mean': scores['test_recall'].mean(),
                     'std':  scores['test_recall'].std(),
                 },
                 'f1': {
-                    'mean': scores['test_f1'].mean(), 
+                    'mean': scores['test_f1'].mean(),
                     'std':  scores['test_f1'].std(),
                 },
             }
