@@ -15,43 +15,47 @@ dimReducer = DimensionalityReducer()
 analyzer = Analyzer()
 print("data loaded")
 
-healthy = dataLoader.getData(["healthy"], ["THCA","LUAD","KIRC","GBM","HNSC","UCEC","SARC"])
-sick = dataLoader.getData(["sick"], ["THCA","LUAD","KIRC","GBM","HNSC","UCEC","SARC"])
+
+# %%
+healthy = dataLoader.getData(["healthy"], ["THCA","LUAD"])
+sick = dataLoader.getData(["sick"], ["THCA","LUAD"])
 gene_labels = dataLoader.getGeneLabels()
 print("got combined data")
 
 # %%
 # Feature Selection
-selected_genes, sick_X, healthy_X = dimReducer.getFeaturesBySFS(sick,healthy,3)
+selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3)
 print(selected_genes)
 
-sick_reduced = Expressions(sick_X, sick.labels)
-healthy_reduced = Expressions(healthy_X, healthy.labels)
-
 print("SICK REDUCED")
-plotScatter(sick_X, sick.labels, gene_labels[selected_genes])
+plotScatter(sick, selected_genes, gene_labels)
 
 print("HEALTHY REDUCED")
-plotScatter(healthy_X,healthy.labels, gene_labels[selected_genes])
-#%%
-#validation = analyzer.computeFeatureValidation(sick, healthy, selected_genes)
-#pprint(validation)
+plotScatter(healthy, selected_genes, gene_labels)
 
-#%%
-expression_matrix = analyzer.computeExpressionMatrix(sick_reduced, healthy_reduced, selected_genes)
+
+# %%
+### ALL AT ONCE ###
+validation = analyzer.computeFeatureValidation(sick, healthy, selected_genes)
+pprint(validation)
+expression_matrix = analyzer.computeExpressionMatrix(sick, healthy, selected_genes)
 pprint(expression_matrix)
+
+
+
+# %%
+### ONE vs. REST ###
+features = dimReducer.getOneAgainstRestFeatures(sick, healthy, )
+pprint(features)
+results = analyzer.computeFeatureValidationOneAgainstRest(sick, healthy, features)
+pprint(results)
+expressions = analyzer.computeExpressionMatrixOneAgainstRest(sick, healthy, features)
+pprint(expressions)
+
 
 
 #%%
 ########## SICK OR HEALTHY DATA ONLY ##########
-features, data_reduced_X = dimReducer.getFeatures(healthy, 3)
-data_reduced = Expressions(data_reduced_X, healthy.labels)
+features = dimReducer.getFeatures(healthy, 3)
 validation = analyzer.computeFeatureValidation(healthy, '', features)
 pprint(validation)
-
-
-# %%
-features = dimReducer.getOneAgainstRestFeatures(healthy, '', 3)
-pprint(features)
-results = analyzer.computeFeatureValidationOneAgainstRest(healthy, '', features)
-pprint(results)

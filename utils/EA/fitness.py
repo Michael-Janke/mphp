@@ -10,64 +10,50 @@ def fitness(sick, healthy):
     def fitness_(indiv):
         pheno = phenotype(indiv)
         # select features and only pass this data to evaluate
-        sick_reduced = Expressions(sick.expressions[:,pheno], sick.labels)
-        healthy_reduced = Expressions(healthy.expressions[:,pheno], healthy.labels)
-        return distance_evaluate(sick_reduced, healthy_reduced)
+        # todo smarter penalty
+        if pheno.shape[0] > 10:
+            return -10
+
+        return combined_fitness(sick, healthy, pheno)
     return fitness_
 
+
 @ignore_warnings
-def classification_fitness(sick, healthy, alpha=0.5):
+def classification_fitness(sick, healthy, genes, alpha=0.5):
     clf = DecisionTreeClassifier()
-    sick_score = cross_val_score(clf, sick.expressions, sick.labels, cv=5, scoring="f1_macro").mean()
-    healthy_score = cross_val_score(clf, healthy.expressions, healthy.labels, cv=5, scoring="f1_macro").mean()
+    sick_score = cross_val_score(clf, sick.expressions[:,genes], sick.labels, cv=5, scoring="f1_macro").mean()
+    healthy_score = cross_val_score(clf, healthy.expressions[:,genes], healthy.labels, cv=5, scoring="f1_macro").mean()
 
     return (alpha * sick_score + (1-alpha) * (1- healthy_score))
 
-def clustering_fitness(sick, healthy, alpha=0.5):
 
-    sick_silhouette_samples = (silhouette_samples(sick.expressions, sick.labels) + 1) / 2
+def clustering_fitness(sick, healthy, genes, alpha=0.5):
+
+    sick_silhouette_samples = (silhouette_samples(sick.expressions[:,genes], sick.labels) + 1) / 2
     sick_cluster_silhouettes = [np.mean(sick_silhouette_samples[sick.labels==label]) for label in np.unique(sick.labels)]
 
-    healthy_silhouette_samples = (silhouette_samples(healthy.expressions, healthy.labels) + 1) / 2
+    healthy_silhouette_samples = (silhouette_samples(healthy.expressions[:,genes], healthy.labels) + 1) / 2
     healthy_cluster_silhouettes = [np.mean(healthy_silhouette_samples[healthy.labels==label]) for label in np.unique(healthy.labels)]
 
-    return (np.mean(sick_cluster_silhouettes) + 1 - np.mean(healthy_cluster_silhouettes))
+    return (alpha * np.mean(sick_cluster_silhouettes) + (1 - alpha) * (1 - np.mean(healthy_cluster_silhouettes)))
 
 
-def combined_fitness(sick, healthy, alpha=0.5, beta=0.5):
-    return beta * classification_fitness(sick, healthy, alpha) + (1 - beta) * clustering_fitness(sick, healthy, alpha)
+def combined_fitness(sick, healthy, genes, alpha=0.5, beta=0.5):
+    return beta * classification_fitness(sick, healthy, genes, alpha) + (1 - beta) * clustering_fitness(sick, healthy, genes, alpha)
 
 
-def evaluate(sick, healthy):
-    clf = DecisionTreeClassifier()
-
-    if sick.expressions.shape[1] > 10:
-        return -10
-    else:
-        sick_scores = cross_val_score(clf, sick.expressions, sick.labels, cv=5, scoring="f1_micro")
-        fitness_score = sick_scores.mean() - sick_scores.std()
-
-        healthy_scores = cross_val_score(clf, healthy.expressions, healthy.labels, cv=5, scoring="f1_micro")
-        fitness_score -= 2*healthy_scores.mean() - healthy_scores.std()
-
-        #fitness_score -= np.log10(sick_data.shape[1])
-
-        return fitness_score
-
-def distance_evaluate(sick, healthy):
-    if sick.expressions.shape[1] > 10:
-        return -10
-
-    sick_intra_distance, sick_inner_distance = compute_cluster_distance(sick)
-    healthy_intra_distance, healthy_inner_distance = compute_cluster_distance(healthy)
+def distance_fitness(sick, healthy, genes):
+    sick_intra_distance, sick_inner_distance = compute_cluster_distance(sick, genes)
+    healthy_intra_distance, healthy_inner_distance = compute_cluster_distance(healthy, genes)
 
     fitness_sick = 5*sick_intra_distance - sick_inner_distance
     fitness_healthy = 5*healthy_intra_distance + healthy_inner_distance
     fitness = fitness_sick - fitness_healthy
     return fitness
 
-def compute_cluster_distance(data):
-    normalized_data = data.expressions / np.max(data.expressions, axis=0)
+
+def compute_cluster_distance(data, genes):
+    normalized_data = data.expressions[:,genes] / np.max(data.expressions[:,genes], axis=0)
 
     centers = []
     deviations = []

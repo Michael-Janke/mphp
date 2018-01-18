@@ -1,6 +1,6 @@
 import json
 import numpy as np
-import base64
+import re
 
 from flask import Flask, request
 from flask_cors import CORS
@@ -131,70 +131,75 @@ def runSpecificAlgorithm():
     #
     # }
     key = algorithm["key"]
+    cancer_types = algorithm["cancerTypes"]
+    sick_tissue_types = algorithm["sickTissueTypes"]
+    healthy_tissue_types = algorithm["healthyTissueTypes"]
+    n_components = algorithm["parameters"].get("n_components")
+    n_f_components = algorithm["parameters"].get("n_features_per_component")
+    k = algorithm["parameters"].get("k")
+    n = algorithm["parameters"].get("n")
 
-    sick = dataLoader.getData(
-        algorithm["sickTissueTypes"], algorithm["cancerTypes"])
+    sick = dataLoader.getData(sick_tissue_types, cancer_types)
     sick = dataLoader.replaceLabels(sick)
-    healthy = dataLoader.getData(
-        algorithm["healthyTissueTypes"], algorithm["cancerTypes"])
+
+    healthy = dataLoader.getData(healthy_tissue_types, cancer_types)
     healthy = dataLoader.replaceLabels(healthy)
-    data = dataLoader.getData(
-        algorithm["healthyTissueTypes"] + algorithm["sickTissueTypes"], algorithm["cancerTypes"])
+
+    data = dataLoader.getData(sick_tissue_types + healthy_tissue_types, cancer_types)
     data = dataLoader.replaceLabels(data)
 
-    calcExpressionMatrix = False
-
+    calc_expression_matrix = False
     if key == "getPCA":
-        _, X, gene_indices = dimReducer.getPCA(
-            data.expressions, algorithm["parameters"]["n_components"], algorithm["parameters"]["n_features_per_component"])
-    elif key == "getDecisionTreeFeatures":
-        gene_indices, X = dimReducer.getDecisionTreeFeatures(
-            data, algorithm["parameters"]["k"])
-    elif key == "getNormalizedFeaturesE":
-        gene_indices, X, Y = dimReducer.getNormalizedFeaturesE(
-            sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"], "chi2")
-        sick_response = X
-        X = np.vstack((X, Y))
-        calcExpressionMatrix = True
-    elif key == "getNormalizedFeaturesS":
-        gene_indices, X, Y = dimReducer.getNormalizedFeaturesS(
-            sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"], "chi2")
-        sick_response = X
-        X = np.vstack((X, Y))
-        calcExpressionMatrix = True
-    elif key == "getFeatures":
-        gene_indices, X = dimReducer.getFeatures(
-            data, algorithm["parameters"]["k"])
-    elif key == "getFeaturesBySFS":
-        gene_indices, X, Y = dimReducer.getFeaturesBySFS(
-            sick, healthy)
-        sick_response = X
-        X = np.vstack((X, Y))
-        calcExpressionMatrix = True
+        gene_indices = dimReducer.getPCA(data.expressions, n_components, n_f_components)
 
-    responseData = {}
-    for label in np.unique(data.labels):
-        responseData[label] = X[data.labels == label, :].T.tolist()
+    elif key == "getFeatures":
+        gene_indices = dimReducer.getFeatures(data, k)
+        
+    elif key == "getDecisionTreeFeatures":
+        gene_indices = dimReducer.getDecisionTreeFeatures(data, k)
+
+    elif key == "getNormalizedFeaturesE":
+        gene_indices = dimReducer.getNormalizedFeaturesE(sick, healthy, k, n, "chi2")
+        calc_expression_matrix = True
+
+    elif key == "getNormalizedFeaturesS":
+        gene_indices = dimReducer.getNormalizedFeaturesS(sick, healthy, k, n, "chi2")
+        calc_expression_matrix = True
+
+    elif key == "getFeaturesBySFS":
+        gene_indices = dimReducer.getFeaturesBySFS(sick, healthy)
+        calc_expression_matrix = True
+
+    
+    X = data.expressions[:, gene_indices]
+    labels = data.labels
 
     # calculate expression matrix
-    expressionMatrix = None
-    if calcExpressionMatrix:
-        sick_reduced = Expressions(sick_response, sick.labels)
-        healthy_reduced = Expressions(Y, healthy.labels)
-        expressionMatrix = analyzer.computeExpressionMatrix(
-            sick_reduced, healthy_reduced, gene_indices)
+    expression_matrix = None
+    if calc_expression_matrix:        
+        X = np.vstack((sick.expressions[:, gene_indices], healthy.expressions[:, gene_indices]))
+        labels = np.hstack((sick.labels, healthy.labels))
+        expression_matrix = analyzer.computeExpressionMatrix(sick, healthy, gene_indices)
+
+    response_data = {}
+    for label in np.unique(labels):
+        response_data[label] = X[labels == label, :].T.tolist()
 
     # evaluation
     evaluation = analyzer.computeFeatureValidation(sick, healthy, gene_indices)
 
     response = {
-        'data': responseData,
+        'data': response_data,
         'genes': gene_labels[gene_indices].tolist(),
-        'expressionMatrix': expressionMatrix,
+        'expressionMatrix': expression_matrix,
         'geneNames': gene_names[gene_indices].tolist(),
         'evaluation': evaluation,
     }
-    return json.dumps(response)
+
+    # workaround to replace NaN by null
+    jsonResponse = json.dumps(response)
+    regex = re.compile(r'\bNaN\b')
+    return re.sub(regex, 'null', jsonResponse)
 
 
 @app.route('/statistics', methods=["GET"])

@@ -26,7 +26,7 @@ print("got data")
 
 # %%
 chromo_size = c.chromo_size
-selected_genes, sick_X, healthy_X = dimReducer.getNormalizedFeatures(sick,healthy,"substract", chromo_size, chromo_size)
+selected_genes = dimReducer.getNormalizedFeatures(sick,healthy,"substract", chromo_size, chromo_size)
 print("preselected genes")
 
 
@@ -41,15 +41,12 @@ else:
 
 mutation = binary_mutation
 
-fitness_function = fitness(Expressions(sick_X, sick.labels), Expressions(healthy_X, healthy.labels))
+fitness_function = fitness(sick, healthy)
 
 best, stat, stat_aver = ea_for_plot(c, chromo_size, fitness_function, crossover, mutation)
 
 display_stat_1(stat, stat_aver)
 print(best[0])
 print(phenotype(best), best[1])
-
-
-# %%
 features = selected_genes[phenotype(best)]
 print(features)

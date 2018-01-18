@@ -21,7 +21,7 @@ class ClusterValidator():
         }
 
     @ignore_warnings
-    def evaluate(self, data, algorithms, measures):
+    def evaluate(self, data, genes, algorithms, measures):
         result = {}
         if "*" in algorithms:
             algorithms = self.cluster_table.keys()
@@ -29,7 +29,7 @@ class ClusterValidator():
             if a not in self.cluster_table:
                 continue
             clustering = self.cluster_table[a]()
-            clustering.fit(data.expressions)
+            clustering.fit(data.expressions[:,genes])
             result[a] = self.evaluateClustering(data.labels, clustering.labels_, measures)
         return result
 
