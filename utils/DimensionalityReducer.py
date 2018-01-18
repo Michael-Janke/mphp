@@ -120,13 +120,13 @@ class DimensionalityReducer:
         # preselect 100 genes in sick data which do not separate healthy data well
         selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
 
-        bestSet = self.getFeatureSetBySFS(sick, healthy, selected_genes, k, fitness, true_label=true_label)
+        best_set = self.getFeatureSetBySFS(sick, healthy, selected_genes, k, fitness, true_label=true_label)
 
         if not returnMultipleSets:
-            return self.getFeatureSetBySFS(sick, healthy, selected_genes, k, fitness)
+            return best_set
 
-        sets = []
-        for i in range(2):
+        sets = [best_set]
+        for i in range(1,3):
             print("finished feature set")
             sets.append(self.getFeatureSetBySFS(sick, healthy, selected_genes[i:], k, fitness))
 
