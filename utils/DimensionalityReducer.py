@@ -5,6 +5,8 @@ from sklearn.feature_selection import chi2
 from sklearn.feature_selection import mutual_info_classif
 from sklearn.feature_selection import f_classif
 from sklearn.tree import DecisionTreeClassifier
+from scipy.stats import rankdata
+from random import random
 
 import utils.EA.config as c
 import utils.EA.fitness as fitness_module
@@ -46,24 +48,21 @@ class DimensionalityReducer:
 
     ####### FEATURE SELECTION BY STATISTICS #######
 
-    def getFeatures(self,  data, k=20, m="chi2"):
+    def getFeatures(self,  data, k=20, m="chi2", returnMultipleSets = False):
         selector = SelectKBest(self.method_table[m], k=k)
         selector.fit(data.expressions, data.labels)
-        # sort and select features
-        # [::-1] reverses an 1d array in numpy
-        indices = selector.scores_.argsort()[-k:][::-1]
 
-        return indices
+        return self.getFeatureSets(selector.scores_, k, returnMultipleSets)
 
-    def getNormalizedFeatures(self, sick, healthy, normalization, k=20, n=5000, m="chi2"):
+    def getNormalizedFeatures(self, sick, healthy, normalization="exclude", k=20, n=5000, m="chi2", returnMultipleSets = False):
         options = {
             'substract': self.getNormalizedFeaturesS,
             'exclude': self.getNormalizedFeaturesE,
         }
         
-        return options[normalization](sick, healthy, k, n, m)
+        return options[normalization](sick, healthy, k, n, m, returnMultipleSets)
 
-    def getNormalizedFeaturesS(self, sick, healthy, k, n, m):
+    def getNormalizedFeaturesS(self, sick, healthy, k, n, m, returnMultipleSets = False):
         selector = SelectKBest(self.method_table[m], k="all")
         selector.fit(healthy.expressions, healthy.labels)
         healthy_scores = selector.scores_
@@ -73,12 +72,12 @@ class DimensionalityReducer:
         sick_scores = selector.scores_
         sick_scores /= max(sick_scores)
 
-        # subtract healthy scores from sick scores (this is the normalization here)
-        indices = (sick_scores - healthy_scores).argsort()[-k:][::-1]
+        # subtract healthy scores from sick scores (this is the normalization)
+        scores = (sick_scores - healthy_scores)
 
-        return indices
+        return self.getFeatureSets(scores, k, returnMultipleSets)
 
-    def getNormalizedFeaturesE(self, sick, healthy, k, n, m):
+    def getNormalizedFeaturesE(self, sick, healthy, k, n, m, returnMultipleSets = False):
         selector = SelectKBest(self.method_table[m], k=n)
         selector.fit(healthy.expressions, healthy.labels)
         h_indices = selector.get_support(indices=True)
@@ -91,21 +90,24 @@ class DimensionalityReducer:
         features = list(set(s_indices)-set(h_indices))
         print("excluded "+str(n+k-len(features))+" features")
         features = np.asarray(features, dtype=np.uint32)
-        # sort selected features by score
-        indices = features[selector.scores_[features].argsort()[-k:][::-1]]
 
-        return indices
+        if not returnMultipleSets:
+            return features[selector.scores_[features].argsort()[-k:][::-1]]
+
+        sets = self.getFeatureSets(selector.scores_[features], k, returnMultipleSets)
+
+        return [features[f_set] for f_set in sets]
 
     ####### MULTI-VARIATE FEATURE SELECTION #######
 
-    def getEAFeatures(self, sick, healthy, normalization="substract", fitness="distance", returnMultipleSets = False):
+    def getEAFeatures(self, sick, healthy, normalization="substract", returnMultipleSets = False, fitness="combined", true_label=""):
         # preselect features to reduce runtime
         selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, c.chromo_size, c.chromo_size)
 
         crossover = one_point_crossover
         mutation = binary_mutation
         fitness_function = fitness_module.fitness(sick, healthy, fitness)
-        
+
         best, sets, _, _ = ea_for_plot(c, c.chromo_size, fitness_function, crossover, mutation)
 
         if not returnMultipleSets:
@@ -114,24 +116,23 @@ class DimensionalityReducer:
 
         return [selected_genes[feature_set] for feature_set in sets]
 
-    def getFeaturesBySFS(self, sick, healthy, k=3, n=5000, m=100, normalization="exclude", fitness="combined", returnMultipleSets = False):
+    def getFeaturesBySFS(self, sick, healthy, k=3, n=5000, m=100, normalization="exclude", fitness="combined", returnMultipleSets = False, true_label=""):
         # preselect 100 genes in sick data which do not separate healthy data well
         selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
 
-        bestSet = self.getFeatureSetBySFS(sick, healthy, selected_genes, k, fitness)
+        bestSet = self.getFeatureSetBySFS(sick, healthy, selected_genes, k, fitness, true_label=true_label)
 
         if not returnMultipleSets:
-            return bestSet
+            return self.getFeatureSetBySFS(sick, healthy, selected_genes, k, fitness)
 
-        sets = [bestSet]
+        sets = []
         for i in range(2):
             print("finished feature set")
-            selected_genes = selected_genes[1:]
-            sets.append(self.getFeatureSetBySFS(sick, healthy, selected_genes, k, fitness))
+            sets.append(self.getFeatureSetBySFS(sick, healthy, selected_genes[i:], k, fitness))
 
         return sets
 
-    def getFeatureSetBySFS(self, sick, healthy, genes, k, fitness):
+    def getFeatureSetBySFS(self, sick, healthy, genes, k, fitness, true_label=""):
         # first gene has highest score and will be selected first
         indices = [genes[0]]
         # iteratively join the best next feature based on a fitness function until k features are found
@@ -140,9 +141,11 @@ class DimensionalityReducer:
             best_gene = 0
             for i in range(1, len(genes)):
                 gene = genes[i]
+                if gene in indices:
+                    continue
 
                 fitness_function = fitness_module.get_fitness_function_name(fitness)
-                fitness_score = getattr(fitness_module, fitness_function)(sick, healthy, indices + [gene])
+                fitness_score = getattr(fitness_module, fitness_function)(sick, healthy, indices + [gene], true_label=true_label)
 
                 if fitness_score > best_fitness:
                     best_fitness = fitness_score
@@ -154,39 +157,80 @@ class DimensionalityReducer:
 
     ####### EMBEDDED FEATURE SELECTION #######
 
-    def getDecisionTreeFeatures(self, data, k=20):
+    def getDecisionTreeFeatures(self, data, k=20, returnMultipleSets = False):
         tree = DecisionTreeClassifier()
         tree.fit(data.expressions, data.labels)
-        indices = tree.feature_importances_.argsort()[-k:][::-1]  # indices of k greatest values
-        return indices
+        
+        return self.getFeatureSets(tree.feature_importances_, k, returnMultipleSets)
 
 
     ####### 1 vs Rest #######
 
-    def getOneAgainstRestFeatures(self, sick, healhty, k=3, method="sfs", normalization="exclude", fitness="combined"):
+    def getOneAgainstRestFeatures(self, sick, healthy, k=3, method="sfs", normalization="exclude", fitness="combined"):
         features = {}
         for label in np.unique(sick.labels):
             label = label.split("-")[0]
             s_labels = binarize_labels(sick.labels, label)
             sick_binary = Expressions(sick.expressions, s_labels)
 
-            if healhty == "":
+            if healthy == "":
                 if method == "tree":
                     indices = self.getDecisionTreeFeatures(sick_binary, k)
                 else:
                     indices = self.getFeatures(sick_binary, k)
 
             else:
-                h_labels = binarize_labels(healhty.labels, label)
-                healhty_binary = Expressions(healhty.expressions, h_labels)
+                h_labels = binarize_labels(healthy.labels, label)
+                healthy_binary = Expressions(healthy.expressions, h_labels)
 
                 if method == "ea":
-                    indices = self.getEAFeatures(sick_binary, healhty_binary, normalization, fitness=fitness)
+                    indices = self.getEAFeatures(sick, healthy, normalization, fitness=fitness, true_label=label)
                 elif method == "norm":
-                    indices = self.getNormalizedFeatures(sick_binary, healhty_binary, normalization, k)
+                    indices = self.getNormalizedFeatures(sick_binary, healthy_binary, normalization, k)
                 else:
-                    indices = self.getFeaturesBySFS(sick_binary, healhty_binary, k, normalization=normalization, fitness=fitness)
+                    indices = self.getFeaturesBySFS(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
 
             features[label] = indices
 
         return features
+
+
+    ####### UTILS #######
+
+    def getFeatureSets(self, scores, k, returnMultipleSets):
+        best_set = scores.argsort()[-k:][::-1]
+
+        if not returnMultipleSets:
+            return best_set
+
+        sets = [best_set]
+        for i in range(1,3):
+            sets.append(self.getFeatureSet(scores, k))
+
+        return sets
+
+    def getFeatureSet(self, scores, k):
+        indices = scores.argsort()[::-1]
+
+        scores /= rankdata(scores, method='min')
+        scores = sorted(scores, reverse=True)
+        scores /= np.sum(scores)
+
+        features = []
+
+        while len(features) < k:
+            feature = self.getFeature(scores)
+            while feature in features:
+                feature += 1
+
+            features.append(feature)
+
+        return indices[features]
+
+    def getFeature(self, scores):
+        cumulated_prob = 0
+        i = 0
+        while cumulated_prob < random():
+            cumulated_prob += scores[i]
+            i += 1
+        return i

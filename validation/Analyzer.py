@@ -15,29 +15,29 @@ class Analyzer:
     def computeFeatureValidationOneAgainstRest(self, sick, healthy, selected_genes_dict):
         results = {}
         for label, genes in selected_genes_dict.items():
-            s_labels = binarize_labels(sick.labels, label)
-            sick_binary = Expressions(sick.expressions, s_labels)
+            #s_labels = binarize_labels(sick.labels, label)
+            #sick_binary = Expressions(sick.expressions, s_labels)
 
             if healthy == "":
-                results[label] = self.computeFeatureValidation(sick_binary, "", genes)
+                results[label] = self.computeFeatureValidation(sick_binary, "", genes, true_label=label)
             else:
-                h_labels = binarize_labels(healthy.labels, label)
-                healthy_binary = Expressions(healthy.expressions, h_labels)
-                results[label] = self.computeFeatureValidation(sick_binary, healthy_binary, genes)
+                #h_labels = binarize_labels(healthy.labels, label)
+                #healthy_binary = Expressions(healthy.expressions, h_labels)
+                results[label] = self.computeFeatureValidation(sick, healthy, genes, true_label=label)
 
         return results
 
-    def computeFeatureValidation(self, sick, healthy, selected_genes):
-        sick_validation = self.assembleValidationOutput(sick, selected_genes)
+    def computeFeatureValidation(self, sick, healthy, selected_genes, true_label=""):
+        sick_validation = self.assembleValidationOutput(sick, selected_genes, true_label=true_label)
 
         if healthy == "":
             return sick_validation
 
-        healthy_validation = self.assembleValidationOutput(healthy, selected_genes)
+        healthy_validation = self.assembleValidationOutput(healthy, selected_genes, true_label=true_label)
 
-        class_fitness = classification_fitness(sick, healthy, selected_genes)
-        clus_fitness = clustering_fitness(sick, healthy, selected_genes)
-        comb_fitness = combined_fitness(sick, healthy, selected_genes)
+        class_fitness = classification_fitness(sick, healthy, selected_genes, true_label=true_label)
+        clus_fitness = clustering_fitness(sick, healthy, selected_genes, true_label=true_label)
+        comb_fitness = combined_fitness(sick, healthy, selected_genes, true_label=true_label)
         dist_fitness = distance_fitness(sick, healthy, selected_genes)
 
         return {
@@ -51,12 +51,12 @@ class Analyzer:
             }
         }
 
-    def assembleValidationOutput(self, X, selected_genes):
-        clusVal = ClusterValidator()
+    def assembleValidationOutput(self, X, selected_genes, true_label=""):
+        #clusVal = ClusterValidator()
         classVal = ClassificationValidator()
         classification = classVal.evaluate(X, selected_genes, ["*"])
-        clustering = clusVal.evaluate(X, selected_genes, ["*"], ["*"])
-        return {"classification": classification, "clustering": clustering}
+        #clustering = clusVal.evaluate(X, selected_genes, ["*"], ["*"])
+        return {"classification": classification}
 
 
     def computeExpressionMatrixOneAgainstRest(self, sick, healthy, selected_genes_dict):

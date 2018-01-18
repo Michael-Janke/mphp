@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import silhouette_samples
-from utils import ignore_warnings
+from utils import ignore_warnings, binarize_labels
 
 from utils.EA.population import phenotype
 
@@ -25,31 +25,44 @@ def get_fitness_function_name(fit):
         'combined': 'combined_fitness',
         'distance': 'distance_fitness',
     }
-    
+
     return options.get(fit, 'combined_fitness')
 
 @ignore_warnings
-def classification_fitness(sick, healthy, genes, alpha=0.5):
-    clf = DecisionTreeClassifier()
-    sick_score = cross_val_score(clf, sick.expressions[:,genes], sick.labels, cv=5, scoring="f1_macro").mean()
-    healthy_score = cross_val_score(clf, healthy.expressions[:,genes], healthy.labels, cv=5, scoring="f1_macro").mean()
-
+def classification_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
+    sick_expressions = sick.expressions[:,genes]
+    healthy_expressions = healthy.expressions[:,genes]
+    if not true_label:
+        clf = DecisionTreeClassifier()
+        sick_score = cross_val_score(clf, sick_expressions, sick.labels, cv=5, scoring="f1_macro").mean()
+        healthy_score = cross_val_score(clf, healthy_expressions, healthy.labels, cv=5, scoring="f1_macro").mean()
+        return (alpha * sick_score + (1-alpha) * (1- healthy_score))
+    else:
+        sick_labels = binarize_labels(sick.labels, true_label)
+        healthy_labels = binarize_labels(healthy.labels, true_label)
+        clf = DecisionTreeClassifier()
+        sick_score = cross_val_score(clf, sick_expressions, sick_labels, cv=5, scoring="f1").mean()
+        healthy_score = cross_val_score(clf, healthy_expressions, healthy_labels, cv=5, scoring="f1").mean()
     return (alpha * sick_score + (1-alpha) * (1- healthy_score))
 
+def clustering_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
+    sick_expressions = sick.expressions[:,genes]
+    healthy_expressions = healthy.expressions[:,genes]
+    sick_silhouette_samples = (silhouette_samples(sick_expressions, sick.labels) + 1) / 2
+    healthy_silhouette_samples = (silhouette_samples(healthy_expressions, healthy.labels) + 1) / 2
 
-def clustering_fitness(sick, healthy, genes, alpha=0.5):
+    if not true_label:
+        sick_cluster_silhouettes = [np.mean(sick_silhouette_samples[sick.labels==label]) for label in np.unique(sick.labels)]
+        healthy_cluster_silhouettes = [np.mean(healthy_silhouette_samples[healthy.labels==label]) for label in np.unique(healthy.labels)]
+        return (alpha * np.mean(sick_cluster_silhouettes) + (1 - alpha) * (1 - np.mean(healthy_cluster_silhouettes)))
+    else:
+        silhoutte_sick = np.mean(sick_silhouette_samples[sick.labels==true_label+"-sick"])
+        silhoutte_healthy = np.mean(healthy_silhouette_samples[healthy.labels==true_label+"-healthy"])
+        return (alpha * silhoutte_sick + (1- alpha) * (1 - silhoutte_healthy))
 
-    sick_silhouette_samples = (silhouette_samples(sick.expressions[:,genes], sick.labels) + 1) / 2
-    sick_cluster_silhouettes = [np.mean(sick_silhouette_samples[sick.labels==label]) for label in np.unique(sick.labels)]
-
-    healthy_silhouette_samples = (silhouette_samples(healthy.expressions[:,genes], healthy.labels) + 1) / 2
-    healthy_cluster_silhouettes = [np.mean(healthy_silhouette_samples[healthy.labels==label]) for label in np.unique(healthy.labels)]
-
-    return (alpha * np.mean(sick_cluster_silhouettes) + (1 - alpha) * (1 - np.mean(healthy_cluster_silhouettes)))
-
-
-def combined_fitness(sick, healthy, genes, alpha=0.5, beta=0.5):
-    return beta * classification_fitness(sick, healthy, genes, alpha) + (1 - beta) * clustering_fitness(sick, healthy, genes, alpha)
+def combined_fitness(sick, healthy, genes, alpha=0.5, beta=0.5, true_label=""):
+    return beta * classification_fitness(sick, healthy, genes, alpha, true_label=true_label)\
+        + (1 - beta) * clustering_fitness(sick, healthy, genes, alpha, true_label=true_label)
 
 
 def distance_fitness(sick, healthy, genes):
