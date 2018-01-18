@@ -9,7 +9,7 @@ class Expressions:
         self.labels = labels
 
 def binarize_labels(labels, selected_label):
-    new_labels = np.zeros_like(labels)
+    new_labels = np.zeros(labels.shape)
     indices = np.flatnonzero(np.core.defchararray.find(labels,selected_label)!=-1)
     new_labels[indices] = 1
 

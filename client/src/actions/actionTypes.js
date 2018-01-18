@@ -6,3 +6,5 @@ export const CREATE_RUN = "CREATE_RUN";
 export const UPDATE_ALGORITHM = "UPDATE_ALGORITHM";
 export const START_ALGORITHM = "START_ALGORITHM";
 export const ALGORITHM_DONE = "ALGORITHM_DONE";
+
+export const GENE_RESULTS = "GENE_RESULTS";

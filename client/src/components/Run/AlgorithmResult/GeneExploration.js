@@ -13,8 +13,15 @@ import Color from "tinycolor2";
 import { lightGray, slightlyBoringBlue } from "../../../config/colors";
 
 export default class GeneExploration extends Component {
+  constructor(props) {
+    super(props);
+    if (!props.runs[props.runId].geneResults) {
+      this.props.testGenes(props.runId, { genes: props.genes });
+    }
+  }
+
   render() {
-    const { genes, geneNames, expressionMatrix } = this.props.result;
+    const { genes, geneNames, expressionMatrix } = this.props;
 
     return (
       <div>
