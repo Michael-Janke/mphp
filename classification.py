@@ -42,10 +42,9 @@ pprint(expressions)
 
 # %%
 # Feature Selection
-#selected_genes, sick_X, healthy_X = dimReducer.getEAFeatures(sick,healthy)
-selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3)
+#selected_genes = dimReducer.getEAFeatures(sick,healthy,fitness="clustering")
+selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3, fitness="classification")
 print(selected_genes)
-
 
 print("SICK REDUCED")
 pprint(classVal.evaluate(sick, selected_genes, ["DecisionTree"]))
@@ -54,3 +53,6 @@ plotScatter(sick, selected_genes, gene_labels)
 print("HEALTHY REDUCED")
 pprint(classVal.evaluate(healthy, selected_genes, ["DecisionTree"]))
 plotScatter(healthy, selected_genes, gene_labels)
+
+# %%
+pprint(analyzer.computeFeatureValidation(sick, healthy, selected_genes)["fitness"])
