@@ -1,5 +1,7 @@
 # %%
 import numpy as np
+from pprint import pprint
+
 from utils.DataLoader import DataLoader
 from utils.DimensionalityReducer import DimensionalityReducer
 from utils.EA.crossover import *
@@ -43,10 +45,11 @@ mutation = binary_mutation
 
 fitness_function = fitness(sick, healthy)
 
-best, stat, stat_aver = ea_for_plot(c, chromo_size, fitness_function, crossover, mutation)
+best, sets, stat, stat_aver = ea_for_plot(c, chromo_size, fitness_function, crossover, mutation)
 
 display_stat_1(stat, stat_aver)
 print(best[0])
 print(phenotype(best), best[1])
+pprint(sets)
 features = selected_genes[phenotype(best)]
 print(features)

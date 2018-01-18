@@ -98,7 +98,7 @@ class DimensionalityReducer:
 
     ####### MULTI-VARIATE FEATURE SELECTION #######
 
-    def getEAFeatures(self, sick, healthy, normalization="substract", fitness="combined"):
+    def getEAFeatures(self, sick, healthy, normalization="substract", fitness="distance", returnMultipleSets = False):
         # preselect features to reduce runtime
         selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, c.chromo_size, c.chromo_size)
 
@@ -106,10 +106,13 @@ class DimensionalityReducer:
         mutation = binary_mutation
         fitness_function = fitness_module.fitness(sick, healthy, fitness)
         
-        best, _, _ = ea_for_plot(c, c.chromo_size, fitness_function, crossover, mutation)
-        indices = selected_genes[phenotype(best)]
+        best, sets, _, _ = ea_for_plot(c, c.chromo_size, fitness_function, crossover, mutation)
 
-        return indices
+        if not returnMultipleSets:
+            indices = selected_genes[phenotype(best)]
+            return indices
+
+        return [selected_genes[feature_set] for feature_set in sets]
 
     def getFeaturesBySFS(self, sick, healthy, k=3, n=5000, m=100, normalization="exclude", fitness="combined", returnMultipleSets = False):
         # preselect 100 genes in sick data which do not separate healthy data well

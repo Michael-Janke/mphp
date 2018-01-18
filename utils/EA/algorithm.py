@@ -8,14 +8,14 @@ from random import seed
 
 from .population import generate_population
 from .selection import tournament, elitism
-from .ea_utils import best_indiv, average_indiv
+from .ea_utils import best_indiv, best_indivs, average_indiv
 
 
 def run(c, size_cromo, fitness_func, crossover, mutation):
     statistics = []
     for i in range(c.runs):
         seed(i)
-        _, stat_best, _ = ea_for_plot(c, size_cromo, fitness_func, crossover, mutation)
+        _, _, stat_best, _ = ea_for_plot(c, size_cromo, fitness_func, crossover, mutation)
         statistics.append(stat_best)
 
     stat_gener = list(zip(*statistics))
@@ -92,4 +92,4 @@ def ea_for_plot(c, size_cromo, fitness_func, crossover, mutation):
         else:
             gen_without_improvement += 1
     
-    return best_indiv(population), stat, stat_aver
+    return best_indiv(population), best_indivs(population, 3), stat, stat_aver

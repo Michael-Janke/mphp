@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from operator import itemgetter
+from .population import phenotype
 
 from .config import maximization
 
@@ -11,6 +12,18 @@ def best_indiv(population):
 def average_indiv(population):
     return sum([fitness for _, fitness in population]) / len(population)
 
+def best_indivs(population, k):
+    indivs = [list(phenotype(indiv)) for indiv in population]
+
+    sets = []   
+    for indiv in indivs:
+        if not indiv in sets:
+            sets.append(indiv)
+
+        if len(sets) >= k:
+            break
+
+    return sets
 
 
 ### Plotting ###
