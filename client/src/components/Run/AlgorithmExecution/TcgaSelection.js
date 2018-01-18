@@ -10,11 +10,11 @@ import { isHealthy } from "../../../utils";
 
 class TcgaSelection extends PureComponent {
   render() {
-    const { tcgaTokens, tissueTypes, algorithm, disabled } = this.props;
-    const healthyTissueTypes = tissueTypes.filter(tissueType =>
+    const { cancerTypes, sampleTypes, algorithm, disabled } = this.props;
+    const healthyTissueTypes = sampleTypes.filter(tissueType =>
       isHealthy(tissueType)
     );
-    const sickTissueTypes = tissueTypes.filter(
+    const sickTissueTypes = sampleTypes.filter(
       tissueType => !isHealthy(tissueType)
     );
     const selectedHealthyTissueTypes = algorithm.healthyTissueTypes;
@@ -24,7 +24,7 @@ class TcgaSelection extends PureComponent {
       <StyledRoot>
         <StyledList>
           <Subheader>Cancer Types</Subheader>
-          {tcgaTokens.map(
+          {cancerTypes.map(
             tcgaToken =>
               disabled && !algorithm.cancerTypes.includes(tcgaToken) ? null : (
                 <StyledButton

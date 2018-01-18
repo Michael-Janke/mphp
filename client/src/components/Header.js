@@ -23,7 +23,7 @@ class Header extends Component {
           />
           <div>
             <StyledRightContainer>
-              <StyledText>{this.props.dataset}</StyledText>
+              <StyledText>{this.props.datasetName}</StyledText>
               <StyledSpacer />
               <StyledSpacer>|</StyledSpacer>
               <StyledSpacer />
@@ -123,7 +123,7 @@ const StyledRightContainer = styled.div`
 const mapStateToProps = state => {
   return {
     experimentName: state.experiment.name,
-    dataset: state.experiment.dataset,
+    datasetName: state.experiment.datasets[state.experiment.dataset],
     context: state.context
   };
 };

@@ -13,23 +13,24 @@ datasets = {
     "dataset4" : "Dataset 4 | TCGA",
     "dataset5" : "Dataset 5 | TCGA + GTEX"
 }
+dataLoaders = {dataset: DataLoader(dataset) for dataset in datasets}
+statistics = {dataset: dataLoader.getStatistics() for (dataset,dataLoader) in dataLoaders.items()}
 
 app = Flask(__name__)
 CORS(app)
-dataLoaders = {dataset: DataLoader(dataset) for dataset in datasets}
 
 dimReducer = DimensionalityReducer()
 analyzer = Analyzer()
-
 
 @app.route('/')
 def hello_world():
     return 'Hello World!'
 
-
-@app.route("/algorithms", methods=["GET"])
-def algorithms():
+@app.route("/context", methods=["GET"])
+def context():
     response = {
+        'datasets': datasets,
+        'statistics': statistics,
         'algorithms': [
             {
                 "name": 'PCA',
@@ -139,6 +140,10 @@ def runSpecificAlgorithm():
         return abort(400, "need dataset parameter")
 
     dataset = algorithm["dataset"]
+
+    if dataset not in dataLoaders:
+        return abort(400, "unknown datatset id")
+    
     dataLoader = dataLoaders[dataset]
 
     key = algorithm["key"]
@@ -201,9 +206,9 @@ def runSpecificAlgorithm():
 
     response = {
         'data': response_data,
-        'genes': dataLoader.getGeneLabels[gene_indices].tolist(),
+        'genes': dataLoader.getGeneLabels()[gene_indices].tolist(),
         'expressionMatrix': expression_matrix,
-        'geneNames': dataLoader.getGeneNames[gene_indices].tolist(),
+        'geneNames': dataLoader.getGeneNames()[gene_indices].tolist(),
         'evaluation': evaluation,
     }
 
@@ -211,16 +216,6 @@ def runSpecificAlgorithm():
     jsonResponse = json.dumps(response)
     regex = re.compile(r'\bNaN\b')
     return re.sub(regex, 'null', jsonResponse)
-
-
-@app.route('/statistics', methods=["GET"])
-def getStatistics():
-    dataset = request.args.get('dataset')
-    if dataset not in dataLoaders:
-        return abort(400, "need dataset parameter")
-    statistics = dataLoaders[dataset].getStatistics()
-
-    return json.dumps(statistics)
 
 
 if __name__ == '__main__':

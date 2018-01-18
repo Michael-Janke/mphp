@@ -26,7 +26,7 @@ class DataLoader:
             cancer_types.append(cancer_type)
             gene_data = np.load(file)
             meta_data = np.load(file.replace("_count_data.npy","_meta_data.npy"))
-            sample_types = np.unique(meta_data).astype('str')
+            sample_types = np.unique(meta_data).astype('str').tolist()
             data[cancer_type] = {}
             for sample_type in sample_types:
                 indices = np.where(sample_type == meta_data)
@@ -121,7 +121,11 @@ class DataLoader:
                     stat[ct][st] = self.data[ct][st].shape[0]
                 else:
                     stat[ct][st] = 0
-        return stat
+        return {
+            'counts': stat,
+            'cancerTypes': self.cancer_types,
+            'sampleTypes': self.sample_types
+        }
 
     def getStatistics(self): 
         return self.statistics
