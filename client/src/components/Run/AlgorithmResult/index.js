@@ -3,11 +3,11 @@ import styled from "styled-components";
 
 import Plot from "./Plot";
 import Evaluation from "./Evaluation";
-import GeneExploration from "./GeneExploration";
+import GeneExploration from "./GeneExplorationContainer";
 
 export default class Results extends Component {
   render() {
-    const { result } = this.props;
+    const { result, runId } = this.props;
     return (
       <div>
         {!result.isError ? (
@@ -16,7 +16,7 @@ export default class Results extends Component {
               <Plot {...result} />
               <Evaluation {...result.evaluation} />
             </Columns>
-            <GeneExploration {...result} />
+            <GeneExploration runId={runId} {...result} />
           </StyledContent>
         ) : (
           <div>Server error</div>

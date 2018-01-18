@@ -5,7 +5,11 @@ import { ListItem } from "material-ui/List";
 export default class EvaluationValue extends Component {
   render() {
     const primaryText = this.props.primaryText.toFixed(2);
-    const props = { ...this.props, primaryText };
+    const props = {
+      ...this.props,
+      primaryText,
+      primaryTogglesNestedList: true
+    };
     return <ColoredValue {...props} />;
   }
 }
