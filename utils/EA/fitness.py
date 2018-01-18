@@ -2,11 +2,12 @@ import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import silhouette_samples
-from utils import Expressions, binarize_labels, ignore_warnings
+from utils import ignore_warnings
 
 from utils.EA.population import phenotype
 
-def fitness(sick, healthy):
+def fitness(sick, healthy, fit='combined'):
+    fitness_func  = globals()[get_fitness_function_name(fit)]
     def fitness_(indiv):
         pheno = phenotype(indiv)
         # select features and only pass this data to evaluate
@@ -14,9 +15,18 @@ def fitness(sick, healthy):
         if pheno.shape[0] > 10:
             return -10
 
-        return combined_fitness(sick, healthy, pheno)
+        return fitness_func(sick, healthy, pheno)
     return fitness_
 
+def get_fitness_function_name(fit):
+    options = {
+        'clustering': 'clustering_fitness',
+        'classification': 'classification_fitness',
+        'combined': 'combined_fitness',
+        'distance': 'distance_fitness',
+    }
+    
+    return options.get(fit, 'combined_fitness')
 
 @ignore_warnings
 def classification_fitness(sick, healthy, genes, alpha=0.5):

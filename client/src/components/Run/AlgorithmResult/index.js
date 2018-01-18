@@ -13,8 +13,8 @@ export default class Results extends Component {
         {!result.isError ? (
           <StyledContent>
             <Plot {...result} />
-            <Evaluation />
-            <GeneExploration result={result} />
+            <Evaluation {...result.evaluation} />
+            <GeneExploration {...result} />
           </StyledContent>
         ) : (
           <div>Server error</div>
