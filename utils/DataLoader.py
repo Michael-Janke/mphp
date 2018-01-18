@@ -2,7 +2,6 @@ import numpy as np
 import ntpath
 from glob import glob
 import re
-
 import utils
 
 
@@ -11,19 +10,17 @@ class DataLoader:
         self.dataset = dataset
         self.data, self.cancer_types, self.sample_types = self.readData(
             dataset)
-        self.gene_labels, self.statistics = self.readGenesAndStatistics(
-            dataset)
+        self.gene_labels = self.readGeneLabels(dataset)
         self.gene_names_map = self.readGeneNamesMap()
         self.gene_names = self.mapGeneLabelsToGeneNames(self.gene_labels)
+        self.statistics = self.computeStatistics()
 
     def readData(self, dataset):
         data = {}
         cancer_types = []
 
-        all_sample_types = np.load("data/"+dataset+"/statistics/sample_types.npy").astype("str")
         files = glob("data/"+dataset+"/subsets/*_count_data.npy")
         meta_data_files = glob("data/"+dataset+"/subsets/*_meta_data.npy")
-        files = list(set(files)-set(meta_data_files))
         for file in files:
             cancer_type = re.search(".*-(.*)_count_data.npy", file).group(1)
             cancer_types.append(cancer_type)
@@ -35,16 +32,11 @@ class DataLoader:
                 indices = np.where(sample_type == meta_data)
                 data[cancer_type][sample_type] = gene_data[indices]
 
-        return data, cancer_types, all_sample_types
+        return data, cancer_types, sample_types
 
-    def readGenesAndStatistics(self, dataset):
+    def readGeneLabels(self, dataset):
         gene_file = glob("data/"+dataset+"/subsets/*-gene_labels.npy")[0]
-        gene_labels = np.load(gene_file)
-
-        statistics_file = "data/" + dataset + "/statistics/counts.npy"
-        statistics = np.load(statistics_file)
-
-        return gene_labels, statistics
+        return np.load(gene_file)
 
     def readGeneNamesMap(self):
         return np.load('data/gene_names/gene_names.npy').item()
@@ -119,3 +111,17 @@ class DataLoader:
         data.labels = np.asarray(
             [re.sub(r"-T\w*", "-sick", x) for x in data.labels])
         return data
+
+    def computeStatistics(self): 
+        stat = {}
+        for ct in self.cancer_types:
+            stat[ct] = {}
+            for st in self.sample_types:
+                if st in self.data[ct]:
+                    stat[ct][st] = self.data[ct][st].shape[0]
+                else:
+                    stat[ct][st] = 0
+        return stat
+
+    def getStatistics(self): 
+        return self.statistics

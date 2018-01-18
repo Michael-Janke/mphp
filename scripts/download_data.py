@@ -2,11 +2,11 @@ import urllib.request
 import os
 import zipfile
 import sys
+import shutil
 from parse_tcga_dataset import parse_tcga_dataset
 from parse_gtex_dataset import parse_gtex_dataset
 from merge_gtex_tcga import merge_gtex_tcga
 from download_gene_names import download_gene_names
-from create_statistics import create_statistics
 #sys.path.insert(0, './parse_data_scripts')
 
 parseFunctionMap = {
@@ -18,31 +18,26 @@ parseFunctionMap = {
 urls = {
     "dataset1": {
         "parse": False,
-        "create_statistics": False,
     },
     "dataset2": {
         "url":
         "https://www.dropbox.com/sh/1v31yeu0zb4jcmm/AAAi5medvxa_kIbAEB7Edywua?dl=1&preview=LargeSets.zip",
         "parse": [],
-        "create_statistics":
-        False,
     },
     "dataset3": {
         "url":
         "https://www.dropbox.com/s/0hqq2g2ipefy1u1/large_allSampleTypes.zip?dl=1",
         "parse": [],
-        "create_statistics":
-        True,
     },
     "dataset4": {
         "url": "https://www.dropbox.com/s/l2bpf4lka8jxktg/LargeSet.zip?dl=1",
         "parse": ["tcga"],
-        "create_statistics": True,
+        "version": "001"
     },
     "dataset5": {
         "url": "https://www.dropbox.com/s/xcrp4adwk6itwdi/GTEX_TCGA.zip?dl=1",
         "parse": ["tcga", "gtex", "merge"],
-        #"create_statistics": True,
+        "version": "001"
     },
     "gene_names": {
         "download_gene_names": True
@@ -65,27 +60,32 @@ for dataset, url in urls.items():
             os.remove(path + "/download.zip")
         else:
             print("skip already downloaded " + dataset, flush=True)
+    
+    
+    if "parse" in url:
+        version = ""
+        if "version" in url:
+            version = url["version"]
+        try:
+            file = open(path+"/version", "r")
+            lastVersion = file.read()
+            file.close()
+        except:
+            lastVersion = ""
 
-    if not os.path.exists(path + "/subsets") and "parse" in url:
-        if url["parse"]:
+        if version != lastVersion:
+            if os.path.exists(path + "/subsets"):
+                shutil.rmtree(path + "/subsets")
+            
             for parseFunction in url["parse"]:
-                print("parse " + dataset + "/" + parseFunction, flush=True)
+                print("parse {0}/{1}/{2}".format(dataset, version, parseFunction), flush=True)
                 parseFunctionMap[parseFunction](dataset)
-        else:
-            print(
-                "parser for " + dataset + " not implemented yet. Stay tuned!",
-                flush=True)
-    else:
-        print("already parsed " + dataset, flush=True)
-
-    if not os.path.exists(path + "/statistics") and "create_statistics" in url:
-        if url["create_statistics"]:
-            print("creating statistics for " + dataset, flush=True)
-            create_statistics(dataset)
-        else:
-            print("skipping statistics for " + dataset, flush=True)
-    else:
-        print("already created statistics for " + dataset, flush=True)
+                file = open(path+"/version", "w")
+                file.write(version)
+                file.close()
+        
+        if version == lastVersion:
+            print("already parsed {0}/{1}".format(dataset, version), flush=True)
 
     if "download_gene_names" in url and url["download_gene_names"] and not os.path.exists(
             path):
