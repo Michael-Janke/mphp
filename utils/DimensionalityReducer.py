@@ -59,13 +59,8 @@ class DimensionalityReducer:
             'substract': self.getNormalizedFeaturesS,
             'exclude': self.getNormalizedFeaturesE,
         }
-<<<<<<< HEAD
         
         return options[normalization](sick, healthy, k, n, m, returnMultipleSets)
-=======
-
-        return options[normalization](sick, healthy, k, n, m)
->>>>>>> cd6bfb495db5b62423476fa4da29243df435e7a3
 
     def getNormalizedFeaturesS(self, sick, healthy, k, n, m, returnMultipleSets = False):
         selector = SelectKBest(self.method_table[m], k="all")
@@ -105,7 +100,7 @@ class DimensionalityReducer:
 
     ####### MULTI-VARIATE FEATURE SELECTION #######
 
-    def getEAFeatures(self, sick, healthy, normalization="substract", returnMultipleSets = False, true_label=""):
+    def getEAFeatures(self, sick, healthy, normalization="substract", returnMultipleSets = False, fitness="combined", true_label=""):
         # preselect features to reduce runtime
         selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, c.chromo_size, c.chromo_size)
 
@@ -125,11 +120,8 @@ class DimensionalityReducer:
         # preselect 100 genes in sick data which do not separate healthy data well
         selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
 
-<<<<<<< HEAD
-=======
         bestSet = self.getFeatureSetBySFS(sick, healthy, selected_genes, k, fitness, true_label=true_label)
 
->>>>>>> cd6bfb495db5b62423476fa4da29243df435e7a3
         if not returnMultipleSets:
             return self.getFeatureSetBySFS(sick, healthy, selected_genes, k, fitness)
 
