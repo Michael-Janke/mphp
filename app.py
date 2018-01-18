@@ -4,7 +4,8 @@ import base64
 import urllib
 import xml.etree.ElementTree as ET
 import rdflib
-import shutil
+import os.path
+import pandas as pd
 
 from SPARQLWrapper import SPARQLWrapper, JSON
 from pprint import pprint
@@ -35,52 +36,93 @@ def testGene():
     genes = data["genes"]
     response = {}
 
-    #DisGeNet - move down to individual gene
-    sparql = SPARQLWrapper('http://rdf.disgenet.org/sparql/')
-    sparql.setQuery("""
-    SELECT DISTINCT
-        ?gda
-        <http://identifiers.org/ncbigene/1356> as ?gene
-        ?score
-        ?disease
-        ?diseaselabel
-        ?diseasename
-        ?semanticType
-    WHERE {
-        ?gda sio:SIO_000628 <http://identifiers.org/ncbigene/1356>, ?disease ;
-            sio:SIO_000253 ?source ;
-            sio:SIO_000216 ?scoreIRI .
-        ?disease sio:SIO_000008 ?semanticType .
-        ?disease a ncit:C7057 .
-        ?scoreIRI sio:SIO_000300 ?score .
-        FILTER regex(?source, "UNIPROT|CTD_human")
-        FILTER (?score >= 0.2)
-        ?disease dcterms:title ?diseasename .
-        ?disease rdfs:label ?diseaselabel
-    }
-    ORDER BY DESC(?score)
-    """)
-    sparql.setReturnFormat(JSON)
-    results = sparql.query().convert()
-    print(results)
-
+    # cancer gene census
+    csv_file = 'data/cancer_gene_census.csv'
+    cancer_gene_census_data = pd.read_csv(csv_file)
+    census_data_genes = cancer_gene_census_data['Synonyms'].tolist()
     for gene in genes:
 
-        #protein Atlas - TODO: save xml as file and only load new if we don't have it yet
+        #DisGeNet
+        disgenet = False
+        entrez_file = "data/gene_names/entrez_names.npy"
+        entrez_labels_map = np.load(entrez_file).item()
+        gene_url = '<http://identifiers.org/ncbigene/' + entrez_labels_map[int(gene[4:])] + '>'
+        file_name = 'data/disgenet/'+ gene +'.json'
+        results = None
+        try:
+            if not os.path.isfile(file_name):
+                sparql = SPARQLWrapper('http://rdf.disgenet.org/sparql/')
+                sparql.setQuery("""
+                SELECT DISTINCT
+                    ?gda
+                    %s as ?gene
+                    ?score
+                    ?disease
+                    ?diseaselabel
+                    ?diseasename
+                    ?semanticType
+                WHERE {
+                    ?gda sio:SIO_000628 %s, ?disease ;
+                        sio:SIO_000253 ?source ;
+                        sio:SIO_000216 ?scoreIRI .
+                    ?disease sio:SIO_000008 ?semanticType .
+                    ?disease a ncit:C7057 .
+                    ?scoreIRI sio:SIO_000300 ?score .
+                    FILTER regex(?source, "UNIPROT|CTD_human")
+                    FILTER (?score >= 0.2)
+                    ?disease dcterms:title ?diseasename .
+                    ?disease rdfs:label ?diseaselabel
+                }
+                ORDER BY DESC(?score)
+                """ % (gene_url, gene_url))
+                sparql.setReturnFormat(JSON)
+                results = sparql.query().convert()
+                if not os.path.exists(os.path.dirname(file_name)):
+                    os.makedirs(os.path.dirname(file_name))
+                with open(file_name, 'w') as outfile:
+                    json.dump(results, outfile)
+
+            f = open(file_name, 'r')
+            results = json.load(f)
+            f.close()
+        except:
+            print("Error getting / reading disgenet file")
+
+        if results is not None:
+
+            # scan the file for a T191 --> cancer.
+            json_data = results
+            def search(key, var):
+                if hasattr(var,'items'):
+                    for k, v in var.items():
+                        if k == key:
+                            yield v
+                        if isinstance(v, dict):
+                            for result in search(key, v):
+                                yield result
+                        elif isinstance(v, list):
+                            for d in v:
+                                for result in search(key, d):
+                                    yield result
+
+            semantic_types = search('semanticType',json_data)
+            for semantic_type in semantic_types:
+                for k,v in semantic_type.items():
+                    if k == 'value':
+                        if 'T191' in v:
+                            disgenet = True
+        #proteinAtlas
         proteinAtlas = False
         try:
-
             url = 'https://www.proteinatlas.org/'+ gene +'.xml'
             file_name = 'data/proteinatlas/'+ gene +'.xml'
-
-            if not os.path.isfile(fname):
-                with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
-                    shutil.copyfileobj(response, out_file)
+            if not os.path.isfile(file_name):
+                urllib.request.urlretrieve(url, file_name)
 
             f = open(file_name, 'r')
             xml = f.read()
             f.close()
-            dom = parseString(xml.read())
+            dom = parseString(xml)
             proteinClass = dom.getElementsByTagName('proteinClass')
             for c in proteinClass:
                 if c.attributes['name'].value == "Cancer-related genes":
@@ -88,11 +130,17 @@ def testGene():
         except:
             print("Error accessing proteinatlas for gene: " + gene)
 
+        cancer_gene_census = False
+        for gene_synonyms in census_data_genes:
+            # filter out NaN values
+            if gene_synonyms == gene_synonyms:
+                if gene in gene_synonyms:
+                    cancer_gene_census = True
 
-        #for result in results["results"]["bindings"]:
-        #    print(result["label"]["value"])
+        if cancer_gene_census:
+            print("Found one!")
 
-        response[gene] = {'proteinAtlas': proteinAtlas, 'disgenet': results}
+        response[gene] = {'proteinAtlas': proteinAtlas, 'disgenet': disgenet, 'cancer_gene_census': cancer_gene_census}
 
     return json.dumps(response)
 
