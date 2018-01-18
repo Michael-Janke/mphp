@@ -18,7 +18,7 @@ export default class AlgorithmExecution extends Component {
               title={
                 isRunnable
                   ? `Run ${this.props.algorithm.name}`
-                  : `Please select an algorithm`
+                  : `Please select appropriate parameters`
               }
               label="Run"
               primary={true}
@@ -34,7 +34,19 @@ export default class AlgorithmExecution extends Component {
   }
 
   isRunnable() {
-    return typeof this.props.algorithm.key !== "undefined";
+    var oneCancerTypeRunnable = true;
+    if (this.props.algorithm.cancerTypes.length === 1) {
+      const current = this.props.algorithm.key;
+      oneCancerTypeRunnable =
+        current === "getFeatures" ||
+        current === "getPCA" ||
+        current === "getDecisionTreeFeatures";
+    }
+    return (
+      typeof this.props.algorithm.key !== "undefined" &&
+      this.props.algorithm.cancerTypes.length !== 0 &&
+      oneCancerTypeRunnable
+    );
   }
 
   executeAlgorithm() {

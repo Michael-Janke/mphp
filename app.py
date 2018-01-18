@@ -145,48 +145,57 @@ def runSpecificAlgorithm():
     healthy = dataLoader.getData(healthy_tissue_types, cancer_types)
     healthy = dataLoader.replaceLabels(healthy)
 
-    data = dataLoader.getData(sick_tissue_types + healthy_tissue_types, cancer_types)
+    data = dataLoader.getData(
+        sick_tissue_types + healthy_tissue_types, cancer_types)
     data = dataLoader.replaceLabels(data)
 
     calc_expression_matrix = False
     if key == "getPCA":
-        gene_indices = dimReducer.getPCA(data.expressions, n_components, n_f_components)
+        gene_indices = dimReducer.getPCA(
+            data.expressions, n_components, n_f_components)
 
     elif key == "getFeatures":
         gene_indices = dimReducer.getFeatures(data, k)
-        
+
     elif key == "getDecisionTreeFeatures":
         gene_indices = dimReducer.getDecisionTreeFeatures(data, k)
 
     elif key == "getNormalizedFeaturesE":
-        gene_indices = dimReducer.getNormalizedFeaturesE(sick, healthy, k, n, "chi2")
+        gene_indices = dimReducer.getNormalizedFeaturesE(
+            sick, healthy, k, n, "chi2")
         calc_expression_matrix = True
 
     elif key == "getNormalizedFeaturesS":
-        gene_indices = dimReducer.getNormalizedFeaturesS(sick, healthy, k, n, "chi2")
+        gene_indices = dimReducer.getNormalizedFeaturesS(
+            sick, healthy, k, n, "chi2")
         calc_expression_matrix = True
 
     elif key == "getFeaturesBySFS":
         gene_indices = dimReducer.getFeaturesBySFS(sick, healthy)
         calc_expression_matrix = True
 
-    
     X = data.expressions[:, gene_indices]
     labels = data.labels
 
     # calculate expression matrix
     expression_matrix = None
-    if calc_expression_matrix:        
-        X = np.vstack((sick.expressions[:, gene_indices], healthy.expressions[:, gene_indices]))
+    if calc_expression_matrix:
+        X = np.vstack(
+            (sick.expressions[:, gene_indices], healthy.expressions[:, gene_indices]))
         labels = np.hstack((sick.labels, healthy.labels))
-        expression_matrix = analyzer.computeExpressionMatrix(sick, healthy, gene_indices)
+        expression_matrix = analyzer.computeExpressionMatrix(
+            sick, healthy, gene_indices)
 
     response_data = {}
     for label in np.unique(labels):
         response_data[label] = X[labels == label, :].T.tolist()
 
     # evaluation
-    evaluation = analyzer.computeFeatureValidation(sick, healthy, gene_indices)
+    if len(cancer_types) == 1:
+        evaluation = analyzer.computeFeatureValidation(data, "", gene_indices)
+    else:
+        evaluation = analyzer.computeFeatureValidation(
+            sick, healthy, gene_indices)
 
     response = {
         'data': response_data,
