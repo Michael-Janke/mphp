@@ -12,9 +12,11 @@ export default class Results extends Component {
       <div>
         {!result.isError ? (
           <StyledContent>
-            <Plot {...result} />
-            <Evaluation />
-            <GeneExploration runId={runId} result={result} />
+            <Columns>
+              <Plot {...result} />
+              <Evaluation {...result.evaluation} />
+            </Columns>
+            <GeneExploration runId={runId} {...result} />
           </StyledContent>
         ) : (
           <div>Server error</div>
@@ -26,4 +28,10 @@ export default class Results extends Component {
 
 const StyledContent = styled.div`
   margin: 16px;
+`;
+
+const Columns = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 `;

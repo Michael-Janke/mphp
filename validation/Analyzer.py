@@ -1,7 +1,7 @@
 import numpy as np
 from validation.ClusterValidator import ClusterValidator
 from validation.ClassificationValidator import ClassificationValidator
-from utils.EA.fitness import evaluate, distance_evaluate
+from utils.EA.fitness import classification_fitness, clustering_fitness, distance_fitness, combined_fitness
 from utils import Expressions, binarize_labels
 from collections import defaultdict
 
@@ -28,68 +28,60 @@ class Analyzer:
         return results
 
     def computeFeatureValidation(self, sick, healthy, selected_genes):
-        sick_reduced = Expressions(sick.expressions[:,selected_genes], sick.labels)
-        sick = self.assembleValidationOutput(sick_reduced)
+        sick_validation = self.assembleValidationOutput(sick, selected_genes)
 
         if healthy == "":
-            return sick
+            return sick_validation
 
-        healthy_reduced = Expressions(healthy.expressions[:, selected_genes], healthy.labels)
-        healthy = self.assembleValidationOutput(healthy_reduced)
+        healthy_validation = self.assembleValidationOutput(healthy, selected_genes)
 
-        classificationFitness = evaluate(sick_reduced, healthy_reduced)
-        clusteringFitness = distance_evaluate(sick_reduced, healthy_reduced)
+        class_fitness = classification_fitness(sick, healthy, selected_genes)
+        clus_fitness = clustering_fitness(sick, healthy, selected_genes)
+        comb_fitness = combined_fitness(sick, healthy, selected_genes)
+        dist_fitness = distance_fitness(sick, healthy, selected_genes)
 
         return {
-            "sick": sick,
-            "healthy": healthy,
+            "sick": sick_validation,
+            "healthy": healthy_validation,
             "fitness": {
-                "classificationFitness": classificationFitness,
-                "clusteringFitness": clusteringFitness
+                "classificationFitness": class_fitness,
+                "clusteringFitness": clus_fitness,
+                "distanceFitness": dist_fitness,
+                "combinedFitness": comb_fitness,
             }
         }
 
-    def assembleValidationOutput(self, X):
+    def assembleValidationOutput(self, X, selected_genes):
         clusVal = ClusterValidator()
         classVal = ClassificationValidator()
-        classification = classVal.evaluate(X, ["*"])
-        clustering = clusVal.evaluate(X, ["*"], ["*"])
-        return {"classifictation": classification, "clustering": clustering}
+        classification = classVal.evaluate(X, selected_genes, ["*"])
+        clustering = clusVal.evaluate(X, selected_genes, ["*"], ["*"])
+        return {"classification": classification, "clustering": clustering}
+
+
+    def computeExpressionMatrixOneAgainstRest(self, sick, healthy, selected_genes_dict):
+        results = {}
+        for label, genes in selected_genes_dict.items():
+            results[label] = self.computeExpressionMatrix(sick, healthy, genes)
+
+        return results
 
     def computeExpressionMatrix(self, sick, healthy, selected_genes):
         expressions = defaultdict(list)
         for label in np.unique(sick.labels):
             cancertype = label.split("-")[0]
+
             healthy_X = healthy.expressions[healthy.labels==cancertype+"-healthy"]
             sick_X = sick.expressions[sick.labels==cancertype+"-sick"]
-            for i in range(sick_X.shape[1]):
+
+            for gene in selected_genes:
                 if healthy_X.shape[0] < 20:
-                    #h = np.concatenate((healthy_X[:,i],healthy_X[:,i],healthy_X[:,i],healthy_X[:,i],healthy_X[:,i],healthy_X[:,i]), axis=0)
-                    #print(h.shape)
-                    U_high, p_high = mannwhitneyu(sick_X[:,i], healthy_X[:,i], alternative="greater")
-                    U_low,  p_low  = mannwhitneyu(sick_X[:,i], healthy_X[:,i], alternative="less")
+                    U_high, p_high = mannwhitneyu(sick_X[:,gene], healthy_X[:,gene], alternative="greater")
+                    U_low,  p_low  = mannwhitneyu(sick_X[:,gene], healthy_X[:,gene], alternative="less")
                     expression = "greater" if p_high < 0.01 else "less" if p_low < 0.01 else "unchanged"
                     expressions[cancertype].append("cant compute - " + expression)
                 else:
-                    U_high, p_high = mannwhitneyu(sick_X[:,i], healthy_X[:,i], alternative="greater")
-                    U_low,  p_low  = mannwhitneyu(sick_X[:,i], healthy_X[:,i], alternative="less")
+                    U_high, p_high = mannwhitneyu(sick_X[:,gene], healthy_X[:,gene], alternative="greater")
+                    U_low,  p_low  = mannwhitneyu(sick_X[:,gene], healthy_X[:,gene], alternative="less")
                     expressions[cancertype].append("greater" if p_high < 0.01 else "less" if p_low < 0.01 else "unchanged")
-                    #print(p_low, p_high)
-                    #print(np.mean(sick_X[:,i]), np.mean(healthy_X[:,i]))
-            #print("====")
         return expressions
-
-    def computeExpressionThresholds(self, healthy, selected_genes):
-        levels = {}
-        for label in np.unique(healthy.labels):
-            levels[label[0:4]] = {}
-            for gene in selected_genes:
-                indices = np.where(healthy.labels == label)
-                reduced_data = healthy.expressions[indices,gene]
-                min_thresh = np.percentile(reduced_data, 5)
-                max_thresh = np.percentile(reduced_data, 95)
-                lower_thresh = np.percentile(reduced_data, 33)
-                upper_thresh = np.percentile(reduced_data, 66)
-                levels[label[0:4]][gene] = [min_thresh, lower_thresh, upper_thresh, max_thresh]
-
-        return levels

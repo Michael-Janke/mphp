@@ -11,50 +11,52 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import cross_validate
 from sklearn.metrics import make_scorer, precision_score, recall_score, f1_score
 
-from utils import Expressions, binarize_labels
+from utils import Expressions, binarize_labels, ignore_warnings
 
 class ClassificationValidator():
 
     def __init__(self):
         self.classifier_table = {
-            "SVM": SVC,
-            "LogisticRegression": LogisticRegression,
-            "DecisionTree": DecisionTreeClassifier,
-            "naivebayes": GaussianNB,
+            "svm": SVC,
+            "logisticRegression": LogisticRegression,
+            "decisionTree": DecisionTreeClassifier,
+            "naiveBayes": GaussianNB,
             "knn": KNeighborsClassifier,
-            "RandomForest": RandomForestClassifier,
-            "BoostedTrees": AdaBoostClassifier
+            "randomForest": RandomForestClassifier,
+            "boostedTrees": AdaBoostClassifier
         }
 
-    def evaluate(self, data, classifier):
+    @ignore_warnings
+    def evaluate(self, data, genes, classifier):
         result = {}
+
         if "*" in classifier:
             classifier = self.classifier_table.keys()
         for c in classifier:
             if not c in self.classifier_table:
                 continue
             clf = self.classifier_table[c]()
-            
+
             scoring = {
                 'precision': make_scorer(precision_score, average='macro'),
                 'recall': make_scorer(recall_score, average='macro'),
                 'f1': make_scorer(f1_score, average='macro'),
             }
-            
+
             le = LabelEncoder()
             labels = le.fit_transform(data.labels)
-            scores = cross_validate(clf, data.expressions, labels, cv=5, scoring=scoring, return_train_score=False)
+            scores = cross_validate(clf, data.expressions[:,genes], labels, cv=5, scoring=scoring, return_train_score=False)
             score_dict = {
                 'precision': {
-                    'mean': scores['test_precision'].mean(), 
+                    'mean': scores['test_precision'].mean(),
                     'std':  scores['test_precision'].std(),
                 },
                 'recall': {
-                    'mean': scores['test_recall'].mean(), 
+                    'mean': scores['test_recall'].mean(),
                     'std':  scores['test_recall'].std(),
                 },
                 'f1': {
-                    'mean': scores['test_f1'].mean(), 
+                    'mean': scores['test_f1'].mean(),
                     'std':  scores['test_f1'].std(),
                 },
             }
@@ -65,15 +67,15 @@ class ClassificationValidator():
         results = {}
         for label, genes in selected_genes_dict.items():
             s_labels = binarize_labels(sick.labels, label)
-            sick_binary = Expressions(sick.expressions[:,genes], s_labels)
-            sick_results = self.evaluate(sick_binary, ["DecisionTree"])
+            sick_binary = Expressions(sick.expressions, s_labels)
+            sick_results = self.evaluate(sick_binary, genes, ["DecisionTree"])
 
             if healthy == "":
                 results[label] = sick_results
             else:
                 h_labels = binarize_labels(healthy.labels, label)
-                healthy_binary = Expressions(healthy.expressions[:,genes], h_labels)
-                healthy_results = self.evaluate(healthy_binary, ["DecisionTree"])
+                healthy_binary = Expressions(healthy.expressions, h_labels)
+                healthy_results = self.evaluate(healthy_binary, genes, ["DecisionTree"])
 
                 results[label] = {
                     "sick": sick_results,

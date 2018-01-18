@@ -47,7 +47,10 @@ const ScrollableArea = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding-top: ${props => props.theme.totalHeaderHeight};
+  margin-top: ${props =>
+    props.headerMinimized
+      ? props.theme.experimentHeaderHeight
+      : props.theme.totalHeaderHeight};
 `;
 
 export default App;
