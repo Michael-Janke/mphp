@@ -7,7 +7,7 @@ from sklearn.feature_selection import f_classif
 from sklearn.tree import DecisionTreeClassifier
 
 import utils.EA.config as c
-from utils.EA.fitness import fitness, evaluate, distance_evaluate, combined_fitness, classification_fitness, clustering_fitness
+from utils.EA.fitness import fitness, combined_fitness, classification_fitness, clustering_fitness
 from utils.EA.crossover import *
 from utils.EA.mutation import *
 from utils.EA.population import phenotype
@@ -98,17 +98,17 @@ class DimensionalityReducer:
 
     ####### MULTI-VARIATE FEATURE SELECTION #######
 
-    def getEAFeatures(self, sick, healthy, normalization="substract"):
+    def getEAFeatures(self, sick, healthy, normalization="substract", true_label=""):
         # preselect features to reduce runtime
         selected_genes, sick_X, healthy_X = self.getNormalizedFeatures(sick,healthy,normalization, c.chromo_size, c.chromo_size)
         crossover = one_point_crossover
         mutation = binary_mutation
-        fitness_function = fitness(Expressions(sick_X, sick.labels), Expressions(healthy_X, healthy.labels))
+        fitness_function = fitness(Expressions(sick_X, sick.labels), Expressions(healthy_X, healthy.labels), true_label=true_label)
         best, stat, stat_aver = ea_for_plot(c, c.chromo_size, fitness_function, crossover, mutation)
         indices = selected_genes[phenotype(best)]
         return indices, sick.expressions[:, indices], healthy.expressions[:, indices]
 
-    def getFeaturesBySFS(self, sick, healthy, k=3, n=5000, m=100, normalization="exclude"):
+    def getFeaturesBySFS(self, sick, healthy, k=3, n=5000, m=100, normalization="exclude", true_label=""):
         # preselect 100 genes in sick data which do not separate healthy data well
         selected_genes, _, _ = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
 
@@ -121,7 +121,7 @@ class DimensionalityReducer:
             for i in range(1,m):
                 gene = selected_genes[i]
                 fitness_score = combined_fitness(Expressions(sick.expressions[:,indices + [gene]], sick.labels),\
-                                        Expressions(healthy.expressions[:,indices + [gene]], healthy.labels))
+                                        Expressions(healthy.expressions[:,indices + [gene]], healthy.labels), true_label=true_label)
                 if fitness_score > best_fitness:
                     best_fitness = fitness_score
                     best_gene = gene
@@ -158,11 +158,11 @@ class DimensionalityReducer:
                 healhty_binary = Expressions(healhty.expressions, h_labels)
 
                 if method == "ea":
-                    indices, _, _ = self.getEAFeatures(sick_binary, healhty_binary, normalization)
+                    indices, _, _ = self.getEAFeatures(sick, healhty, normalization, true_label=label)
                 elif method == "norm":
                     indices, _, _ = self.getNormalizedFeatures(sick_binary, healhty_binary, normalization, k)
                 else:
-                    indices, _, _ = self.getFeaturesBySFS(sick_binary, healhty_binary, k, normalization=normalization)
+                    indices, _, _ = self.getFeaturesBySFS(sick, healhty, k, normalization=normalization, true_label=label)
 
             features[label] = indices
 

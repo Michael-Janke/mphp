@@ -42,13 +42,6 @@ pprint(expressions)
 
 
 # %%
-evaluation = classVal.evaluateOneAgainstRest(sick, healthy, features)
-pprint(evaluation)
-
-
-
-
-# %%
 # Feature Selection
 #selected_genes, sick_X, healthy_X = dimReducer.getEAFeatures(sick,healthy)
 selected_genes, sick_X, healthy_X = dimReducer.getFeaturesBySFS(sick,healthy,3)

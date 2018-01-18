@@ -16,44 +16,55 @@ def fitness(sick, healthy):
     return fitness_
 
 @ignore_warnings
-def classification_fitness(sick, healthy, alpha=0.5):
-    clf = DecisionTreeClassifier()
-    sick_score = cross_val_score(clf, sick.expressions, sick.labels, cv=5, scoring="f1_macro").mean()
-    healthy_score = cross_val_score(clf, healthy.expressions, healthy.labels, cv=5, scoring="f1_macro").mean()
-
+def classification_fitness(sick, healthy, alpha=0.5, true_label=""):
+    if not true_label:
+        clf = DecisionTreeClassifier()
+        sick_score = cross_val_score(clf, sick.expressions, sick.labels, cv=5, scoring="f1_macro").mean()
+        healthy_score = cross_val_score(clf, healthy.expressions, healthy.labels, cv=5, scoring="f1_macro").mean()
+        return (alpha * sick_score + (1-alpha) * (1- healthy_score))
+    else:
+        sick_labels = binarize_labels(sick.labels, true_label)
+        healthy_labels = binarize_labels(healthy.labels, true_label)
+        clf = DecisionTreeClassifier()
+        sick_score = cross_val_score(clf, sick.expressions, sick_labels, cv=5, scoring="f1").mean()
+        healthy_score = cross_val_score(clf, healthy.expressions, healthy_labels, cv=5, scoring="f1").mean()
     return (alpha * sick_score + (1-alpha) * (1- healthy_score))
 
-def clustering_fitness(sick, healthy, alpha=0.5):
+def clustering_fitness(sick, healthy, alpha=0.5, true_label=""):
 
     sick_silhouette_samples = (silhouette_samples(sick.expressions, sick.labels) + 1) / 2
-    sick_cluster_silhouettes = [np.mean(sick_silhouette_samples[sick.labels==label]) for label in np.unique(sick.labels)]
-
     healthy_silhouette_samples = (silhouette_samples(healthy.expressions, healthy.labels) + 1) / 2
-    healthy_cluster_silhouettes = [np.mean(healthy_silhouette_samples[healthy.labels==label]) for label in np.unique(healthy.labels)]
 
-    return (np.mean(sick_cluster_silhouettes) + 1 - np.mean(healthy_cluster_silhouettes))
-
-
-def combined_fitness(sick, healthy, alpha=0.5, beta=0.5):
-    return beta * classification_fitness(sick, healthy, alpha) + (1 - beta) * clustering_fitness(sick, healthy, alpha)
-
-
-def evaluate(sick, healthy):
-    clf = DecisionTreeClassifier()
-
-    if sick.expressions.shape[1] > 10:
-        return -10
+    if not true_label:
+        sick_cluster_silhouettes = [np.mean(sick_silhouette_samples[sick.labels==label]) for label in np.unique(sick.labels)]
+        healthy_cluster_silhouettes = [np.mean(healthy_silhouette_samples[healthy.labels==label]) for label in np.unique(healthy.labels)]
+        return (alpha * np.mean(sick_cluster_silhouettes) + (1 - alpha) * (1 - np.mean(healthy_cluster_silhouettes)))
     else:
-        sick_scores = cross_val_score(clf, sick.expressions, sick.labels, cv=5, scoring="f1_micro")
-        fitness_score = sick_scores.mean() - sick_scores.std()
+        silhoutte_sick = np.mean(sick_silhouette_samples[sick.labels==true_label+"-sick"])
+        silhoutte_healthy = np.mean(healthy_silhouette_samples[healthy.labels==true_label+"-healthy"])
+        return (alpha * silhoutte_sick + (1- alpha) * (1 - silhoutte_healthy))
 
-        healthy_scores = cross_val_score(clf, healthy.expressions, healthy.labels, cv=5, scoring="f1_micro")
-        fitness_score -= 2*healthy_scores.mean() - healthy_scores.std()
+def combined_fitness(sick, healthy, alpha=0.5, beta=0.5, true_label=""):
+    return beta * classification_fitness(sick, healthy, alpha, true_label=true_label)\
+        + (1 - beta) * clustering_fitness(sick, healthy, alpha, true_label=true_label)
 
-        #fitness_score -= np.log10(sick_data.shape[1])
-
-        return fitness_score
-
+#
+# def evaluate(sick, healthy):
+#     clf = DecisionTreeClassifier()
+#
+#     if sick.expressions.shape[1] > 10:
+#         return -10
+#     else:
+#         sick_scores = cross_val_score(clf, sick.expressions, sick.labels, cv=5, scoring="f1_micro")
+#         fitness_score = sick_scores.mean() - sick_scores.std()
+#
+#         healthy_scores = cross_val_score(clf, healthy.expressions, healthy.labels, cv=5, scoring="f1_micro")
+#         fitness_score -= 2*healthy_scores.mean() - healthy_scores.std()
+#
+#         #fitness_score -= np.log10(sick_data.shape[1])
+#
+#         return fitness_score
+#
 def distance_evaluate(sick, healthy):
     if sick.expressions.shape[1] > 10:
         return -10

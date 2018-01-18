@@ -1,7 +1,7 @@
 import numpy as np
 from validation.ClusterValidator import ClusterValidator
 from validation.ClassificationValidator import ClassificationValidator
-from utils.EA.fitness import evaluate, distance_evaluate
+from utils.EA.fitness import classification_fitness, clustering_fitness
 from utils import Expressions, binarize_labels
 from collections import defaultdict
 
@@ -15,30 +15,30 @@ class Analyzer:
     def computeFeatureValidationOneAgainstRest(self, sick, healthy, selected_genes_dict):
         results = {}
         for label, genes in selected_genes_dict.items():
-            s_labels = binarize_labels(sick.labels, label)
-            sick_binary = Expressions(sick.expressions, s_labels)
+            #s_labels = binarize_labels(sick.labels, label)
+            #sick_binary = Expressions(sick.expressions, s_labels)
 
             if healthy == "":
-                results[label] = self.computeFeatureValidation(sick_binary, "", genes)
+                results[label] = self.computeFeatureValidation(sick_binary, "", genes, true_label=label)
             else:
-                h_labels = binarize_labels(healthy.labels, label)
-                healthy_binary = Expressions(healthy.expressions, h_labels)
-                results[label] = self.computeFeatureValidation(sick_binary, healthy_binary, genes)
+                #h_labels = binarize_labels(healthy.labels, label)
+                #healthy_binary = Expressions(healthy.expressions, h_labels)
+                results[label] = self.computeFeatureValidation(sick, healthy, genes, true_label=label)
 
         return results
 
-    def computeFeatureValidation(self, sick, healthy, selected_genes):
+    def computeFeatureValidation(self, sick, healthy, selected_genes, true_label=""):
         sick_reduced = Expressions(sick.expressions[:,selected_genes], sick.labels)
-        sick = self.assembleValidationOutput(sick_reduced)
+        sick = self.assembleValidationOutput(sick_reduced, true_label=true_label)
 
         if healthy == "":
             return sick
 
         healthy_reduced = Expressions(healthy.expressions[:, selected_genes], healthy.labels)
-        healthy = self.assembleValidationOutput(healthy_reduced)
+        healthy = self.assembleValidationOutput(healthy_reduced, true_label = true_label)
 
-        classificationFitness = evaluate(sick_reduced, healthy_reduced)
-        clusteringFitness = distance_evaluate(sick_reduced, healthy_reduced)
+        classificationFitness = classification_fitness(sick_reduced, healthy_reduced, true_label=true_label)
+        clusteringFitness = clustering_fitness(sick_reduced, healthy_reduced, true_label=true_label)
 
         return {
             "sick": sick,
@@ -49,14 +49,14 @@ class Analyzer:
             }
         }
 
-    def assembleValidationOutput(self, X):
-        clusVal = ClusterValidator()
+    def assembleValidationOutput(self, X, true_label=""):
+        #clusVal = ClusterValidator()
         classVal = ClassificationValidator()
-        classification = classVal.evaluate(X, ["*"])
-        clustering = clusVal.evaluate(X, ["*"], ["*"])
-        return {"classifictation": classification, "clustering": clustering}
+        classification = classVal.evaluate(X, ["*"], true_label=true_label)
+        #clustering = clusVal.evaluate(X, ["*"], ["*"])
+        #return {"classifictation": classification, "clustering": clustering}
+        return {"classification": classification}
 
-    
     def computeExpressionMatrixOneAgainstRest(self, sick, healthy, selected_genes_dict):
         results = {}
         for label, genes in selected_genes_dict.items():
@@ -89,18 +89,18 @@ class Analyzer:
                     #print(np.mean(sick_X[:,i]), np.mean(healthy_X[:,i]))
             #print("====")
         return expressions
-
-    def computeExpressionThresholds(self, healthy, selected_genes):
-        levels = {}
-        for label in np.unique(healthy.labels):
-            levels[label[0:4]] = {}
-            for gene in selected_genes:
-                indices = np.where(healthy.labels == label)
-                reduced_data = healthy.expressions[indices,gene]
-                min_thresh = np.percentile(reduced_data, 5)
-                max_thresh = np.percentile(reduced_data, 95)
-                lower_thresh = np.percentile(reduced_data, 33)
-                upper_thresh = np.percentile(reduced_data, 66)
-                levels[label[0:4]][gene] = [min_thresh, lower_thresh, upper_thresh, max_thresh]
-
-        return levels
+    #
+    # def computeExpressionThresholds(self, healthy, selected_genes):
+    #     levels = {}
+    #     for label in np.unique(healthy.labels):
+    #         levels[label[0:4]] = {}
+    #         for gene in selected_genes:
+    #             indices = np.where(healthy.labels == label)
+    #             reduced_data = healthy.expressions[indices,gene]
+    #             min_thresh = np.percentile(reduced_data, 5)
+    #             max_thresh = np.percentile(reduced_data, 95)
+    #             lower_thresh = np.percentile(reduced_data, 33)
+    #             upper_thresh = np.percentile(reduced_data, 66)
+    #             levels[label[0:4]][gene] = [min_thresh, lower_thresh, upper_thresh, max_thresh]
+    #
+    #     return levels
