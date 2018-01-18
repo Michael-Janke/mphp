@@ -34,6 +34,12 @@ export default class AlgorithmExecution extends Component {
   }
 
   isRunnable() {
+    const algorithmSelected = typeof this.props.algorithm.key !== "undefined";
+    const cancerTypeSelected = this.props.algorithm.cancerTypes.length !== 0;
+    const tissueTypeSelected =
+      this.props.algorithm.healthyTissueTypes.length !== 0 ||
+      this.props.algorithm.sickTissueTypes.length !== 0;
+
     var oneCancerTypeRunnable = true;
     if (this.props.algorithm.cancerTypes.length === 1) {
       const current = this.props.algorithm.key;
@@ -41,10 +47,17 @@ export default class AlgorithmExecution extends Component {
         current === "getFeatures" ||
         current === "getPCA" ||
         current === "getDecisionTreeFeatures";
+      // if only one cancer type is selected, at least one healthy and one sick type are necessary
+      oneCancerTypeRunnable =
+        oneCancerTypeRunnable &&
+        this.props.algorithm.healthyTissueTypes.length !== 0 &&
+        this.props.algorithm.sickTissueTypes.length !== 0;
     }
+
     return (
-      typeof this.props.algorithm.key !== "undefined" &&
-      this.props.algorithm.cancerTypes.length !== 0 &&
+      algorithmSelected &&
+      cancerTypeSelected &&
+      tissueTypeSelected &&
       oneCancerTypeRunnable
     );
   }

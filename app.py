@@ -191,7 +191,7 @@ def runSpecificAlgorithm():
         response_data[label] = X[labels == label, :].T.tolist()
 
     # evaluation
-    if len(cancer_types) == 1:
+    if len(cancer_types) == 1 or len(sick_tissue_types) == 0 or len(healthy_tissue_types) == 0:
         evaluation = analyzer.computeFeatureValidation(data, "", gene_indices)
     else:
         evaluation = analyzer.computeFeatureValidation(
