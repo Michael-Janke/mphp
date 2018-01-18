@@ -12,8 +12,10 @@ export default class Results extends Component {
       <div>
         {!result.isError ? (
           <StyledContent>
-            <Plot {...result} />
-            <Evaluation {...result.evaluation} />
+            <Columns>
+              <Plot {...result} />
+              <Evaluation {...result.evaluation} />
+            </Columns>
             <GeneExploration {...result} />
           </StyledContent>
         ) : (
@@ -26,4 +28,10 @@ export default class Results extends Component {
 
 const StyledContent = styled.div`
   margin: 16px;
+`;
+
+const Columns = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 `;
