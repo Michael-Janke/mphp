@@ -19,7 +19,7 @@ class Analyzer:
             #sick_binary = Expressions(sick.expressions, s_labels)
 
             if healthy == "":
-                results[label] = self.computeFeatureValidation(sick_binary, "", genes, true_label=label)
+                results[label] = self.computeFeatureValidation(sick, "", genes, true_label=label)
             else:
                 #h_labels = binarize_labels(healthy.labels, label)
                 #healthy_binary = Expressions(healthy.expressions, h_labels)
@@ -52,10 +52,8 @@ class Analyzer:
         }
 
     def assembleValidationOutput(self, X, selected_genes, true_label=""):
-        #clusVal = ClusterValidator()
         classVal = ClassificationValidator()
         classification = classVal.evaluate(X, selected_genes, ["*"])
-        #clustering = clusVal.evaluate(X, selected_genes, ["*"], ["*"])
         return {"classification": classification}
 
 

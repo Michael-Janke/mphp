@@ -27,7 +27,7 @@ class ClassificationValidator():
         }
 
     @ignore_warnings
-    def evaluate(self, data, classifier, true_label=""):
+    def evaluate(self, data, genes, classifier, true_label=""):
         result = {}
 
         if "*" in classifier:
@@ -37,17 +37,23 @@ class ClassificationValidator():
                 continue
             clf = self.classifier_table[c]()
 
-            scoring = {
-                'precision': make_scorer(precision_score, average='macro'),
-                'recall': make_scorer(recall_score, average='macro'),
-                'f1': make_scorer(f1_score, average='macro'),
-            }
             labels = None
             if not true_label:
                 le = LabelEncoder()
                 labels = le.fit_transform(data.labels)
+                scoring = {
+                    'precision': make_scorer(precision_score, average='macro'),
+                    'recall': make_scorer(recall_score, average='macro'),
+                    'f1': make_scorer(f1_score, average='macro'),
+                }
             else:
                 labels = binarize_labels(data.labels, true_label)
+                scoring = {
+                    'precision': make_scorer(precision_score, average='binary'),
+                    'recall': make_scorer(recall_score, average='binary'),
+                    'f1': make_scorer(f1_score, average='binary'),
+                }
+            
             scores = cross_validate(clf, data.expressions[:,genes], labels, cv=5, scoring=scoring, return_train_score=False)
             score_dict = {
                 'precision': {

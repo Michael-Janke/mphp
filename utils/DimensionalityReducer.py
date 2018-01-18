@@ -136,7 +136,7 @@ class DimensionalityReducer:
         # first gene has highest score and will be selected first
         indices = [genes[0]]
         # iteratively join the best next feature based on a fitness function until k features are found
-        for idx in range(1,k):
+        for idx in range(k-1):
             best_fitness = -10
             best_gene = 0
             for i in range(1, len(genes)):
