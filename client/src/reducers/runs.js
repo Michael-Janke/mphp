@@ -4,7 +4,8 @@ import { isHealthy } from "../utils";
 const emptyRun = {
   algorithm: { cancerTypes: [], healthyTissueTypes: [], sickTissueTypes: [] },
   isLoading: false,
-  result: null
+  result: null,
+  geneResults: null
 };
 
 const initialState = {
@@ -35,6 +36,11 @@ export function runs(state = initialState, action = {}) {
       return updateRun(state, action, {
         isLoading: false,
         result: action.result
+      });
+    case types.GENE_RESULTS:
+      return updateRun(state, action, {
+        isLoading: false,
+        geneResults: action.result
       });
     default:
       return state;

@@ -1,7 +1,16 @@
 import json
 import numpy as np
 import base64
+import urllib
+import xml.etree.ElementTree as ET
+import rdflib
+import os.path
+import pandas as pd
+import re
 
+from SPARQLWrapper import SPARQLWrapper, JSON
+from pprint import pprint
+from xml.dom.minidom import parse, parseString
 from flask import Flask, request
 from flask_cors import CORS
 from utils.DataLoader import DataLoader
@@ -22,6 +31,119 @@ analyzer = Analyzer()
 def hello_world():
     return 'Hello World!'
 
+@app.route('/testGenes', methods=["POST"])
+def testGene():
+    data = request.get_json()["genes"]
+    genes = data["genes"]
+    response = {}
+
+    # cancer gene census
+    csv_file = 'data/cancer_gene_census.csv'
+    cancer_gene_census_data = pd.read_csv(csv_file)
+    census_data_genes = cancer_gene_census_data['Synonyms'].tolist()
+    for gene in genes:
+
+        #DisGeNet
+        disgenet = False
+        entrez_file = "data/gene_names/entrez_names.npy"
+        entrez_labels_map = np.load(entrez_file).item()
+        gene_url = '<http://identifiers.org/ncbigene/' + entrez_labels_map[int(gene[4:])] + '>'
+        file_name = 'data/disgenet/'+ gene +'.json'
+        results = None
+        try:
+            if not os.path.isfile(file_name):
+                sparql = SPARQLWrapper('http://rdf.disgenet.org/sparql/')
+                sparql.setQuery("""
+                SELECT DISTINCT
+                    ?gda
+                    %s as ?gene
+                    ?score
+                    ?disease
+                    ?diseaselabel
+                    ?diseasename
+                    ?semanticType
+                WHERE {
+                    ?gda sio:SIO_000628 %s, ?disease ;
+                        sio:SIO_000253 ?source ;
+                        sio:SIO_000216 ?scoreIRI .
+                    ?disease sio:SIO_000008 ?semanticType .
+                    ?disease a ncit:C7057 .
+                    ?scoreIRI sio:SIO_000300 ?score .
+                    FILTER regex(?source, "UNIPROT|CTD_human")
+                    FILTER (?score >= 0.2)
+                    ?disease dcterms:title ?diseasename .
+                    ?disease rdfs:label ?diseaselabel
+                }
+                ORDER BY DESC(?score)
+                """ % (gene_url, gene_url))
+                sparql.setReturnFormat(JSON)
+                results = sparql.query().convert()
+                if not os.path.exists(os.path.dirname(file_name)):
+                    os.makedirs(os.path.dirname(file_name))
+                with open(file_name, 'w') as outfile:
+                    json.dump(results, outfile)
+
+            f = open(file_name, 'r')
+            results = json.load(f)
+            f.close()
+        except:
+            print("Error getting / reading disgenet file")
+
+        if results is not None:
+
+            # scan the file for a T191 --> cancer.
+            json_data = results
+            def search(key, var):
+                if hasattr(var,'items'):
+                    for k, v in var.items():
+                        if k == key:
+                            yield v
+                        if isinstance(v, dict):
+                            for result in search(key, v):
+                                yield result
+                        elif isinstance(v, list):
+                            for d in v:
+                                for result in search(key, d):
+                                    yield result
+
+            semantic_types = search('semanticType',json_data)
+            for semantic_type in semantic_types:
+                for k,v in semantic_type.items():
+                    if k == 'value':
+                        if 'T191' in v:
+                            disgenet = True
+        #proteinAtlas
+        proteinAtlas = False
+        try:
+            url = 'https://www.proteinatlas.org/'+ gene +'.xml'
+            file_name = 'data/proteinatlas/'+ gene +'.xml'
+            if not os.path.isfile(file_name):
+                urllib.request.urlretrieve(url, file_name)
+
+            f = open(file_name, 'r')
+            xml = f.read()
+            f.close()
+            dom = parseString(xml)
+            proteinClass = dom.getElementsByTagName('proteinClass')
+            for c in proteinClass:
+                if c.attributes['name'].value == "Cancer-related genes":
+                    proteinAtlas = True
+        except:
+            print("Error accessing proteinatlas for gene: " + gene)
+
+        cancer_gene_census = False
+        for gene_synonyms in census_data_genes:
+            # filter out NaN values
+            if gene_synonyms == gene_synonyms:
+                if gene in gene_synonyms:
+                    cancer_gene_census = True
+
+        if cancer_gene_census:
+            print("Found one!")
+
+        response[gene] = {'proteinAtlas': proteinAtlas, 'disgenet': disgenet, 'cancer_gene_census': cancer_gene_census}
+
+    return json.dumps(response)
 
 @app.route("/algorithms", methods=["GET"])
 def algorithms():
@@ -131,70 +253,84 @@ def runSpecificAlgorithm():
     #
     # }
     key = algorithm["key"]
+    cancer_types = algorithm["cancerTypes"]
+    sick_tissue_types = algorithm["sickTissueTypes"]
+    healthy_tissue_types = algorithm["healthyTissueTypes"]
+    n_components = algorithm["parameters"].get("n_components")
+    n_f_components = algorithm["parameters"].get("n_features_per_component")
+    k = algorithm["parameters"].get("k")
+    n = algorithm["parameters"].get("n")
 
-    sick = dataLoader.getData(
-        algorithm["sickTissueTypes"], algorithm["cancerTypes"])
+    sick = dataLoader.getData(sick_tissue_types, cancer_types)
     sick = dataLoader.replaceLabels(sick)
-    healthy = dataLoader.getData(
-        algorithm["healthyTissueTypes"], algorithm["cancerTypes"])
+
+    healthy = dataLoader.getData(healthy_tissue_types, cancer_types)
     healthy = dataLoader.replaceLabels(healthy)
+
     data = dataLoader.getData(
-        algorithm["healthyTissueTypes"] + algorithm["sickTissueTypes"], algorithm["cancerTypes"])
+        sick_tissue_types + healthy_tissue_types, cancer_types)
     data = dataLoader.replaceLabels(data)
 
-    calcExpressionMatrix = False
-
+    calc_expression_matrix = False
     if key == "getPCA":
-        _, X, gene_indices = dimReducer.getPCA(
-            data.expressions, algorithm["parameters"]["n_components"], algorithm["parameters"]["n_features_per_component"])
-    elif key == "getDecisionTreeFeatures":
-        gene_indices, X = dimReducer.getDecisionTreeFeatures(
-            data, algorithm["parameters"]["k"])
-    elif key == "getNormalizedFeaturesE":
-        gene_indices, X, Y = dimReducer.getNormalizedFeaturesE(
-            sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"], "chi2")
-        sick_response = X
-        X = np.vstack((X, Y))
-        calcExpressionMatrix = True
-    elif key == "getNormalizedFeaturesS":
-        gene_indices, X, Y = dimReducer.getNormalizedFeaturesS(
-            sick, healthy, algorithm["parameters"]["k"], algorithm["parameters"]["n"], "chi2")
-        sick_response = X
-        X = np.vstack((X, Y))
-        calcExpressionMatrix = True
-    elif key == "getFeatures":
-        gene_indices, X = dimReducer.getFeatures(
-            data, algorithm["parameters"]["k"])
-    elif key == "getFeaturesBySFS":
-        gene_indices, X, Y = dimReducer.getFeaturesBySFS(
-            sick, healthy)
-        sick_response = X
-        X = np.vstack((X, Y))
-        calcExpressionMatrix = True
+        gene_indices = dimReducer.getPCA(
+            data.expressions, n_components, n_f_components)
 
-    responseData = {}
-    for label in np.unique(data.labels):
-        responseData[label] = X[data.labels == label, :].T.tolist()
+    elif key == "getFeatures":
+        gene_indices = dimReducer.getFeatures(data, k)
+
+    elif key == "getDecisionTreeFeatures":
+        gene_indices = dimReducer.getDecisionTreeFeatures(data, k)
+
+    elif key == "getNormalizedFeaturesE":
+        gene_indices = dimReducer.getNormalizedFeaturesE(
+            sick, healthy, k, n, "chi2")
+        calc_expression_matrix = True
+
+    elif key == "getNormalizedFeaturesS":
+        gene_indices = dimReducer.getNormalizedFeaturesS(
+            sick, healthy, k, n, "chi2")
+        calc_expression_matrix = True
+
+    elif key == "getFeaturesBySFS":
+        gene_indices = dimReducer.getFeaturesBySFS(sick, healthy)
+        calc_expression_matrix = True
+
+    X = data.expressions[:, gene_indices]
+    labels = data.labels
 
     # calculate expression matrix
-    expressionMatrix = None
-    if calcExpressionMatrix:
-        sick_reduced = Expressions(sick_response, sick.labels)
-        healthy_reduced = Expressions(Y, healthy.labels)
-        expressionMatrix = analyzer.computeExpressionMatrix(
-            sick_reduced, healthy_reduced, gene_indices)
+    expression_matrix = None
+    if calc_expression_matrix:
+        X = np.vstack(
+            (sick.expressions[:, gene_indices], healthy.expressions[:, gene_indices]))
+        labels = np.hstack((sick.labels, healthy.labels))
+        expression_matrix = analyzer.computeExpressionMatrix(
+            sick, healthy, gene_indices)
+
+    response_data = {}
+    for label in np.unique(labels):
+        response_data[label] = X[labels == label, :].T.tolist()
 
     # evaluation
-    evaluation = analyzer.computeFeatureValidation(sick, healthy, gene_indices)
+    if len(cancer_types) == 1 or len(sick_tissue_types) == 0 or len(healthy_tissue_types) == 0:
+        evaluation = analyzer.computeFeatureValidation(data, "", gene_indices)
+    else:
+        evaluation = analyzer.computeFeatureValidation(
+            sick, healthy, gene_indices)
 
     response = {
-        'data': responseData,
+        'data': response_data,
         'genes': gene_labels[gene_indices].tolist(),
-        'expressionMatrix': expressionMatrix,
+        'expressionMatrix': expression_matrix,
         'geneNames': gene_names[gene_indices].tolist(),
         'evaluation': evaluation,
     }
-    return json.dumps(response)
+
+    # workaround to replace NaN by null
+    jsonResponse = json.dumps(response)
+    regex = re.compile(r'\bNaN\b')
+    return re.sub(regex, 'null', jsonResponse)
 
 
 @app.route('/statistics', methods=["GET"])
