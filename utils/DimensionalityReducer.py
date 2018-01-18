@@ -111,18 +111,32 @@ class DimensionalityReducer:
 
         return indices
 
-    def getFeaturesBySFS(self, sick, healthy, k=3, n=5000, m=100, normalization="exclude", fitness="combined"):
+    def getFeaturesBySFS(self, sick, healthy, k=3, n=5000, m=100, normalization="exclude", fitness="combined", returnMultipleSets = False):
         # preselect 100 genes in sick data which do not separate healthy data well
         selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
 
+        bestSet = self.getFeatureSetBySFS(sick, healthy, selected_genes, k, fitness)
+
+        if not returnMultipleSets:
+            return bestSet
+
+        sets = [bestSet]
+        for i in range(2):
+            print("finished feature set")
+            selected_genes = selected_genes[1:]
+            sets.append(self.getFeatureSetBySFS(sick, healthy, selected_genes, k, fitness))
+
+        return sets
+
+    def getFeatureSetBySFS(self, sick, healthy, genes, k, fitness):
         # first gene has highest score and will be selected first
-        indices = [selected_genes[0]]
+        indices = [genes[0]]
         # iteratively join the best next feature based on a fitness function until k features are found
         for idx in range(1,k):
             best_fitness = -10
             best_gene = 0
-            for i in range(1,m):
-                gene = selected_genes[i]
+            for i in range(1, len(genes)):
+                gene = genes[i]
 
                 fitness_function = fitness_module.get_fitness_function_name(fitness)
                 fitness_score = getattr(fitness_module, fitness_function)(sick, healthy, indices + [gene])
@@ -134,7 +148,6 @@ class DimensionalityReducer:
             print("added new feature")
 
         return indices
-
 
     ####### EMBEDDED FEATURE SELECTION #######
 
@@ -155,7 +168,10 @@ class DimensionalityReducer:
             sick_binary = Expressions(sick.expressions, s_labels)
 
             if healhty == "":
-                indices = self.getFeatures(sick_binary, k)
+                if method == "tree":
+                    indices = self.getDecisionTreeFeatures(sick_binary, k)
+                else:
+                    indices = self.getFeatures(sick_binary, k)
 
             else:
                 h_labels = binarize_labels(healhty.labels, label)

@@ -56,3 +56,7 @@ plotScatter(healthy, selected_genes, gene_labels)
 
 # %%
 pprint(analyzer.computeFeatureValidation(sick, healthy, selected_genes)["fitness"])
+
+# %%
+selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3, fitness="classification", returnMultipleSets = True)
+pprint(selected_genes)
