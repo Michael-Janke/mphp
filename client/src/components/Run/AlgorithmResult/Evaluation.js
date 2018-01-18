@@ -3,67 +3,107 @@ import { List } from "material-ui/List";
 import EvaluationValue from "./EvaluationValue";
 
 export default class Evaluation extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { openScore: null };
+  }
+
   render() {
     const { fitness, sick, healthy } = this.props;
     const hasHealthy = fitness && sick && healthy;
     return hasHealthy ? (
       <List>
-        {this.renderFitnessScore()}
-        {this.renderScores(sick, " of sick data")}
-        {this.renderScores(healthy, " of heahlthy data")}
+        {this.renderFitnessScore(0)}
+        {this.renderSickScore(1)}
+        {this.renderHealthyScore(2)}
       </List>
     ) : (
       <List>{this.renderScores(this.props)}</List>
     );
   }
 
-  renderFitnessScore() {
+  renderFitnessScore(index) {
     const {
       combinedFitness,
       clusteringFitness,
       classificationFitness
     } = this.props.fitness;
+
+    const parameters = {
+      primaryText: combinedFitness,
+      secondaryText: "Fitness",
+      nestedItems: [
+        {
+          key: "classification-fitness",
+          primaryText: classificationFitness,
+          secondaryText: "Classification fitness"
+        },
+        {
+          key: "clustering-fitness",
+          primaryText: clusteringFitness,
+          secondaryText: "Clustering fitness"
+        }
+      ],
+      index
+    };
+
+    return this.renderScore(parameters);
+  }
+
+  renderSickScore(index) {
+    const scores = this.props.sick.classification.decisionTree;
+    const parameters = {
+      ...this.classificationScoreParameters(scores, "for sick"),
+      index
+    };
+    return this.renderScore(parameters);
+  }
+
+  renderHealthyScore(index) {
+    const scores = this.props.healthy.classification.decisionTree;
+    const parameters = {
+      ...this.classificationScoreParameters(scores, "for healthy"),
+      index
+    };
+    return this.renderScore(parameters);
+  }
+
+  classificationScoreParameters(scores, postfix = "") {
+    return {
+      primaryText: scores.f1.mean,
+      secondaryText: `F1 score ${postfix}`,
+      nestedItems: [
+        {
+          key: "precision",
+          primaryText: scores.precision.mean,
+          secondaryText: "Precision"
+        },
+        {
+          key: "recall",
+          primaryText: scores.recall.mean,
+          secondaryText: "Recall"
+        }
+      ]
+    };
+  }
+
+  renderScore(parameters) {
+    const { index, primaryText, secondaryText, nestedItems } = parameters;
     return (
       <EvaluationValue
-        primaryText={combinedFitness}
-        secondaryText="Fitness"
-        nestedItems={[
-          <EvaluationValue
-            key="classification-fitness"
-            primaryText={classificationFitness}
-            secondaryText="Classification fitness"
-          />,
-          <EvaluationValue
-            key="clustering-fitness"
-            primaryText={clusteringFitness}
-            secondaryText="Clustering fitness"
-          />
-        ]}
+        open={this.state.openScore === index}
+        primaryText={primaryText}
+        secondaryText={secondaryText}
+        onNestedListToggle={() => this.toggleOpenScore(index)}
+        nestedItems={nestedItems.map(nestedItem => (
+          <EvaluationValue {...nestedItem} />
+        ))}
       />
     );
   }
 
-  renderScores({ classification, clustering }, secondaryTextPostfix = "") {
-    const { f1, precision, recall } = classification.decisionTree;
-    return (
-      <div>
-        <EvaluationValue
-          primaryText={f1.mean}
-          secondaryText={`F1 score${secondaryTextPostfix}`}
-          nestedItems={[
-            <EvaluationValue
-              key="precision"
-              primaryText={precision.mean}
-              secondaryText="Precision"
-            />,
-            <EvaluationValue
-              key="recall"
-              primaryText={recall.mean}
-              secondaryText="Recall"
-            />
-          ]}
-        />
-      </div>
-    );
+  toggleOpenScore(index) {
+    const openScore = this.state.openScore === index ? null : index;
+    this.setState({ openScore });
   }
 }

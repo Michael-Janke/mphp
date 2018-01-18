@@ -65,9 +65,9 @@ def combined_fitness(sick, healthy, genes, alpha=0.5, beta=0.5, true_label=""):
         + (1 - beta) * clustering_fitness(sick, healthy, genes, alpha, true_label=true_label)
 
 
-def distance_fitness(sick, healthy, genes):
-    sick_intra_distance, sick_inner_distance = compute_cluster_distance(sick, genes)
-    healthy_intra_distance, healthy_inner_distance = compute_cluster_distance(healthy, genes)
+def distance_fitness(sick, healthy, genes, true_label=""):
+    sick_intra_distance, sick_inner_distance = compute_cluster_distance(sick, genes, true_label)
+    healthy_intra_distance, healthy_inner_distance = compute_cluster_distance(healthy, genes, true_label)
 
     fitness_sick = 5*sick_intra_distance - sick_inner_distance
     fitness_healthy = 5*healthy_intra_distance + healthy_inner_distance
@@ -75,7 +75,7 @@ def distance_fitness(sick, healthy, genes):
     return fitness
 
 
-def compute_cluster_distance(data, genes):
+def compute_cluster_distance(data, genes, true_label=""):
     normalized_data = data.expressions[:,genes] / np.max(data.expressions[:,genes], axis=0)
 
     centers = []
@@ -88,10 +88,14 @@ def compute_cluster_distance(data, genes):
 
     unique_labels = np.unique(data.labels).T
     dist = 0
-    for index, label in enumerate(unique_labels):
-        unique_labels = np.delete(unique_labels, 0)
-        for _ in unique_labels:
-            dist += np.linalg.norm(centers[index][0] - centers[index+1][0])
+    for i in range(len(unique_labels)-1):
+        for j in range(i+1, len(unique_labels)-1):
+            if true_label in unique_labels[i] or true_label in unique_labels[j] or not true_label:
+                dist += np.linalg.norm(centers[i][0] - centers[j][0])
+    # for index, label in enumerate(unique_labels):
+    #     unique_labels = np.delete(unique_labels, 0)
+    #     for _ in unique_labels:
+    #         dist += np.linalg.norm(centers[index][0] - centers[index+1][0])
 
     number_types = np.unique(data.labels).shape[0]
     deviation = np.sum(deviations)/number_types

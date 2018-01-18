@@ -38,7 +38,7 @@ class Analyzer:
         class_fitness = classification_fitness(sick, healthy, selected_genes, true_label=true_label)
         clus_fitness = clustering_fitness(sick, healthy, selected_genes, true_label=true_label)
         comb_fitness = combined_fitness(sick, healthy, selected_genes, true_label=true_label)
-        dist_fitness = distance_fitness(sick, healthy, selected_genes)
+        dist_fitness = distance_fitness(sick, healthy, selected_genes, true_label=true)
 
         return {
             "sick": sick_validation,
@@ -53,7 +53,7 @@ class Analyzer:
 
     def assembleValidationOutput(self, X, selected_genes, true_label=""):
         classVal = ClassificationValidator()
-        classification = classVal.evaluate(X, selected_genes, ["*"])
+        classification = classVal.evaluate(X, selected_genes, ["*"], true_label=true_label)
         return {"classification": classification}
 
 
