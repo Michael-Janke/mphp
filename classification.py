@@ -14,8 +14,6 @@ from validation.ClassificationValidator import ClassificationValidator
 
 print("Imported modules")
 
-#%%
-
 dataLoader = DataLoader("dataset4")
 dimReducer = DimensionalityReducer()
 analyzer = Analyzer()
@@ -34,8 +32,8 @@ print("got combined data")
 features = dimReducer.getOneAgainstRestFeatures(sick,healthy)
 pprint(features)
 
-#results = analyzer.computeFeatureValidationOneAgainstRest(sick, healthy, features)
-#pprint(results)
+results = analyzer.computeFeatureValidationOneAgainstRest(sick, healthy, features)
+pprint(results)
 
 expressions = analyzer.computeExpressionMatrixOneAgainstRest(sick, healthy, features)
 pprint(expressions)
@@ -43,24 +41,22 @@ pprint(expressions)
 
 # %%
 # Feature Selection
-#selected_genes, sick_X, healthy_X = dimReducer.getEAFeatures(sick,healthy)
-selected_genes, sick_X, healthy_X = dimReducer.getFeaturesBySFS(sick,healthy,3)
+#selected_genes = dimReducer.getEAFeatures(sick,healthy,fitness="clustering")
+selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3, fitness="classification")
 print(selected_genes)
 
-
-sick_reduced = Expressions(sick_X, sick.labels)
-healthy_reduced = Expressions(healthy_X, healthy.labels)
-
-#pprint(clusVal.evaluate(sick_reduced, ["*"], ["*"]))
-
-#print("\n\nSICK COMPLETE")
-#pprint(classVal.evaluate(sick, ["LogisticRegression"]))
-#print("\n################")
-
 print("SICK REDUCED")
-pprint(classVal.evaluate(sick_reduced, ["DecisionTree"]))
-plotScatter(sick_X, sick.labels, gene_labels[selected_genes])
+pprint(classVal.evaluate(sick, selected_genes, ["DecisionTree"]))
+plotScatter(sick, selected_genes, gene_labels)
 
 print("HEALTHY REDUCED")
-pprint(classVal.evaluate(healthy_reduced, ["DecisionTree"]))
-plotScatter(healthy_X,healthy.labels, gene_labels[selected_genes])
+pprint(classVal.evaluate(healthy, selected_genes, ["DecisionTree"]))
+plotScatter(healthy, selected_genes, gene_labels)
+
+# %%
+pprint(analyzer.computeFeatureValidation(sick, healthy, selected_genes)["fitness"])
+
+# %%
+#selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3, fitness="classification", returnMultipleSets = True)
+selected_genes = dimReducer.getEAFeatures(sick, healthy, fitness="distance", returnMultipleSets = True)
+pprint(selected_genes)

@@ -48,7 +48,7 @@ class ClassificationValidator():
                 labels = le.fit_transform(data.labels)
             else:
                 labels = binarize_labels(data.labels, true_label)
-            scores = cross_validate(clf, data.expressions, labels, cv=5, scoring=scoring, return_train_score=False)
+            scores = cross_validate(clf, data.expressions[:,genes], labels, cv=5, scoring=scoring, return_train_score=False)
             score_dict = {
                 'precision': {
                     'mean': scores['test_precision'].mean(),
