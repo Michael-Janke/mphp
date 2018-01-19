@@ -26,7 +26,6 @@ export default class Card extends Component {
 
   renderBody() {
     const { isError, isLoading, result } = this.props;
-    if (isLoading) return null;
     if (isError) {
       return (
         <StyledError>Sorry, there was an error fetching the data.</StyledError>
@@ -34,7 +33,10 @@ export default class Card extends Component {
     }
     return (
       <div>
-        <AlgorithmExecution {...this.props} disabled={result != null} />
+        <AlgorithmExecution
+          {...this.props}
+          disabled={isLoading || result !== null}
+        />
         {result != null ? <AlgorithmResult {...this.props} /> : null}
       </div>
     );
