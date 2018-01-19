@@ -1,48 +1,48 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { loadStatistics, loadAlgorithms } from "../actions/contextActions";
+import { loadContext } from "../actions/contextActions";
 import { runAlgorithm, updateAlgorithm } from "../actions/runActions";
+import Spinner from "./Spinner"
 
 import Run from "./Run";
 
 class Content extends Component {
   constructor(props) {
     super(props);
-    const { algorithms, statistics } = this.props.context;
-    if (algorithms === null) {
-      this.props.loadAlgorithms();
-    }
-    if (statistics === null) {
-      this.props.loadStatistics();
+    const context = this.props.context;
+    if (context === null) {
+      this.props.loadContext();
     }
   }
 
   render() {
-    const { runs, context, runAlgorithm, updateAlgorithm } = this.props;
-    const { algorithms, statistics } = context;
+    const { runs, context, runAlgorithm, updateAlgorithm, dataset } = this.props;
+    const { isError, datasets, statistics, algorithms } = context || {};
     return (
       <div className="content">
-        {Object.keys(runs)
-          .reverse()
-          .map(runId => {
-            const { algorithm, result, isLoading } = runs[runId];
-            return (
-              <Run
-                key={runId}
-                isLoading={!algorithms || !statistics || isLoading}
-                isError={
-                  (statistics && statistics.isError) ||
-                  (algorithms && algorithms.isError)
-                }
-                runId={runId}
-                algorithm={algorithm}
-                result={result}
-                runAlgorithm={runAlgorithm}
-                updateAlgorithm={updateAlgorithm}
-                {...context}
-              />
-            );
-          })}
+        {dataset && datasets ? 
+          Object.keys(runs)
+            .reverse()
+            .map(runId => {
+              const { algorithm, result, isLoading } = runs[runId];
+              return (
+                <Run
+                  key={runId}
+                  isLoading={!algorithms || !statistics || isLoading}
+                  isError={isError}
+                  runId={runId}
+                  algorithm={algorithm}
+                  result={result}
+                  runAlgorithm={runAlgorithm}
+                  updateAlgorithm={updateAlgorithm}
+                  algorithms={algorithms}
+                  dataset={dataset}
+                  {...statistics[dataset]}
+                />
+              );
+            }) : 
+            <Spinner />
+        }
       </div>
     );
   }
@@ -51,17 +51,15 @@ class Content extends Component {
 const mapStateToProps = state => {
   return {
     runs: state.runs,
-    context: state.context
+    context: state.context,
+    dataset: state.experiment.dataset
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    loadAlgorithms: () => {
-      dispatch(loadAlgorithms());
-    },
-    loadStatistics: () => {
-      dispatch(loadStatistics());
+    loadContext: () => {
+      dispatch(loadContext());
     },
     runAlgorithm: (runId, params) => {
       dispatch(runAlgorithm(runId, params));
