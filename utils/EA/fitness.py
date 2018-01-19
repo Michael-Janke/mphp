@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, cross_validate
 from sklearn.metrics import silhouette_samples
 from utils import ignore_warnings, binarize_labels
 
@@ -34,15 +34,20 @@ def classification_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
     healthy_expressions = healthy.expressions[:,genes]
     if not true_label:
         clf = DecisionTreeClassifier()
-        sick_score = cross_val_score(clf, sick_expressions, sick.labels, cv=5, scoring="f1_macro").mean()
-        healthy_score = cross_val_score(clf, healthy_expressions, healthy.labels, cv=5, scoring="f1_macro").mean()
+        sick_score = cross_validate(clf, sick_expressions, sick.labels, cv=5, scoring="f1_macro", return_train_score=False)["test_score"].mean()
+        healthy_score = cross_validate(clf, healthy_expressions, healthy.labels, cv=5, scoring="f1_macro", return_train_score=False)["test_score"].mean()
+        #sick_score = cross_val_score(clf, sick_expressions, sick.labels, cv=5, scoring="f1_macro").mean()
+        #healthy_score = cross_val_score(clf, healthy_expressions, healthy.labels, cv=5, scoring="f1_macro").mean()
         return (alpha * sick_score + (1-alpha) * (1- healthy_score))
     else:
         sick_labels = binarize_labels(sick.labels, true_label)
         healthy_labels = binarize_labels(healthy.labels, true_label)
         clf = DecisionTreeClassifier()
-        sick_score = cross_val_score(clf, sick_expressions, sick_labels, cv=5, scoring="f1").mean()
-        healthy_score = cross_val_score(clf, healthy_expressions, healthy_labels, cv=5, scoring="f1").mean()
+        sick_score = cross_validate(clf, sick_expressions, sick_labels, cv=5, scoring="f1", return_train_score=False)["test_score"].mean()
+        sick_score = cross_validate(clf, healthy_expressions, healthy_labels, cv=5, scoring="f1", return_train_score=False)["test_score"].mean()
+
+        #sick_score = cross_val_score(clf, sick_expressions, sick_labels, cv=5, scoring="f1").mean()
+        #healthy_score = cross_val_score(clf, healthy_expressions, healthy_labels, cv=5, scoring="f1").mean()
     return (alpha * sick_score + (1-alpha) * (1- healthy_score))
 
 def clustering_fitness(sick, healthy, genes, alpha=0.5, true_label=""):

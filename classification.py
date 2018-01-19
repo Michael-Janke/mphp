@@ -41,8 +41,8 @@ pprint(expressions)
 
 # %%
 # Feature Selection
-#selected_genes = dimReducer.getEAFeatures(sick,healthy,fitness="clustering")
-selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3, fitness="classification")
+selected_genes = dimReducer.getEAFeatures(sick,healthy,fitness="clustering")
+#selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3, fitness="classification")
 print(selected_genes)
 
 print("SICK REDUCED")
