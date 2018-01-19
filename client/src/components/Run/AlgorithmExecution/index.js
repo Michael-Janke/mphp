@@ -34,36 +34,76 @@ export default class AlgorithmExecution extends Component {
   }
 
   isRunnable() {
-    const algorithmSelected = typeof this.props.algorithm.key !== "undefined";
-    const cancerTypeSelected = this.props.algorithm.cancerTypes.length !== 0;
+    const { algorithm, counts } = this.props;
+
+    const algorithmSelected = typeof algorithm.key !== "undefined";
+    const cancerTypeSelected = algorithm.cancerTypes.length !== 0;
     const tissueTypeSelected =
-      this.props.algorithm.healthyTissueTypes.length !== 0 ||
-      this.props.algorithm.sickTissueTypes.length !== 0;
+      algorithm.healthyTissueTypes.length !== 0 ||
+      algorithm.sickTissueTypes.length !== 0;
+
+    var enoughSamples = true;
+    // test if there are more than 20 healthy samples for each cancer type (but only if healthy types are selected)
+    if (algorithm.healthyTissueTypes.length !== 0) {
+      algorithm.cancerTypes.forEach(cancerType => {
+        var sum = 0;
+        algorithm.healthyTissueTypes.forEach(tissueType => {
+          sum += counts[cancerType][tissueType];
+        });
+        if (sum < 20) {
+          enoughSamples = false;
+        }
+      });
+    }
+    // test if there are more than 20 sick samples for each cancer type (but only if sick types are selected)
+    if (algorithm.sickTissueTypes.length !== 0) {
+      algorithm.cancerTypes.forEach(cancerType => {
+        var sum = 0;
+        algorithm.sickTissueTypes.forEach(tissueType => {
+          sum += counts[cancerType][tissueType];
+        });
+        if (sum < 20) {
+          enoughSamples = false;
+        }
+      });
+    }
 
     var oneCancerTypeRunnable = true;
-    if (this.props.algorithm.cancerTypes.length === 1) {
-      const current = this.props.algorithm.key;
+    // if only one cancer type is selected, only some algorithms are allowed and
+    // at least 20 healthy samples and 20 sick samples are necessary
+    if (algorithm.cancerTypes.length === 1) {
+      const currentAlgorithm = algorithm.key;
+      const currentCancerType = algorithm.cancerTypes[0];
+      var sumHealthy = 0;
+      algorithm.healthyTissueTypes.forEach(x => {
+        sumHealthy += counts[currentCancerType][x];
+      });
+      var sumSick = 0;
+      algorithm.sickTissueTypes.forEach(x => {
+        sumSick += counts[currentCancerType][x];
+      });
       oneCancerTypeRunnable =
-        current === "getFeatures" ||
-        current === "getPCA" ||
-        current === "getDecisionTreeFeatures";
-      // if only one cancer type is selected, at least one healthy and one sick type are necessary
-      oneCancerTypeRunnable =
-        oneCancerTypeRunnable &&
-        this.props.algorithm.healthyTissueTypes.length !== 0 &&
-        this.props.algorithm.sickTissueTypes.length !== 0;
+        (currentAlgorithm === "getFeatures" ||
+          currentAlgorithm === "getPCA" ||
+          currentAlgorithm === "getDecisionTreeFeatures") &&
+        sumHealthy >= 20 &&
+        sumSick >= 20;
     }
 
     return (
       algorithmSelected &&
       cancerTypeSelected &&
       tissueTypeSelected &&
+      enoughSamples &&
       oneCancerTypeRunnable
     );
   }
 
   executeAlgorithm() {
-    this.props.runAlgorithm(this.props.runId, {...this.props.algorithm, dataset: this.props.dataset});
+    this.props.runAlgorithm(this.props.runId, {
+      ...this.props.algorithm,
+      dataset: this.props.dataset
+    });
   }
 }
 
