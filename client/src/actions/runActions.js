@@ -9,20 +9,28 @@ export function createRun({ tcgaTokens, tissueTypes }) {
   };
 }
 
-export function updateAlgorithm(id, algorithm) {
+export function updateRun(id, updates) {
   return dispatch => {
-    dispatch({ type: types.UPDATE_ALGORITHM, id, algorithm });
+    dispatch({ type: types.UPDATE_RUN, id, updates});
+  };
+}
+
+export function deleteRun(id) {
+  return dispatch => {
+    dispatch({ type: types.DELETE_RUN, id});
   };
 }
 
 export function toggleTcgaToken(id, algorithm, tcgaToken) {
   return dispatch => {
     dispatch({
-      type: types.UPDATE_ALGORITHM,
+      type: types.UPDATE_RUN,
       id,
-      algorithm: {
-        ...algorithm,
-        cancerTypes: arrayToggle(algorithm.cancerTypes, tcgaToken)
+      updates: {
+          algorithm: {
+          ...algorithm,
+          cancerTypes: arrayToggle(algorithm.cancerTypes, tcgaToken)
+        }
       }
     });
   };
@@ -31,31 +39,33 @@ export function toggleTcgaToken(id, algorithm, tcgaToken) {
 export function toggleTissueType(id, algorithm, tissueType) {
   return dispatch => {
     dispatch({
-      type: types.UPDATE_ALGORITHM,
+      type: types.UPDATE_RUN,
       id,
-      algorithm: {
-        ...algorithm,
-        healthyTissueTypes: isHealthy(tissueType)
-          ? arrayToggle(algorithm.healthyTissueTypes, tissueType)
-          : algorithm.healthyTissueTypes,
-        sickTissueTypes: !isHealthy(tissueType)
-          ? arrayToggle(algorithm.sickTissueTypes, tissueType)
-          : algorithm.sickTissueTypes
+      updates: {
+        algorithm: {
+          ...algorithm,
+          healthyTissueTypes: isHealthy(tissueType)
+            ? arrayToggle(algorithm.healthyTissueTypes, tissueType)
+            : algorithm.healthyTissueTypes,
+          sickTissueTypes: !isHealthy(tissueType)
+            ? arrayToggle(algorithm.sickTissueTypes, tissueType)
+            : algorithm.sickTissueTypes
+        }
       }
     });
   };
 }
 
-export function runAlgorithm(id, algorithm) {
+export function startRun(id, algorithm) {
   return dispatch => {
-    dispatch({ type: types.START_ALGORITHM, id, algorithm });
+    dispatch({ type: types.START_RUN, id, algorithm });
     postRequest("/runAlgorithm", { algorithm }).then(response =>
-      dispatch(_runAlgorithm(id, response))
+      dispatch(_finishRun(id, response))
     );
 
-    function _runAlgorithm(id, result) {
+    function _finishRun(id, result) {
       return {
-        type: types.ALGORITHM_DONE,
+        type: types.FINISH_RUN,
         id,
         result
       };

@@ -23,10 +23,6 @@ class Header extends Component {
           />
           <div>
             <StyledRightContainer>
-              <StyledText>{this.props.datasetName}</StyledText>
-              <StyledSpacer />
-              <StyledSpacer>|</StyledSpacer>
-              <StyledSpacer />
               <IconButton
                 tooltip="Open existing experiment"
                 icon="open"
@@ -43,9 +39,7 @@ class Header extends Component {
                 tooltip="Add Card"
                 icon="add"
                 color={almostWhite}
-                onClick={() => {
-                  this.props.createRun(this.props.context);
-                }}
+                onClick={this.props.createRun}
               />
             </StyledRightContainer>
           </div>
@@ -104,17 +98,6 @@ const StyledLogo = styled.img`
   height: 45px;
 `;
 
-const StyledText = styled.p`
-  color: ${props => props.theme.almostWhite};
-  padding: ${props => props.theme.smallSpace};
-  margin: 0;
-  text-align: right;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  max-width: 200px;
-`;
-
 const StyledRightContainer = styled.div`
   display: flex;
   align-items: center;
@@ -123,8 +106,6 @@ const StyledRightContainer = styled.div`
 const mapStateToProps = state => {
   return {
     experimentName: state.experiment.name,
-    datasetName: state.experiment.datasets[state.experiment.dataset],
-    context: state.context
   };
 };
 

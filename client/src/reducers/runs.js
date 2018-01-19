@@ -2,6 +2,7 @@ import * as types from "../actions/actionTypes";
 
 const emptyRun = {
   algorithm: { cancerTypes: ["THCA", "COAD"], healthyTissueTypes: ["NT"], sickTissueTypes: ["TP"] },
+  dataset: "dataset5",
   isLoading: false,
   result: null,
   geneResults: null
@@ -12,25 +13,27 @@ const initialState = {
 };
 
 export function runs(state = initialState, action = {}) {
+  if(action.type !== types.CREATE_RUN && !state[action.id]) {return state}
   switch (action.type) {
     case types.CREATE_RUN:
       return { ...state, [action.id]: emptyRun };
-    case types.UPDATE_ALGORITHM:
-      return updateRun(state, action, {
-        algorithm: action.algorithm
-      });
-    case types.START_ALGORITHM:
-      return updateRun(state, action, {
-        algorithm: action.algorithm,
+    case types.UPDATE_RUN:
+      return updateRun(state, action.id, action.updates);
+    case types.DELETE_RUN:
+      let newState = {...state};
+      delete newState[action.id];
+      return newState;
+    case types.START_RUN:
+      return updateRun(state, action.id, {
         isLoading: true
       });
-    case types.ALGORITHM_DONE:
-      return updateRun(state, action, {
+    case types.FINISH_RUN:
+      return updateRun(state, action.id, {
         isLoading: false,
         result: action.result
       });
     case types.GENE_RESULTS:
-      return updateRun(state, action, {
+      return updateRun(state, action.id, {
         isLoading: false,
         geneResults: action.result
       });
@@ -39,14 +42,12 @@ export function runs(state = initialState, action = {}) {
   }
 }
 
-function updateRun(state, action, updates) {
-  return Object.keys(state).includes(`${action.id}`)
-    ? {
+function updateRun(state, runid, updates) {
+  return {
         ...state,
-        [action.id]: {
-          ...state[action.id],
+        [runid]: {
+          ...state[runid],
           ...updates
         }
       }
-    : state;
 }

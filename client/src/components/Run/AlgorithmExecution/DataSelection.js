@@ -43,7 +43,7 @@ export default class DataSelection extends Component {
   }
 
   parseData() {
-    const { counts, cancerTypes} = this.props;
+    const { counts, cancerTypes }  = this.props.statistics[this.props.dataset];
 
     return cancerTypes.map(cancerType => ({
       name: cancerType,
@@ -52,8 +52,8 @@ export default class DataSelection extends Component {
   }
 
   renderBars() {
-    const tissueTypes = this.props.sampleTypes;
-    const dataKeys = tissueTypes.map((name, index) => (
+    const { sampleTypes }  = this.props.statistics[this.props.dataset];
+    const dataKeys = sampleTypes.map((name, index) => (
       { name, 
         color: statisticsColors[index] 
       }));
