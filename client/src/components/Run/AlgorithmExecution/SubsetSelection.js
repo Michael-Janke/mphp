@@ -8,7 +8,7 @@ import { connect } from "react-redux";
 import { toggleTcgaToken, toggleTissueType } from "../../../actions/runActions";
 import { isHealthy } from "../../../utils";
 
-class TcgaSelection extends PureComponent {
+class SubsetSelection extends PureComponent {
   render() {
     const { algorithm, disabled } = this.props;
     const { cancerTypes, sampleTypes }  = this.props.statistics[this.props.dataset];
@@ -57,8 +57,6 @@ class TcgaSelection extends PureComponent {
                 />
               )
           )}
-        </StyledList>
-        <StyledList>
           <Subheader>Sick Tissue</Subheader>
           {sickTissueTypes.map(
             tissueType =>
@@ -130,4 +128,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(TcgaSelection);
+export default connect(mapStateToProps, mapDispatchToProps)(SubsetSelection);

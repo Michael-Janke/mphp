@@ -12,27 +12,26 @@ import {
 } from "recharts";
 
 import { statisticsColors } from "../../../config/colors";
-import TcgaSelection from "./TcgaSelection";
 
 export default class DataSelection extends Component {
   render() {
     const chartOptions = {
       data: this.parseData(),
-      margin: { top: 5, right: 30, left: 20, bottom: 5 }
+      margin: { top: 5, right: 30, left: 20, bottom: 5 },
+      layout: 'vertical'
     };
 
     return (
-      <StyledContent>
-        <TcgaSelection {...this.props} />
+      <StyledContent> 
         {this.props.disabled ? null : (
           <DiagramContainer>
-            <ResponsiveContainer height="100%" width="100%">
+            <ResponsiveContainer width={300}>
               <BarChart {...chartOptions}>
-                <XAxis dataKey="name" />
-                <YAxis />
+                <XAxis type="number" />
+                <YAxis dataKey="name" type="category" />
                 <CartesianGrid strokeDasharray="3 3" />
                 <Tooltip />
-                <Legend />
+                <Legend/>
                 {this.renderBars()}
               </BarChart>
             </ResponsiveContainer>

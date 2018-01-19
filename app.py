@@ -155,89 +155,74 @@ def context():
     response = {
         'datasets': datasets,
         'statistics': statistics,
-        'algorithms': [
-            {
-                "name": 'PCA',
-                "parameters": [
-                    {
+        'algorithms': {
+            'getPCA': {
+                "parameters": {
+                    "n_components":{
                         "name": "#Components",
-                        "key": "n_components",
                         "default": 3
                     },
-                    {
+                    "n_features_per_component":{
                         "name": "#Features per component",
-                        "key": "n_features_per_component",
                         "default": 10
                     }
-                ],
-                "key": "getPCA"
+                },
+                "name": "PCA"
             },
-            {
-                "name": 'Decision Tree',
-                "parameters": [
-                    {
+            'getDecisionTreeFeatures': {
+                "parameters": {
+                    "k":{
                         "name": "#Features",
-                        "key": "k",
                         "default": 20
-
                     }
-                ],
-                "key": "getDecisionTreeFeatures"
+                },
+                "name": "Decision Tree"
             },
-            {
-                "name": 'Feature Selection Normalization:Exclude',
-                "parameters": [
-                    {
+            'getNormalizedFeaturesE': {
+                "parameters": {
+                    "k":{
                         "name": "#Features",
-                        "key": "k",
                         "default": 20
 
                     },
-                    {
+                    "n":{
                         "name": "#Considered features",
-                        "key": "n",
                         "default": 5000
 
                     }
-                ],
-                "key": "getNormalizedFeaturesE"
+                },
+                "name": "Feature Selection Normalization:Exclude"
             },
-            {
-                "name": 'Feature Selection Normalization:Substract',
-                "parameters": [
-                    {
+            'getNormalizedFeaturesS': {
+                "parameters": {
+                    "k":{
                         "name": "#Features",
-                        "key": "k",
                         "default": 20
 
                     },
-                    {
+                    "n":{
                         "name": "#Considered features",
-                        "key": "n",
                         "default": 5000
 
                     }
-                ],
-                "key": "getNormalizedFeaturesS"
+                },
+                "name": "Feature Selection Normalization:Substract"
             },
-            {
-                "name": "Feature Selection",
-                "parameters": [
-                    {
+            "getFeatures": {
+                "parameters": {
+                    "k":{
                         "name": "#Features",
-                        "key": "k",
                         "default": 20
 
                     }
-                ],
-                "key": "getFeatures"
+                },
+                "name": "Feature Selection"
             },
-            {
+            "getFeaturesBySFS": {
                 "name": "Sequential Forward Selection (normalized)",
-                "key": "getFeaturesBySFS",
-                "parameters": []
+                "parameters": {}
             }
-        ],
+        }
     }
 
     return json.dumps(response)

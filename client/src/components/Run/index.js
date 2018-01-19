@@ -47,7 +47,7 @@ export default class Card extends Component {
           </Dialog>
         </StyledCardTitle>
         {this.renderBody()}
-        <StyledError>{result && result.error}</StyledError>
+        <StyledError>{result && result.error && result.error.message}</StyledError>
       </StyledCard>
     );
   }
@@ -76,6 +76,9 @@ const StyledCard = styled(_Card)`
   padding: ${props => props.theme.mediumSpace};
   padding-top: ${props => props.theme.smallerSpace};
   padding-bottom: ${props => props.theme.smallerSpace};
+  min-width: 800px;
+  max-width: 1000px;
+  flex:1;
 `;
 
 const StyledCardTitle = styled(CardTitle)`

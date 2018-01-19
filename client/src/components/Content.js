@@ -21,7 +21,7 @@ class Content extends Component {
   render() {
     const { runs, context, startRun, updateRun, deleteRun } = this.props;
     return (
-      <div className="content">
+      <ContentContainer>
         { context.datasets ? 
           Object.keys(runs)
             .reverse()
@@ -53,10 +53,15 @@ class Content extends Component {
                  }
             </Dialog>
         }
-      </div>
+      </ContentContainer>
     );
   }
 }
+
+const ContentContainer = styled.div`
+  display:flex;
+  flex-flow: row wrap;
+`;
 
 const StyledSpinnerContainer = styled.div`
   display:flex;

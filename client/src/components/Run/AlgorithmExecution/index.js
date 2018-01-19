@@ -4,14 +4,21 @@ import styled from "styled-components";
 
 import DataSelection from "./DataSelection";
 import AlgorithmSelection from "./AlgorithmSelection";
+import SubsetSelection from "./SubsetSelection";
+import RunDescription from "./RunDescription";
 
 export default class AlgorithmExecution extends Component {
   render() {
     const isRunnable = this.isRunnable();
     return (
       <div>
-        <AlgorithmSelection {...this.props} />
-        <DataSelection {...this.props} />
+        {!this.props.disabled ? <Row>
+          <AlgorithmSelection {...this.props} />
+          <SubsetSelection {...this.props} />
+          <DataSelection {...this.props} />
+        </Row> : 
+          <RunDescription {...this.props}/>
+        }
         <CardActions>
           {this.props.disabled ? null : (
             <StyledButton
@@ -107,6 +114,11 @@ export default class AlgorithmExecution extends Component {
     });
   }
 }
+
+const Row = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
 
 const CardActions = styled.div`
   margin-top: ${props => props.theme.smallSpace};
