@@ -18,8 +18,9 @@ def parse_gtex_dataset(name):
 
     data_file.seek(0)
     gene_labels = np.genfromtxt(data_file, delimiter=",", max_rows=1, dtype=np.unicode)[1:]
-    regex = re.compile('ENSG\d*')
-    trim_quotes = (lambda regex: lambda string: regex.search(string)[0])(regex)
+    regex = re.compile('(ENSG\d*).*')
+
+    trim_quotes = (lambda regex: lambda string: regex.search(string).group(1))(regex)
     gene_labels = np.vectorize(trim_quotes)(gene_labels)
 
     feature_count = gene_labels.shape[0]

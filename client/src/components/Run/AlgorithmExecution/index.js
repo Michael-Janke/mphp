@@ -63,7 +63,7 @@ export default class AlgorithmExecution extends Component {
   }
 
   executeAlgorithm() {
-    this.props.runAlgorithm(this.props.runId, this.props.algorithm);
+    this.props.runAlgorithm(this.props.runId, {...this.props.algorithm, dataset: this.props.dataset});
   }
 }
 

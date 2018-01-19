@@ -11,21 +11,26 @@ import re
 from SPARQLWrapper import SPARQLWrapper, JSON
 from pprint import pprint
 from xml.dom.minidom import parse, parseString
-from flask import Flask, request
+from flask import Flask, request,abort
+
 from flask_cors import CORS
 from utils.DataLoader import DataLoader
 from utils.DimensionalityReducer import DimensionalityReducer
 from validation.Analyzer import Analyzer
 from utils import Expressions
 
+datasets = {
+    "dataset4" : "Dataset 4 | TCGA",
+    "dataset5" : "Dataset 5 | TCGA + GTEX"
+}
+dataLoaders = {dataset: DataLoader(dataset) for dataset in datasets}
+statistics = {dataset: dataLoader.getStatistics() for (dataset,dataLoader) in dataLoaders.items()}
+
 app = Flask(__name__)
 CORS(app)
-dataLoader = DataLoader("dataset4")
-gene_labels = dataLoader.getGeneLabels()
-gene_names = dataLoader.getGeneNames()
+
 dimReducer = DimensionalityReducer()
 analyzer = Analyzer()
-
 
 @app.route('/')
 def hello_world():
@@ -145,9 +150,11 @@ def testGene():
 
     return json.dumps(response)
 
-@app.route("/algorithms", methods=["GET"])
-def algorithms():
+@app.route("/context", methods=["GET"])
+def context():
     response = {
+        'datasets': datasets,
+        'statistics': statistics,
         'algorithms': [
             {
                 "name": 'PCA',
@@ -252,6 +259,17 @@ def runSpecificAlgorithm():
     #         }
     #
     # }
+
+    if "dataset" not in algorithm:
+        return abort(400, "need dataset parameter")
+
+    dataset = algorithm["dataset"]
+
+    if dataset not in dataLoaders:
+        return abort(400, "unknown datatset id")
+    
+    dataLoader = dataLoaders[dataset]
+
     key = algorithm["key"]
     cancer_types = algorithm["cancerTypes"]
     sick_tissue_types = algorithm["sickTissueTypes"]
@@ -321,9 +339,9 @@ def runSpecificAlgorithm():
 
     response = {
         'data': response_data,
-        'genes': gene_labels[gene_indices].tolist(),
+        'genes': dataLoader.getGeneLabels()[gene_indices].tolist(),
         'expressionMatrix': expression_matrix,
-        'geneNames': gene_names[gene_indices].tolist(),
+        'geneNames': dataLoader.getGeneNames()[gene_indices].tolist(),
         'evaluation': evaluation,
     }
 
@@ -331,13 +349,6 @@ def runSpecificAlgorithm():
     jsonResponse = json.dumps(response)
     regex = re.compile(r'\bNaN\b')
     return re.sub(regex, 'null', jsonResponse)
-
-
-@app.route('/statistics', methods=["GET"])
-def getStatistics():
-    statistics = dataLoader.getStatistics()
-
-    return json.dumps(statistics.tolist())
 
 
 if __name__ == '__main__':

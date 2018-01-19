@@ -43,30 +43,20 @@ export default class DataSelection extends Component {
   }
 
   parseData() {
-    const { statistics, algorithm } = this.props;
-    const tcgaTokens = algorithm.cancerTypes;
-    const tissueTypes = [
-      ...algorithm.healthyTissueTypes,
-      ...algorithm.sickTissueTypes
-    ];
+    const { counts, cancerTypes} = this.props;
 
-    return tcgaTokens.map(tcgaToken => {
-      const result = { name: tcgaToken };
-      tissueTypes.forEach(tissueType => {
-        result[tissueType] = statistics[tcgaToken][tissueType];
-      });
-      return result;
-    });
+    return cancerTypes.map(cancerType => ({
+      name: cancerType,
+      ...counts[cancerType] 
+    }));
   }
 
   renderBars() {
-    const tissueTypes = [
-      ...this.props.algorithm.healthyTissueTypes,
-      ...this.props.algorithm.sickTissueTypes
-    ];
-    const dataKeys = tissueTypes.map((name, index) => {
-      return { name, color: statisticsColors[index] };
-    });
+    const tissueTypes = this.props.sampleTypes;
+    const dataKeys = tissueTypes.map((name, index) => (
+      { name, 
+        color: statisticsColors[index] 
+      }));
     return dataKeys.map((dataKey, index) => {
       return (
         <Bar
