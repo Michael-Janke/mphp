@@ -43,7 +43,10 @@ else:
 
 mutation = binary_mutation
 
-fitness_function = fitness(sick, healthy)
+sick_reduced = Expressions(sick.expressions[:, selected_genes], sick.labels)
+healthy_reduced = Expressions(healthy.expressions[:, selected_genes], healthy.labels)
+
+fitness_function = fitness(sick_reduced, healthy_reduced)
 
 best, sets, stat, stat_aver = ea_for_plot(c, chromo_size, fitness_function, crossover, mutation)
 
