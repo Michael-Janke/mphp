@@ -21,6 +21,8 @@ Inside each folder is a data and meta data file and a folder for subsets which c
 
 # Setup servers
 
+python version 3 and x64 is required
+
 ## Flask server
 
 To start the Flask server you need to install all requirements by running:
