@@ -8,10 +8,26 @@ import { boringBlue } from "../../../config/colors";
 
 export default class AlgorithmSelection extends Component {
   render() {
-    const { algorithms, algorithm } = this.props;
+    const { algorithms, algorithm, datasets, dataset } = this.props;
     return (
       <StyledMenu>
         <StyledOptions>
+          <StyledSelectField
+            floatingLabelText="Dataset"
+            floatingLabelFixed={true}
+            hintText="Select dataset..."
+            value={dataset || null}
+            onChange={this.changeDataset.bind(this)}
+            autoWidth={true}
+            selectedMenuItemStyle={{ color: boringBlue }}
+            disabled={this.props.disabled}
+          >
+            {Object.keys(datasets).map((dataset) => <MenuItem
+              key={dataset}
+              value={dataset}
+              primaryText={datasets[dataset]}/>)
+            }
+          </StyledSelectField>
           <StyledSelectField
             floatingLabelText="Algorithm"
             floatingLabelFixed={true}
@@ -62,17 +78,22 @@ export default class AlgorithmSelection extends Component {
     );
   }
 
+  changeDataset(event, index, dataset) {
+    const { runId, updateRun } = this.props;
+    updateRun(runId, { dataset: dataset });
+  }
+
   changeParameter(event, index, key) {
-    const { algorithm, runId, updateAlgorithm } = this.props;
+    const { algorithm, runId, updateRun } = this.props;
     const updatedParams = {
       ...algorithm.parameters,
       [event.target.id]: parseInt(event.target.value, 10)
     };
-    updateAlgorithm(runId, { ...algorithm, parameters: updatedParams });
+    updateRun(runId, { algorithm: {...algorithm, parameters: updatedParams} });
   }
 
   selectAlgorithm(event, index, key) {
-    const { algorithm, runId, updateAlgorithm } = this.props;
+    const { algorithm, runId, updateRun } = this.props;
     const updatedAlgorithm = this.algorithmDescription(key);
     const updatedValues = {
       name: updatedAlgorithm.name,
@@ -81,7 +102,7 @@ export default class AlgorithmSelection extends Component {
         return { ...reducedParams, [param.key]: param.default };
       }, {})
     };
-    updateAlgorithm(runId, { ...algorithm, ...updatedValues });
+    updateRun(runId, { algorithm: {...algorithm, ...updatedValues}});
   }
 
   algorithmDescription(algorithmKey) {

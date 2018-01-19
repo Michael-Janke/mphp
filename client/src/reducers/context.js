@@ -1,6 +1,6 @@
 import * as types from "../actions/actionTypes";
 
-const initialState = null;
+const initialState = {};
 
 export function context(state = initialState, action = {}) {
   switch (action.type) {

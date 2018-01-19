@@ -10,7 +10,8 @@ import { isHealthy } from "../../../utils";
 
 class TcgaSelection extends PureComponent {
   render() {
-    const { cancerTypes, sampleTypes, algorithm, disabled } = this.props;
+    const { algorithm, disabled } = this.props;
+    const { cancerTypes, sampleTypes }  = this.props.statistics[this.props.dataset];
     const healthyTissueTypes = sampleTypes.filter(tissueType =>
       isHealthy(tissueType)
     );

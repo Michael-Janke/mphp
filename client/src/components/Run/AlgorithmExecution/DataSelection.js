@@ -43,7 +43,8 @@ export default class DataSelection extends Component {
   }
 
   parseData() {
-    const { counts, cancerTypes, algorithm } = this.props;
+    const { counts, cancerTypes }  = this.props.statistics[this.props.dataset];
+    const { algorithm } = this.props;
 
     // necessary to get the same ordering in diagram
     const selectedCancerTypes = cancerTypes.filter(cancerType =>
@@ -66,6 +67,7 @@ export default class DataSelection extends Component {
       name,
       color: statisticsColors[index]
     }));
+
     return dataKeys.map((dataKey, index) => {
       return (
         <Bar

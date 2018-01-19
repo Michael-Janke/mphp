@@ -4,6 +4,7 @@ from pprint import pprint
 from utils.DataLoader import DataLoader
 from utils.DimensionalityReducer import DimensionalityReducer
 from utils.DataNormalizer import DataNormalizer
+from utils.Sampler import Sampler
 from utils.plot import plotScatter
 
 from utils import Expressions
@@ -20,10 +21,13 @@ analyzer = Analyzer()
 
 clusVal = ClusterValidator()
 classVal = ClassificationValidator()
+sampler = Sampler()
 print("data loaded")
 
 #%%
 healthy = dataLoader.getData(["healthy"], ["THCA","LUAD","GBM"])
+#healthy = sampler.over_sample(healthy)
+
 sick = dataLoader.getData(["sick"], ["THCA","LUAD","GBM"])
 gene_labels = dataLoader.getGeneLabels()
 print("got combined data")
