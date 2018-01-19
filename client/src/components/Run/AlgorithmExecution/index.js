@@ -34,7 +34,8 @@ export default class AlgorithmExecution extends Component {
   }
 
   isRunnable() {
-    const { algorithm, counts } = this.props;
+    const algorithm = this.props.algorithm;
+    const statistics = this.props.statistics[this.props.dataset];
 
     const algorithmSelected = typeof algorithm.key !== "undefined";
     const cancerTypeSelected = algorithm.cancerTypes.length !== 0;
@@ -48,7 +49,7 @@ export default class AlgorithmExecution extends Component {
       algorithm.cancerTypes.forEach(cancerType => {
         var sum = 0;
         algorithm.healthyTissueTypes.forEach(tissueType => {
-          sum += counts[cancerType][tissueType];
+          sum += statistics.counts[cancerType][tissueType];
         });
         if (sum < 20) {
           enoughSamples = false;
@@ -60,7 +61,7 @@ export default class AlgorithmExecution extends Component {
       algorithm.cancerTypes.forEach(cancerType => {
         var sum = 0;
         algorithm.sickTissueTypes.forEach(tissueType => {
-          sum += counts[cancerType][tissueType];
+          sum += statistics.counts[cancerType][tissueType];
         });
         if (sum < 20) {
           enoughSamples = false;
@@ -76,11 +77,11 @@ export default class AlgorithmExecution extends Component {
       const currentCancerType = algorithm.cancerTypes[0];
       var sumHealthy = 0;
       algorithm.healthyTissueTypes.forEach(x => {
-        sumHealthy += counts[currentCancerType][x];
+        sumHealthy += statistics.counts[currentCancerType][x];
       });
       var sumSick = 0;
       algorithm.sickTissueTypes.forEach(x => {
-        sumSick += counts[currentCancerType][x];
+        sumSick += statistics.counts[currentCancerType][x];
       });
       oneCancerTypeRunnable =
         (currentAlgorithm === "getFeatures" ||
@@ -100,7 +101,10 @@ export default class AlgorithmExecution extends Component {
   }
 
   executeAlgorithm() {
-    this.props.startRun(this.props.runId, {...this.props.algorithm, dataset: this.props.dataset});
+    this.props.startRun(this.props.runId, {
+      ...this.props.algorithm,
+      dataset: this.props.dataset
+    });
   }
 }
 
