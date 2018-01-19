@@ -8,8 +8,8 @@ from glob import glob
 def parse_tcga_dataset(name):
 
     PATH = "data/" + name + "/"
-    DATA_PATH, META_DATA_PATH = glob(PATH + "TCGA*") #eliminate TCGA?
-
+    DATA_PATH = glob(PATH + "TCGA*ounts.csv")[0]
+    META_DATA_PATH = glob(PATH + "TCGA*etadata.csv")[0] #eliminate TCGA?
     data_file = open(DATA_PATH, "rb")
 
     # will load the data file and save into files per cancer type
