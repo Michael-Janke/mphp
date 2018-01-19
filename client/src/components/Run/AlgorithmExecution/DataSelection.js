@@ -44,19 +44,30 @@ export default class DataSelection extends Component {
 
   parseData() {
     const { counts, cancerTypes }  = this.props.statistics[this.props.dataset];
+    const { algorithm } = this.props;
 
-    return cancerTypes.map(cancerType => ({
+    // necessary to get the same ordering in diagram
+    const selectedCancerTypes = cancerTypes.filter(cancerType =>
+      algorithm.cancerTypes.includes(cancerType)
+    );
+
+    return selectedCancerTypes.map(cancerType => ({
       name: cancerType,
-      ...counts[cancerType] 
+      ...counts[cancerType]
     }));
   }
 
   renderBars() {
-    const { sampleTypes }  = this.props.statistics[this.props.dataset];
-    const dataKeys = sampleTypes.map((name, index) => (
-      { name, 
-        color: statisticsColors[index] 
-      }));
+    const tissueTypes = [
+      ...this.props.algorithm.healthyTissueTypes,
+      ...this.props.algorithm.sickTissueTypes
+    ];
+
+    const dataKeys = tissueTypes.map((name, index) => ({
+      name,
+      color: statisticsColors[index]
+    }));
+
     return dataKeys.map((dataKey, index) => {
       return (
         <Bar

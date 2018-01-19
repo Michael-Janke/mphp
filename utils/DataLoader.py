@@ -112,7 +112,7 @@ class DataLoader:
             [re.sub(r"-T\w*", "-sick", x) for x in data.labels])
         return data
 
-    def computeStatistics(self): 
+    def computeStatistics(self):
         stat = {}
         for ct in self.cancer_types:
             stat[ct] = {}
@@ -127,5 +127,5 @@ class DataLoader:
             'sampleTypes': self.sample_types
         }
 
-    def getStatistics(self): 
+    def getStatistics(self):
         return self.statistics
