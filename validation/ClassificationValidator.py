@@ -17,13 +17,13 @@ class ClassificationValidator():
 
     def __init__(self):
         self.classifier_table = {
-            #"SVM": SVC,
-            #"LogisticRegression": LogisticRegression,
-            "DecisionTree": DecisionTreeClassifier,
+            #"svm": SVC,
+            #"logisticRegression": LogisticRegression,
+            "decisionTree": DecisionTreeClassifier,
             #"naivebayes": GaussianNB,
             #"knn": KNeighborsClassifier,
-            #"RandomForest": RandomForestClassifier,
-            #"BoostedTrees": AdaBoostClassifier
+            #"randomForest": RandomForestClassifier,
+            #"boostedTrees": AdaBoostClassifier
         }
 
     @ignore_warnings
@@ -77,14 +77,14 @@ class ClassificationValidator():
     #     for label, genes in selected_genes_dict.items():
     #         s_labels = binarize_labels(sick.labels, label)
     #         sick_binary = Expressions(sick.expressions[:,genes], s_labels)
-    #         sick_results = self.evaluate(sick_binary, ["DecisionTree"])
+    #         sick_results = self.evaluate(sick_binary, ["decisionTree"])
     #
     #         if healthy == "":
     #             results[label] = sick_results
     #         else:
     #             h_labels = binarize_labels(healthy.labels, label)
     #             healthy_binary = Expressions(healthy.expressions[:,genes], h_labels)
-    #             healthy_results = self.evaluate(healthy_binary, ["DecisionTree"])
+    #             healthy_results = self.evaluate(healthy_binary, ["decisionTree"])
     #
     #             results[label] = {
     #                 "sick": sick_results,

@@ -106,7 +106,11 @@ class DimensionalityReducer:
 
         crossover = one_point_crossover
         mutation = binary_mutation
-        fitness_function = fitness_module.fitness(sick, healthy, fitness)
+
+        sick_reduced = Expressions(sick.expressions[:, selected_genes], sick.labels)
+        healthy_reduced = Expressions(healthy.expressions[:, selected_genes], healthy.labels)
+
+        fitness_function = fitness_module.fitness(sick_reduced, healthy_reduced, fitness)
 
         best, sets, _, _ = ea_for_plot(c, c.chromo_size, fitness_function, crossover, mutation)
 

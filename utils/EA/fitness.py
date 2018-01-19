@@ -43,8 +43,8 @@ def classification_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
         sick_labels = binarize_labels(sick.labels, true_label)
         healthy_labels = binarize_labels(healthy.labels, true_label)
         clf = DecisionTreeClassifier()
-        sick_score = cross_validate(clf, sick_expressions, sick_labels, cv=5, scoring="f1", return_train_score=False)["test_score"].mean()
-        sick_score = cross_validate(clf, healthy_expressions, healthy_labels, cv=5, scoring="f1", return_train_score=False)["test_score"].mean()
+        sick_score = cross_validate(clf, sick_expressions, sick_labels, cv=5, scoring="f1_binary", return_train_score=False)["test_score"].mean()
+        sick_score = cross_validate(clf, healthy_expressions, healthy_labels, cv=5, scoring="f1_binary", return_train_score=False)["test_score"].mean()
 
         #sick_score = cross_val_score(clf, sick_expressions, sick_labels, cv=5, scoring="f1").mean()
         #healthy_score = cross_val_score(clf, healthy_expressions, healthy_labels, cv=5, scoring="f1").mean()

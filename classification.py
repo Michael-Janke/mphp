@@ -46,11 +46,11 @@ selected_genes = dimReducer.getEAFeatures(sick,healthy,fitness="clustering")
 print(selected_genes)
 
 print("SICK REDUCED")
-pprint(classVal.evaluate(sick, selected_genes, ["DecisionTree"]))
+pprint(classVal.evaluate(sick, selected_genes, ["decisionTree"]))
 plotScatter(sick, selected_genes, gene_labels)
 
 print("HEALTHY REDUCED")
-pprint(classVal.evaluate(healthy, selected_genes, ["DecisionTree"]))
+pprint(classVal.evaluate(healthy, selected_genes, ["decisionTree"]))
 plotScatter(healthy, selected_genes, gene_labels)
 
 # %%
