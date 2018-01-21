@@ -23,6 +23,10 @@ export default class GeneExploration extends Component {
   render() {
     const { genes, geneNames, expressionMatrix } = this.props;
 
+    const geneResults = this.props.runs[this.props.runId].geneResults
+      ? this.props.runs[this.props.runId].geneResults
+      : null;
+
     return (
       <div>
         <h3>
@@ -42,6 +46,7 @@ export default class GeneExploration extends Component {
                 >
                   {geneNames[i]}
                 </a>
+                {geneResults && geneResults[gene].score}
               </StyledItem>
             ))}
           </StyledList>
@@ -56,12 +61,15 @@ export default class GeneExploration extends Component {
                 <TableHeaderColumn />
                 {genes.map((gene, i) => (
                   <StyledTableHeaderColumn key={gene} title={geneNames[i]}>
-                    <a
-                      href={`https://www.proteinatlas.org/${gene}`}
-                      target="_blank"
-                    >
-                      {geneNames[i]}
-                    </a>
+                    <StyledItem key={gene}>
+                      <a
+                        href={`https://www.proteinatlas.org/${gene}`}
+                        target="_blank"
+                      >
+                        {geneNames[i]}
+                      </a>
+                      {geneResults && geneResults[gene].score}
+                    </StyledItem>
                   </StyledTableHeaderColumn>
                 ))}
               </TableRow>
@@ -126,6 +134,15 @@ export default class GeneExploration extends Component {
   }
 }
 
+const StyledScores = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+`;
+
+const styledScore = styled.span`
+  margin: 16px 8px;
+`;
+
 const StyledList = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -133,6 +150,8 @@ const StyledList = styled.div`
 
 const StyledItem = styled.span`
   margin: 5px;
+  display: flex;
+  flex-direction: column;
 `;
 
 const StyledTableHeaderColumn = styled(TableHeaderColumn)`

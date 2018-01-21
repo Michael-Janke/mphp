@@ -59,7 +59,7 @@ class DimensionalityReducer:
             'substract': self.getNormalizedFeaturesS,
             'exclude': self.getNormalizedFeaturesE,
         }
-        
+
         return options[normalization](sick, healthy, k, n, m, returnMultipleSets)
 
     def getNormalizedFeaturesS(self, sick, healthy, k, n, m, returnMultipleSets = False):
@@ -164,7 +164,7 @@ class DimensionalityReducer:
     def getDecisionTreeFeatures(self, data, k=20, returnMultipleSets = False):
         tree = DecisionTreeClassifier()
         tree.fit(data.expressions, data.labels)
-        
+
         return self.getFeatureSets(tree.feature_importances_, k, returnMultipleSets)
 
 

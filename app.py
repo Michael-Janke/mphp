@@ -146,7 +146,8 @@ def testGene():
         if cancer_gene_census:
             print("Found one!")
 
-        response[gene] = {'proteinAtlas': proteinAtlas, 'disgenet': disgenet, 'cancer_gene_census': cancer_gene_census}
+        score = (0.5 if cancer_gene_census else 0) +  (0.25 if disgenet else 0) + (0.25 if proteinAtlas else 0)
+        response[gene] = {'proteinAtlas': proteinAtlas, 'disgenet': disgenet, 'cancer_gene_census': cancer_gene_census, 'score': score}
 
     return json.dumps(response)
 
@@ -267,7 +268,7 @@ def runSpecificAlgorithm():
 
     if dataset not in dataLoaders:
         return abort(400, "unknown datatset id")
-    
+
     dataLoader = dataLoaders[dataset]
 
     key = algorithm["key"]
