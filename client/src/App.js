@@ -28,6 +28,11 @@ class App extends Component {
     );
   }
   handleScroll = event => {
+    // do not scroll if any child element was scrolled
+    if (event.target !== this.scrollableArea) {
+      return;
+    }
+
     if (event.target.scrollTop > THRESHOLD) {
       this.setState({ minimize: true });
     } else {

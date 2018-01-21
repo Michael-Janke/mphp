@@ -8,10 +8,27 @@ import { boringBlue } from "../../../config/colors";
 
 export default class AlgorithmSelection extends Component {
   render() {
-    const { algorithms, algorithm } = this.props;
+    const { algorithms, algorithm, datasets, dataset } = this.props;
     return (
       <StyledMenu>
         <StyledOptions>
+          <StyledSelectField
+            floatingLabelText="Dataset"
+            floatingLabelFixed={true}
+            hintText="Select dataset..."
+            value={dataset || null}
+            onChange={this.changeDataset.bind(this)}
+            autoWidth={true}
+            selectedMenuItemStyle={{ color: boringBlue }}
+            disabled={this.props.disabled}
+            style={{width:220}}
+          >
+            {Object.keys(datasets).map((dataset) => <MenuItem
+              key={dataset}
+              value={dataset}
+              primaryText={datasets[dataset]}/>)
+            }
+          </StyledSelectField>
           <StyledSelectField
             floatingLabelText="Algorithm"
             floatingLabelFixed={true}
@@ -21,13 +38,12 @@ export default class AlgorithmSelection extends Component {
             autoWidth={true}
             selectedMenuItemStyle={{ color: boringBlue }}
             disabled={this.props.disabled}
+            style={{width:220}}
           >
-            {algorithms.map(this.renderMenuItem)}
+            {Object.keys(algorithms).map(this.renderMenuItem.bind(this))}
           </StyledSelectField>
-          {algorithm.key &&
-            this.algorithmDescription().parameters.map(
-              this.renderParameter.bind(this, this.props.disabled)
-            )}
+          {algorithm.key && algorithms &&
+            Object.keys(algorithms[algorithm.key].parameters).map(this.renderParameter.bind(this, this.props.disabled))}
         </StyledOptions>
       </StyledMenu>
     );
@@ -38,70 +54,69 @@ export default class AlgorithmSelection extends Component {
     return (
       <MenuItem
         key={`algorithm-option-${index}`}
-        value={algorithm.key}
-        primaryText={algorithm.name}
+        value={algorithm}
+        primaryText={this.props.algorithms[algorithm].name}
       />
     );
   }
 
   renderParameter(disabled, parameter, index) {
+    var parameterObj = this.props.algorithms[this.props.algorithm.key].parameters[parameter];
     return (
       <StyledTextField
-        key={parameter.key}
-        id={parameter.key}
+        key={parameter}
+        id={parameter}
         value={
-          this.props.algorithm.parameters[parameter.key] || parameter.default
+          this.props.algorithm.parameters[parameter] || parameterObj.default
         }
-        hintText={parameter.default}
-        floatingLabelText={parameter.name}
+        hintText={parameterObj.default}
+        floatingLabelText={parameterObj.name}
         floatingLabelFixed={true}
         type="number"
         onChange={this.changeParameter.bind(this)}
         disabled={disabled}
+        style={{width:210}}
       />
     );
   }
 
+  changeDataset(event, index, dataset) {
+    const { runId, updateRun } = this.props;
+    updateRun(runId, { dataset: dataset });
+  }
+
   changeParameter(event, index, key) {
-    const { algorithm, runId, updateAlgorithm } = this.props;
+    const { algorithm, runId, updateRun } = this.props;
     const updatedParams = {
       ...algorithm.parameters,
       [event.target.id]: parseInt(event.target.value, 10)
     };
-    updateAlgorithm(runId, { ...algorithm, parameters: updatedParams });
+    updateRun(runId, { algorithm: {...algorithm, parameters: updatedParams} });
   }
 
   selectAlgorithm(event, index, key) {
-    const { algorithm, runId, updateAlgorithm } = this.props;
-    const updatedAlgorithm = this.algorithmDescription(key);
+    const { algorithm, algorithms, runId, updateRun } = this.props;
+    const parameters = algorithms[key].parameters;
     const updatedValues = {
-      name: updatedAlgorithm.name,
-      key: updatedAlgorithm.key,
-      parameters: updatedAlgorithm.parameters.reduce((reducedParams, param) => {
-        return { ...reducedParams, [param.key]: param.default };
+      name: algorithms[key].name,
+      key,
+      parameters: Object.keys(parameters).reduce((reducedParams, param) => {
+        return { ...reducedParams, [param]: parameters[param].default };
       }, {})
     };
-    updateAlgorithm(runId, { ...algorithm, ...updatedValues });
+    updateRun(runId, { algorithm: {...algorithm, ...updatedValues}});
   }
 
-  algorithmDescription(algorithmKey) {
-    algorithmKey = algorithmKey || this.props.algorithm.key;
-    return this.props.algorithms.find(
-      algorithm => algorithm.key === algorithmKey
-    );
-  }
 }
 
 const StyledMenu = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  margin: 16px;
 `;
 
 const StyledOptions = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 16px;
 `;
 
 const StyledSelectField = styled(SelectField)`

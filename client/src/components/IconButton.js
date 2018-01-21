@@ -4,6 +4,7 @@ import _IconButton from "material-ui/IconButton";
 import EditIcon from "material-ui/svg-icons/editor/mode-edit";
 import OpenIcon from "material-ui/svg-icons/file/folder-open";
 import SaveIcon from "material-ui/svg-icons/content/save";
+import DeleteIcon from "material-ui/svg-icons/action/delete";
 import AddIcon from "material-ui/svg-icons/content/add-circle";
 
 class IconButton extends Component {
@@ -12,6 +13,7 @@ class IconButton extends Component {
       edit: EditIcon,
       open: OpenIcon,
       save: SaveIcon,
+      delete: DeleteIcon,
       add: AddIcon
     };
     const Icon = icons[this.props.icon];
