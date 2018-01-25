@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import SelectField from "material-ui/SelectField";
 import MenuItem from "material-ui/MenuItem";
 import TextField from "material-ui/TextField";
+import Checkbox from "material-ui/Checkbox";
 import styled from "styled-components";
 
 import { boringBlue } from "../../../config/colors";
@@ -47,9 +48,10 @@ export default class AlgorithmSelection extends Component {
           {algorithm.key &&
             algorithms &&
             Object.keys(algorithms[algorithm.key].parameters).map(
-              this.renderParameter.bind(this, this.props.disabled)
+              this.renderParameter.bind(this)
             )}
         </StyledOptions>
+        {this.renderComparisonModeSelection()}
       </StyledMenu>
     );
   }
@@ -65,23 +67,35 @@ export default class AlgorithmSelection extends Component {
     );
   }
 
-  renderParameter(disabled, parameter, index) {
-    var parameterObj = this.props.algorithms[this.props.algorithm.key]
-      .parameters[parameter];
+  renderParameter(parameterName, index) {
+    const { disabled, algorithms, algorithm } = this.props;
+    var parameter = algorithms[algorithm.key].parameters[parameterName];
     return (
       <StyledTextField
-        key={parameter}
-        id={parameter}
+        key={parameterName}
+        id={parameterName}
         value={
-          this.props.algorithm.parameters[parameter] || parameterObj.default
+          this.props.algorithm.parameters[parameterName] || parameter.default
         }
-        hintText={parameterObj.default}
-        floatingLabelText={parameterObj.name}
+        hintText={parameter.default}
+        floatingLabelText={parameter.name}
         floatingLabelFixed={true}
         type="number"
         onChange={this.changeParameter.bind(this)}
         disabled={disabled}
         style={{ width: 210 }}
+      />
+    );
+  }
+
+  renderComparisonModeSelection() {
+    return (
+      <StyledCheckbox
+        label="One against rest"
+        checked={this.props.oneAgainstRest}
+        onCheck={this.toggleComparisonMode.bind(this)}
+        disabled={this.props.disabled}
+        iconStyle={{ fill: boringBlue }}
       />
     );
   }
@@ -108,6 +122,11 @@ export default class AlgorithmSelection extends Component {
     });
   }
 
+  toggleComparisonMode() {
+    const { oneAgainstRest, runId, updateRun } = this.props;
+    updateRun(runId, { oneAgainstRest: !oneAgainstRest });
+  }
+
   selectAlgorithm(event, index, key) {
     const { algorithm, algorithms, runId, updateRun } = this.props;
     const parameters = algorithms[key].parameters;
@@ -122,7 +141,11 @@ export default class AlgorithmSelection extends Component {
   }
 }
 
-const StyledMenu = styled.div``;
+const StyledMenu = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
 
 const StyledOptions = styled.div`
   display: flex;
@@ -139,4 +162,9 @@ const StyledSelectField = styled(SelectField)`
 
 const StyledTextField = styled(TextField)`
   margin-left: ${props => props.theme.mediumSpace};
+`;
+
+const StyledCheckbox = styled(Checkbox)`
+  margin-left: ${props => props.theme.mediumSpace};
+  margin-top: ${props => props.theme.mediumSpace};
 `;

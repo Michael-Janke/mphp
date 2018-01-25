@@ -12,13 +12,15 @@ export default class AlgorithmExecution extends Component {
     const isRunnable = this.isRunnable();
     return (
       <div>
-        {!this.props.disabled ? <Row>
-          <AlgorithmSelection {...this.props} />
-          <SubsetSelection {...this.props} />
-          <DataSelection {...this.props} />
-        </Row> : 
-          <RunDescription {...this.props}/>
-        }
+        {!this.props.disabled ? (
+          <Row>
+            <AlgorithmSelection {...this.props} />
+            <SubsetSelection {...this.props} />
+            <DataSelection {...this.props} />
+          </Row>
+        ) : (
+          <RunDescription {...this.props} />
+        )}
         <CardActions>
           {this.props.disabled ? null : (
             <StyledButton
@@ -108,7 +110,7 @@ export default class AlgorithmExecution extends Component {
   }
 
   executeAlgorithm() {
-    this.props.startRun(this.props.runId, {
+    this.props.startRun(this.props.runId, this.props.oneAgainstRest, {
       ...this.props.algorithm,
       dataset: this.props.dataset
     });
