@@ -83,8 +83,6 @@ def runSpecificAlgorithm():
     regex = re.compile(r'\bNaN\b')
     return re.sub(regex, 'null', jsonResponse)
 
-
-
 def flaskrun(app, default_host="0.0.0.0", 
                   default_port="5000"):
     """
