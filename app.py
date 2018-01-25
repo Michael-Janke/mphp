@@ -39,7 +39,6 @@ def servemedia(path):
 def test_genes():
     return json.dumps(externalApiCalls.testGenes(request))
 
-
 @app.route("/context", methods=["GET"])
 def context():
     response = {
@@ -48,7 +47,6 @@ def context():
         'algorithms': availableAlgorithms.algorithms
     }
     return json.dumps(response)
-
 
 @app.route("/runAlgorithm", methods=["POST"])
 def runSpecificAlgorithm():
