@@ -20,11 +20,12 @@ class Analyzer:
             else:
                 results[label] = self.computeFeatureValidation(sick, healthy, genes, true_label=label)
 
-        cumulated_fitness = 0
-        for res in results.values():
-            cumulated_fitness += res["fitness"]["combinedFitness"]
+        if not healthy == "":
+            cumulated_fitness = 0
+            for res in results.values():
+                cumulated_fitness += res["fitness"]["combinedFitness"]
 
-        results["meanFitness"] = cumulated_fitness / len(results.keys())
+            results["meanFitness"] = cumulated_fitness / len(results.keys())
 
         return results
 

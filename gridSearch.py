@@ -12,6 +12,7 @@ from utils.DataLoader import DataLoader
 from utils.DimensionalityReducer import DimensionalityReducer
 from utils.DataNormalizer import DataNormalizer
 from utils.EA.fitness import combined_fitness
+from validation.Analyzer import Analyzer
 
 from utils import Expressions
 
@@ -19,13 +20,14 @@ print("Imported modules")
 
 dataLoader = DataLoader("dataset4")
 dimReducer = DimensionalityReducer()
+analyzer = Analyzer()
 
 print("data loaded")
 
 #%%
-healthy = dataLoader.getData(["healthy"], ["THCA","LUAD","GBM"])
-sick = dataLoader.getData(["sick"], ["THCA","LUAD","GBM"])
-data = dataLoader.getData(["sick", "healthy"], ["THCA","LUAD","GBM"])
+healthy = dataLoader.getData(["healthy"], ["THCA","LUAD"])
+sick = dataLoader.getData(["sick"], ["THCA","LUAD"])
+data = dataLoader.getData(["sick", "healthy"], ["THCA","LUAD"])
 gene_labels = dataLoader.getGeneLabels()
 print("got combined data")
 
@@ -54,13 +56,13 @@ COMBINED_METHODS = {
     "sfs": dimReducer.getFeaturesBySFS,
 }
 
-ALL_METHODS = {
-    "basic": dimReducer.getFeatures,
-    "tree":  dimReducer.getDecisionTreeFeatures,
-    "norm":  dimReducer.getNormalizedFeaturesS, # SELECT BEST
-    "ea":    dimReducer.getEAFeatures,
-    "sfs":   dimReducer.getFeaturesBySFS,
-}
+ALL_METHODS = [
+    "basic", 
+    #"tree",
+    "norm",
+    #"ea",
+    "sfs",
+]
 
 def get_result_dict(method, k, feature_set, time, statistic="", normalization="", exclude="", preselect="", fitness_method=""):
     fitness_score = float(str(combined_fitness(sick, healthy, feature_set))[0:5])
@@ -142,14 +144,12 @@ def get_combined_results(statistic = "chi2", normalization = "exclude", n = 5000
     print("Combined methods are done")
     return results
 
-
 #%%
 table = []
 table.append(["Method", "K", "Statistic", "Normalization", "Exclude", "Preselect", "Fitness_method", "Fitness_score", "Sick_F1", "Time", "Features"])
 table.extend(get_basic_results())
 table.extend(get_normalized_results())
 table.extend(get_combined_results())
-
 print("table creation done")
 
 # %%
@@ -157,5 +157,48 @@ print("table creation done")
 with open("grid_table.csv","w") as f:
     wr = csv.writer(f)
     wr.writerows(table)
+
+print("saved table to file")
+
+# %%
+def get_result_dict2(id, cancer_type, method, k, metrics, time, features):
+    fitness = float(str(metrics["fitness"]["combinedFitness"])[0:5])
+    sick_f1 = float(str(metrics["sick"]["classification"]["decisionTree"]["f1"]["mean"])[0:5])
+    return [id, cancer_type, method, k, fitness, sick_f1, time, features.tolist()]
+
+
+def get_one_against_rest_results():
+    results = []
+    id = 0
+    for k in K_OPTIONS:
+        for method in ALL_METHODS:
+            start = datetime.now()
+            feature_sets = dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method)
+            time = round((datetime.now()-start).total_seconds(),2)
+
+            validation = analyzer.computeFeatureValidationOneAgainstRest(sick, healthy, feature_sets)
+            del validation["meanFitness"]
+
+            for cancer_type, metrics in validation.items():
+                result = get_result_dict2(id, cancer_type, method, k, metrics, time, feature_sets[cancer_type])
+                results.append(result)
+
+            id += 1
+            print("Method: " +  method + " is done")
+        print("Parameter k: " + str(k) + " is done")
+
+    return results
+
+
+
+table2 = []
+table2.append(["ID", "Type", "Method", "K", "Fitness_score", "Sick_F1", "Time", "Features"])
+table2.extend(get_one_against_rest_results())
+print("table creation done")
+# %%
+
+with open("grid_table_2.csv","w") as f:
+    wr = csv.writer(f)
+    wr.writerows(table2)
 
 print("saved table to file")
