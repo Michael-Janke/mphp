@@ -1,4 +1,12 @@
-const SERVER_URL = "http://localhost:5000";
+
+let SERVER_URL;
+const hostname = window && window.location && window.location.hostname;
+
+if(hostname === 'localhost' || hostname === "127.0.0.1") {
+  SERVER_URL = "http://localhost:5000";
+} else {
+  SERVER_URL = "http://" + hostname;
+}
 
 export default route => {
   return fetch(`${SERVER_URL}${route}`)

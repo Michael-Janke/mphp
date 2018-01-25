@@ -1,11 +1,12 @@
 import json
 import re
 
-from flask import Flask, request, abort
+from flask import Flask, request, abort, send_from_directory
 from flask_cors import CORS
 from utils.DataLoader import DataLoader
 from server import availableAlgorithms, externalApiCalls, algorithmExecution
 import optparse
+import os
 
 datasets = {
     "dataset4": "Dataset 4 | TCGA",
@@ -18,11 +19,21 @@ statistics = {dataset: dataLoader.getStatistics()
 app = Flask(__name__)
 CORS(app)
 
+@app.route('/', defaults={'path': 'index.html'})
+@app.route('/<path:path>')
+def serve(path):
+    if(os.path.exists('client/build/' + path)):
+        return send_from_directory('client/build/', path)
+    else:
+        return send_from_directory('client/build/', 'index.html')
 
-@app.route('/')
-def hello_world():
-    return 'Hello World!'
+@app.route('/static/js/<path:path>')
+def servejs(path):
+    return send_from_directory('client/build/static/js/', path)
 
+@app.route('/static/media/<path:path>')
+def servemedia(path):
+    return send_from_directory('client/build/static/media/', path)
 
 @app.route('/testGenes', methods=["POST"])
 def test_genes():
