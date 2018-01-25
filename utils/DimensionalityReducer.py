@@ -17,15 +17,24 @@ from utils.EA.algorithm import ea_for_plot
 
 from utils import Expressions, binarize_labels
 
-class DimensionalityReducer:
+class DimensionalityReducer(object):
     ####### PCA #######
 
-    def __init__(self):
+    def __init__(self, sick=[], healthy=[]):
         self.method_table = {
             "chi2": chi2,
             "f_classif": f_classif,
             "mutual_info_classif": mutual_info_classif
         }
+        self.sick = sick
+        self.healthy = healthy
+        
+    def transform(self, X):
+        return X[:, self.features]
+
+    def fit(self, X, y):
+        self.features = self.getFeaturesBySFS(self.sick, self.healthy)
+        return self
 
     def getPCA(self, data, n_components, n_features_per_component=10):
         pca = PCA(n_components=n_components, svd_solver='full')
