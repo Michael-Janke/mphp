@@ -50,8 +50,6 @@ const StyledRoot = styled.div`
 const ScrollableArea = styled.div`
   overflow: auto;
   flex: 1;
-  display: flex;
-  flex-direction: column;
   margin-top: ${props =>
     props.headerMinimized
       ? props.theme.experimentHeaderHeight
