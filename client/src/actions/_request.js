@@ -31,7 +31,8 @@ export const postRequest = (route, body) => {
     },
     method: "POST",
     body: JSON.stringify(body),
-    mode: "cors"
+    mode: "cors",
+    timeout: 0
   });
   return fetch(request)
     .then(response => {
