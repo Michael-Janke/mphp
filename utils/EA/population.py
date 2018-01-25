@@ -21,5 +21,5 @@ def phenotype(indiv):
     #should return indices of ones
     selected_features = [i for i, x in enumerate(indiv[0]) if x == 1]
     if len(selected_features) == 0:
-        selected_features = [ randint(0, len(indiv[0])) ]
+        selected_features = [ randint(0, len(indiv[0])-1) ]
     return np.array(selected_features)

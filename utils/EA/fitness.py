@@ -15,7 +15,7 @@ def fitness(sick, healthy, fit='combined', k=10, true_label=""):
         if pheno.shape[0] > k:
             return -10
 
-        return fitness_func(sick, healthy, pheno, true_label)
+        return fitness_func(sick, healthy, pheno, true_label=true_label)
     return fitness_
 
 def get_fitness_function_name(fit):

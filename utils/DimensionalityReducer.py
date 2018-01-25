@@ -188,7 +188,7 @@ class DimensionalityReducer():
                 healthy_binary = Expressions(healthy.expressions, h_labels)
 
                 if method == "ea":
-                    indices = self.getEAFeatures(sick, healthy, normalization, fitness=fitness, true_label=label)
+                    indices = self.getEAFeatures(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
                 elif method == "norm":
                     indices = self.getNormalizedFeatures(sick_binary, healthy_binary, normalization, k)
                 else:

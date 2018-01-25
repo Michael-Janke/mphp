@@ -52,7 +52,7 @@ NORMALIZED_METHODS = {
 }
 
 COMBINED_METHODS = {
-    #"ea":  dimReducer.getEAFeatures,
+    "ea":  dimReducer.getEAFeatures,
     "sfs": dimReducer.getFeaturesBySFS,
 }
 
@@ -61,7 +61,7 @@ ALL_METHODS = [
     #"tree",
     "norm",
     #"ea",
-    "sfs",
+    #"sfs",
 ]
 
 def get_result_dict(method, k, feature_set, time, statistic="", normalization="", exclude="", preselect="", fitness_method=""):
@@ -147,8 +147,8 @@ def get_combined_results(statistic = "chi2", normalization = "exclude", n = 5000
 #%%
 table = []
 table.append(["Method", "K", "Statistic", "Normalization", "Exclude", "Preselect", "Fitness_method", "Fitness_score", "Sick_F1", "Time", "Features"])
-table.extend(get_basic_results())
-table.extend(get_normalized_results())
+#table.extend(get_basic_results())
+#table.extend(get_normalized_results())
 table.extend(get_combined_results())
 print("table creation done")
 
@@ -195,8 +195,9 @@ table2 = []
 table2.append(["ID", "Type", "Method", "K", "Fitness_score", "Sick_F1", "Time", "Features"])
 table2.extend(get_one_against_rest_results())
 print("table creation done")
-# %%
 
+
+# %%
 with open("grid_table_2.csv","w") as f:
     wr = csv.writer(f)
     wr.writerows(table2)
