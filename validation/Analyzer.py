@@ -15,15 +15,16 @@ class Analyzer:
     def computeFeatureValidationOneAgainstRest(self, sick, healthy, selected_genes_dict):
         results = {}
         for label, genes in selected_genes_dict.items():
-            #s_labels = binarize_labels(sick.labels, label)
-            #sick_binary = Expressions(sick.expressions, s_labels)
-
             if healthy == "":
                 results[label] = self.computeFeatureValidation(sick, "", genes, true_label=label)
             else:
-                #h_labels = binarize_labels(healthy.labels, label)
-                #healthy_binary = Expressions(healthy.expressions, h_labels)
                 results[label] = self.computeFeatureValidation(sick, healthy, genes, true_label=label)
+
+        cumulated_fitness = 0
+        for res in results.values():
+            cumulated_fitness += res["fitness"]["combinedFitness"]
+
+        results["meanFitness"] = cumulated_fitness / len(results.keys())
 
         return results
 

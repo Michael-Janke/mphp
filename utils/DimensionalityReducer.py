@@ -17,24 +17,15 @@ from utils.EA.algorithm import ea_for_plot
 
 from utils import Expressions, binarize_labels
 
-class DimensionalityReducer(object):
+class DimensionalityReducer():
     ####### PCA #######
 
-    def __init__(self, sick=[], healthy=[]):
+    def __init__(self):
         self.method_table = {
             "chi2": chi2,
             "f_classif": f_classif,
             "mutual_info_classif": mutual_info_classif
         }
-        self.sick = sick
-        self.healthy = healthy
-        
-    def transform(self, X):
-        return X[:, self.features]
-
-    def fit(self, X, y):
-        self.features = self.getFeaturesBySFS(self.sick, self.healthy)
-        return self
 
     def getPCA(self, data, n_components, n_features_per_component=10):
         pca = PCA(n_components=n_components, svd_solver='full')
@@ -109,9 +100,9 @@ class DimensionalityReducer(object):
 
     ####### MULTI-VARIATE FEATURE SELECTION #######
 
-    def getEAFeatures(self, sick, healthy, normalization="substract", returnMultipleSets = False, fitness="combined", true_label=""):
+    def getEAFeatures(self, sick, healthy, k=3, n=5000, m=100, normalization="exclude", fitness="combined", returnMultipleSets = False, true_label=""):
         # preselect features to reduce runtime
-        selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, c.chromo_size, c.chromo_size)
+        selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
 
         crossover = one_point_crossover
         mutation = binary_mutation
@@ -119,9 +110,9 @@ class DimensionalityReducer(object):
         sick_reduced = Expressions(sick.expressions[:, selected_genes], sick.labels)
         healthy_reduced = Expressions(healthy.expressions[:, selected_genes], healthy.labels)
 
-        fitness_function = fitness_module.fitness(sick_reduced, healthy_reduced, fitness)
+        fitness_function = fitness_module.fitness(sick_reduced, healthy_reduced, fitness, k, true_label)
 
-        best, sets, _, _ = ea_for_plot(c, c.chromo_size, fitness_function, crossover, mutation)
+        best, sets, _, _ = ea_for_plot(c, m, k, fitness_function, crossover, mutation)
 
         if not returnMultipleSets:
             indices = selected_genes[phenotype(best)]
@@ -143,7 +134,7 @@ class DimensionalityReducer(object):
             print("finished feature set")
             sets.append(self.getFeatureSetBySFS(sick, healthy, selected_genes[i:], k, fitness))
 
-        return sets
+        return np.asarray(sets)
 
     def getFeatureSetBySFS(self, sick, healthy, genes, k, fitness, true_label=""):
         # first gene has highest score and will be selected first
@@ -166,7 +157,7 @@ class DimensionalityReducer(object):
             indices.append(best_gene)
             print("added new feature")
 
-        return indices
+        return np.asarray(indices)
 
     ####### EMBEDDED FEATURE SELECTION #######
 

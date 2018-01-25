@@ -11,11 +11,11 @@ from .selection import tournament, elitism
 from .ea_utils import best_indiv, best_indivs, average_indiv
 
 
-def run(c, size_cromo, fitness_func, crossover, mutation):
+def run(c, size_cromo, k, fitness_func, crossover, mutation):
     statistics = []
     for i in range(c.runs):
         seed(i)
-        _, _, stat_best, _ = ea_for_plot(c, size_cromo, fitness_func, crossover, mutation)
+        _, _, stat_best, _ = ea_for_plot(c, size_cromo, k, fitness_func, crossover, mutation)
         statistics.append(stat_best)
 
     stat_gener = list(zip(*statistics))
@@ -29,9 +29,9 @@ def run(c, size_cromo, fitness_func, crossover, mutation):
     return best, aver_gener
 
 # Return the best individual, best by generations, average population by generation
-def ea_for_plot(c, size_cromo, fitness_func, crossover, mutation):
+def ea_for_plot(c, size_cromo, k, fitness_func, crossover, mutation):
     # initialize population: indiv = (cromo,fit)
-    population = generate_population(size_cromo)
+    population = generate_population(size_cromo, k)
     population = [(indiv[0], fitness_func(indiv)) for indiv in population]
 
     stat = [best_indiv(population)[1]]
@@ -46,7 +46,7 @@ def ea_for_plot(c, size_cromo, fitness_func, crossover, mutation):
             gen_without_improvement = 0
             old_pop_size = int(len(population) * (1 - c.immigrant_perc))
             population = population[ 0 : old_pop_size ]
-            immigrants = generate_population(c.population_size - old_pop_size)
+            immigrants = generate_population(c.population_size - old_pop_size, k)
             [population.append(immigrant) for immigrant in immigrants]
             population = [ (indiv[0], fitness_func(indiv)) for indiv in population ]
 

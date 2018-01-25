@@ -6,16 +6,16 @@ from utils import ignore_warnings, binarize_labels
 
 from utils.EA.population import phenotype
 
-def fitness(sick, healthy, fit='combined'):
+def fitness(sick, healthy, fit='combined', k=10, true_label=""):
     fitness_func  = globals()[get_fitness_function_name(fit)]
     def fitness_(indiv):
         pheno = phenotype(indiv)
         # select features and only pass this data to evaluate
         # todo smarter penalty
-        if pheno.shape[0] > 10:
+        if pheno.shape[0] > k:
             return -10
 
-        return fitness_func(sick, healthy, pheno)
+        return fitness_func(sick, healthy, pheno, true_label)
     return fitness_
 
 def get_fitness_function_name(fit):
