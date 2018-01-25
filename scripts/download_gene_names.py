@@ -25,6 +25,5 @@ def download_gene_names(path):
 		gene_map[int(rows[0][4:])] = rows[1]
 		entrez_map[int(rows[0][4:])] = rows[2]
 
-	print(gene_map)
 	np.save	(path + "/gene_names", gene_map)
 	np.save	(path + "/entrez_names", entrez_map)
