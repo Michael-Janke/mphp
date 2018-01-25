@@ -62,7 +62,7 @@ ALL_METHODS = {
     "sfs":   dimReducer.getFeaturesBySFS,
 }
 
-def get_result_dict(method, k, feature_set, time, statistic="-", normalization="-", exclude="-", preselect="-", fitness_method="-"):
+def get_result_dict(method, k, feature_set, time, statistic="", normalization="", exclude="", preselect="", fitness_method=""):
     fitness_score = float(str(combined_fitness(sick, healthy, feature_set))[0:5])
 
     scoring = { 'f1': make_scorer(f1_score, average='macro') }
