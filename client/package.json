@@ -19,7 +19,8 @@
     "tinycolor2": "^1.4.1"
   },
   "scripts": {
-    "start": "concurrently \"react-scripts start\" \"cd .. && python app.py\" -n \"client,server\" -c \"green,yellow\" --kill-others-on-fail ",
+    "start":
+      "concurrently \"react-scripts start\" \"cd .. && python app.py -d\" -n \"client,server\" -c \"green,yellow\" --kill-others-on-fail ",
     "start-client": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
