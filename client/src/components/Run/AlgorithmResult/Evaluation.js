@@ -18,7 +18,13 @@ export default class Evaluation extends Component {
         {this.renderHealthyScore(2)}
       </List>
     ) : (
-      <List>{this.renderScores(this.props)}</List>
+      <List>
+        {this.renderScore(
+          this.classificationScoreParameters(
+            this.props.classification.decisionTree
+          )
+        )}
+      </List>
     );
   }
 
