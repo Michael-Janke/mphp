@@ -5,6 +5,7 @@ from flask import Flask, request, abort
 from flask_cors import CORS
 from utils.DataLoader import DataLoader
 from server import availableAlgorithms, externalApiCalls, algorithmExecution
+import optparse
 
 datasets = {
     "dataset4": "Dataset 4 | TCGA",
@@ -74,5 +75,36 @@ def runSpecificAlgorithm():
     return re.sub(regex, 'null', jsonResponse)
 
 
+
+def flaskrun(app, default_host="127.0.0.1", 
+                  default_port="5000"):
+    """
+    Takes a flask.Flask instance and runs it. Parses 
+    command-line flags to configure the app.
+    """
+
+    # Set up the command-line options
+    parser = optparse.OptionParser()
+    parser.add_option("-H", "--host",
+                      help="Hostname of the Flask app " + \
+                           "[default %s]" % default_host,
+                      default=default_host)
+    parser.add_option("-P", "--port",
+                      help="Port for the Flask app " + \
+                           "[default %s]" % default_port,
+                      default=default_port)
+
+    parser.add_option("-d", "--debug",
+                      action="store_true", dest="debug",
+                      help=optparse.SUPPRESS_HELP)
+
+    options, _ = parser.parse_args()
+
+    app.run(
+        debug=options.debug,
+        host=options.host,
+        port=int(options.port)
+    )
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, use_reloader=True, threaded=True)
+    flaskrun(app)
