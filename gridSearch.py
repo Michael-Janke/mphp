@@ -1,210 +1,32 @@
 #%%
-import numpy as np
-import csv
-from pprint import pprint
-from datetime import datetime
-
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import cross_validate
-from sklearn.metrics import make_scorer, f1_score
-
 from utils.DataLoader import DataLoader
-from utils.DimensionalityReducer import DimensionalityReducer
-from utils.DataNormalizer import DataNormalizer
-from utils.EA.fitness import combined_fitness
-from validation.Analyzer import Analyzer
-
-from utils import Expressions
+from validation.GridSearch import GridSearch
 
 print("Imported modules")
 
 dataLoader = DataLoader("dataset4")
-dimReducer = DimensionalityReducer()
-analyzer = Analyzer()
-
 print("data loaded")
 
 #%%
 healthy = dataLoader.getData(["healthy"], ["THCA","LUAD"])
 sick = dataLoader.getData(["sick"], ["THCA","LUAD"])
 data = dataLoader.getData(["sick", "healthy"], ["THCA","LUAD"])
-gene_labels = dataLoader.getGeneLabels()
+
+grid_search = GridSearch(sick, healthy, data)
 print("got combined data")
 
-
-
-# %%
-K_OPTIONS = [3] # , 5, 10, 20
-EXCLUDE_OPTIONS = [100, 500, 1000, 5000, 10000]
-M_OPTIONS = [10] # , 50, 100, 500
-S_OPTIONS = ["chi2", "f_classif"] #, "mutual_info_classif"
-NORM_OPTIONS = ["substract", "exclude"]
-F_OPTIONS = ["combined", "classification", "clustering", "distance"]
-
-BASIC_METHODS = {
-    "basic": dimReducer.getFeatures,
-    "tree" : dimReducer.getDecisionTreeFeatures,
-}
-
-NORMALIZED_METHODS = {
-    "subt": dimReducer.getNormalizedFeaturesS,
-    "excl": dimReducer.getNormalizedFeaturesE,
-}
-
-COMBINED_METHODS = {
-    "ea":  dimReducer.getEAFeatures,
-    "sfs": dimReducer.getFeaturesBySFS,
-}
-
-ALL_METHODS = [
-    "basic", 
-    "tree",
-    "norm",
-    "ea",
-    "sfs",
-]
-
-def get_result_dict(method, k, feature_set, time, statistic="", normalization="", exclude="", preselect="", fitness_method=""):
-    fitness_score = float(str(combined_fitness(sick, healthy, feature_set))[0:5])
-
-    scoring = { 'f1': make_scorer(f1_score, average='macro') }
-    clf = DecisionTreeClassifier()
-    scores = cross_validate(clf, sick.expressions[:,feature_set], sick.labels, cv=5, scoring=scoring, return_train_score=False)
-    f1 = scores['test_f1'].mean()
-
-    return [method, k, statistic, normalization, exclude, preselect, fitness_method, fitness_score, f1, time, feature_set.tolist()]
-
-def get_basic_results():
-    results = []
-    for k in K_OPTIONS:
-        for method in BASIC_METHODS:
-            if method == "basic":
-                # get result for each possible statistic
-                for stat in S_OPTIONS:
-                    start = datetime.now()
-                    features = BASIC_METHODS[method](data, k, stat)
-                    time = round((datetime.now()-start).total_seconds(),2)
-
-                    result = get_result_dict(method, k, features, time, statistic=stat)
-                    results.append(result)
-
-            else:
-                start = datetime.now()
-                features = BASIC_METHODS[method](data, k)
-                time = round((datetime.now()-start).total_seconds(),2)
-                
-                result = get_result_dict(method, k, features, time)
-                results.append(result)
-
-        print("Parameter k: " + str(k) + " is done")
-    print("Basic methods are done")
-    return results
-
-def get_normalized_results(statistic = "chi2"):
-    results = []
-    for k in K_OPTIONS:
-        for method in NORMALIZED_METHODS:
-            if method == "excl":
-                # get result for each possible exlude parameter
-                for exclude_n in EXCLUDE_OPTIONS:
-                    start = datetime.now()
-                    features = NORMALIZED_METHODS[method](sick, healthy, k, exclude_n, statistic)
-                    time = round((datetime.now()-start).total_seconds(),2)
-
-                    result = get_result_dict(method, k, features, time, statistic=statistic, exclude=exclude_n, normalization="exclude")
-                    results.append(result)
-
-            else:
-                start = datetime.now()
-                features = NORMALIZED_METHODS[method](sick, healthy, k, 42, statistic)
-                time = round((datetime.now()-start).total_seconds(),2)
-                
-                result = get_result_dict(method, k, features, time, statistic=statistic, normalization="substract")
-                results.append(result)
-
-    print("Normalized methods are done")
-    return results
-
-def get_combined_results(statistic = "chi2", normalization = "exclude", n = 5000):
-    results = []
-    for k in K_OPTIONS:
-        for method in COMBINED_METHODS:
-            for m in M_OPTIONS:
-                for fit in F_OPTIONS:
-            
-                    start = datetime.now()
-                    features = COMBINED_METHODS[method](sick, healthy, k, n, m, normalization, fit)
-                    time = round((datetime.now()-start).total_seconds(),2)
-                    
-                    result = get_result_dict(method, k, features, time, statistic=statistic, exclude=n, normalization="exclude", preselect=m, fitness_method=fit)
-                    results.append(result)
-
-            print("Method " + method + " is done")
-        print("Parameter k: " + str(k) + " is done")
-    print("Combined methods are done")
-    return results
-
 #%%
-table = []
-table.append(["Method", "K", "Statistic", "Normalization", "Exclude", "Preselect", "Fitness_method", "Fitness_score", "Sick_F1", "Time", "Features"])
-table.extend(get_basic_results())
-table.extend(get_normalized_results())
-table.extend(get_combined_results())
+#### ALL AT ONCE ####
+table = grid_search.get_table_all_at_once()
 print("table creation done")
 
-# %%
-
-with open("grid_table.csv","w") as f:
-    wr = csv.writer(f)
-    wr.writerows(table)
-
+grid_search.save_table_to_disk(table, "grid_search_all_at_once")
 print("saved table to file")
 
 # %%
-def get_result_dict2(id, cancer_type, method, k, metrics, time, features):
-    fitness = float(str(metrics["fitness"]["combinedFitness"])[0:5])
-    sick_f1 = float(str(metrics["sick"]["classification"]["decisionTree"]["f1"]["mean"])[0:5])
-    return [id, cancer_type, method, k, fitness, sick_f1, time, features.tolist()]
-
-
-def get_one_against_rest_results():
-    results = []
-    id = 0
-    for k in K_OPTIONS:
-        for method in ALL_METHODS:
-            if method in ["basic", "tree"]:
-                start = datetime.now()
-                feature_sets = dimReducer.getOneAgainstRestFeatures(data, '', k, method=method)
-                time = round((datetime.now()-start).total_seconds(),2)
-            else:    
-                start = datetime.now()
-                feature_sets = dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method)
-                time = round((datetime.now()-start).total_seconds(),2)
-
-            validation = analyzer.computeFeatureValidationOneAgainstRest(sick, healthy, feature_sets)
-            del validation["meanFitness"]
-
-            for cancer_type, metrics in validation.items():
-                result = get_result_dict2(id, cancer_type, method, k, metrics, time, feature_sets[cancer_type])
-                results.append(result)
-
-            id += 1
-            print("Method: " +  method + " is done")
-        print("Parameter k: " + str(k) + " is done")
-
-    return results
-
-
-
-table2 = []
-table2.append(["ID", "Type", "Method", "K", "Fitness_score", "Sick_F1", "Time", "Features"])
-table2.extend(get_one_against_rest_results())
+#### ONE VS REST ####
+table = grid_search.get_table_one_vs_rest()
 print("table creation done")
 
-
-# %%
-with open("grid_table_2.csv","w") as f:
-    wr = csv.writer(f)
-    wr.writerows(table2)
-
+grid_search.save_table_to_disk(table, "grid_search_one_vs_rest")
 print("saved table to file")
