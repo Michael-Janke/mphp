@@ -21,10 +21,10 @@ class GridSearch(object):
         self.dimReducer = DimensionalityReducer()
         self.analyzer = Analyzer()
 
-        self.K_OPTIONS = [3] # , 5, 10, 20
+        self.K_OPTIONS = [3, 5, 10, 20] 
         self.EXCLUDE_OPTIONS = [100, 500, 1000, 5000, 10000]
-        self.M_OPTIONS = [10] # , 50, 100, 500
-        self.S_OPTIONS = ["chi2", "f_classif"] #, "mutual_info_classif"
+        self.M_OPTIONS = [10, 50, 100, 500]
+        self.S_OPTIONS = ["chi2", "f_classif", "mutual_info_classif"]
         self.NORM_OPTIONS = ["substract", "exclude"]
         self.F_OPTIONS = ["combined", "classification", "clustering", "distance"]
 
@@ -74,8 +74,8 @@ class GridSearch(object):
                     result = self.get_result_dict_all_at_once(method, k, features, time)
                     results.append(result)
 
-            print("Parameter k: " + str(k) + " is done")
-        print("Basic methods are done")
+            print("Parameter k: " + str(k) + " is done", flush=True)
+        print("Basic methods are done", flush=True)
         return results
 
     def get_normalized_results(self, statistic = "chi2"):
@@ -100,7 +100,7 @@ class GridSearch(object):
                     result = self.get_result_dict_all_at_once(method, k, features, time, statistic=statistic, normalization="substract")
                     results.append(result)
 
-        print("Normalized methods are done")
+        print("Normalized methods are done", flush=True)
         return results
 
     def get_combined_results(self, statistic = "chi2", normalization = "exclude", n = 5000):
@@ -117,9 +117,9 @@ class GridSearch(object):
                         result = self.get_result_dict_all_at_once(method, k, features, time, statistic=statistic, exclude=n, normalization="exclude", preselect=m, fitness_method=fit)
                         results.append(result)
 
-                print("Method " + method + " is done")
-            print("Parameter k: " + str(k) + " is done")
-        print("Combined methods are done")
+                print("Method " + method + " is done", flush=True)
+            print("Parameter k: " + str(k) + " is done", flush=True)
+        print("Combined methods are done", flush=True)
         return results
 
 
@@ -146,8 +146,8 @@ class GridSearch(object):
                     results.append(result)
 
                 id += 1
-                print("Method: " +  method + " is done")
-            print("Parameter k: " + str(k) + " is done")
+                print("Method: " +  method + " is done", flush=True)
+            print("Parameter k: " + str(k) + " is done", flush=True)
 
         return results
 
