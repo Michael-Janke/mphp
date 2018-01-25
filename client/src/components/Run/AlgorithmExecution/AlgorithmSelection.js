@@ -5,6 +5,7 @@ import TextField from "material-ui/TextField";
 import Checkbox from "material-ui/Checkbox";
 import styled from "styled-components";
 
+import Description from "../../Description";
 import { boringBlue } from "../../../config/colors";
 
 export default class AlgorithmSelection extends Component {
@@ -89,14 +90,19 @@ export default class AlgorithmSelection extends Component {
   }
 
   renderComparisonModeSelection() {
+    const descriptionText =
+      "Select discriminating genes per cancer type against all other, " +
+      "disable to select one set of discriminating genes for all cancer types";
     return (
-      <StyledCheckbox
-        label="One against rest"
-        checked={this.props.oneAgainstRest}
-        onCheck={this.toggleComparisonMode.bind(this)}
-        disabled={this.props.disabled}
-        iconStyle={{ fill: boringBlue }}
-      />
+      <DescribedCheckbox text={descriptionText}>
+        <Checkbox
+          label="One against rest"
+          checked={this.props.oneAgainstRest}
+          onCheck={this.toggleComparisonMode.bind(this)}
+          iconStyle={{ fill: boringBlue }}
+          disabled={this.props.algorithm.cancerTypes.length < 2}
+        />
+      </DescribedCheckbox>
     );
   }
 
@@ -164,7 +170,7 @@ const StyledTextField = styled(TextField)`
   margin-left: ${props => props.theme.mediumSpace};
 `;
 
-const StyledCheckbox = styled(Checkbox)`
+const DescribedCheckbox = styled(Description)`
   margin-left: ${props => props.theme.mediumSpace};
   margin-top: ${props => props.theme.mediumSpace};
 `;

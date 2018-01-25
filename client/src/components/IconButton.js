@@ -6,6 +6,7 @@ import OpenIcon from "material-ui/svg-icons/file/folder-open";
 import SaveIcon from "material-ui/svg-icons/content/save";
 import DeleteIcon from "material-ui/svg-icons/action/delete";
 import AddIcon from "material-ui/svg-icons/content/add-circle";
+import QuestionIcon from "material-ui/svg-icons/action/help-outline";
 
 class IconButton extends Component {
   render() {
@@ -14,16 +15,13 @@ class IconButton extends Component {
       open: OpenIcon,
       save: SaveIcon,
       delete: DeleteIcon,
-      add: AddIcon
+      add: AddIcon,
+      help: QuestionIcon
     };
     const Icon = icons[this.props.icon];
 
     return (
-      <StyledIconButton
-        tooltip={this.props.tooltip}
-        color={this.props.color}
-        onClick={this.props.onClick}
-      >
+      <StyledIconButton {...this.props}>
         <Icon />
       </StyledIconButton>
     );
@@ -31,14 +29,15 @@ class IconButton extends Component {
 }
 
 const StyledIconButton = styled(_IconButton)`
-  width: 38px !important;
-  height: 38px !important;
-  padding: ${props => props.theme.smallSpace} !important;
+  width: ${props => props.size || "38px"} !important;
+  height: ${props => props.size || "38px"} !important;
+  padding: ${props => props.padding || props.theme.smallSpace} !important;
   svg {
     width: 19px !important;
     height: 19px !important;
     color: ${props => props.color || props.textColor} !important;
   }
+  cursor: ${props => props.cursor || "pointer"} !important;
 `;
 
 export default IconButton;
