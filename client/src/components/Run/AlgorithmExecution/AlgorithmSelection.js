@@ -21,13 +21,15 @@ export default class AlgorithmSelection extends Component {
             autoWidth={true}
             selectedMenuItemStyle={{ color: boringBlue }}
             disabled={this.props.disabled}
-            style={{width:220}}
+            style={{ width: 220 }}
           >
-            {Object.keys(datasets).map((dataset) => <MenuItem
-              key={dataset}
-              value={dataset}
-              primaryText={datasets[dataset]}/>)
-            }
+            {Object.keys(datasets).map(dataset => (
+              <MenuItem
+                key={dataset}
+                value={dataset}
+                primaryText={datasets[dataset]}
+              />
+            ))}
           </StyledSelectField>
           <StyledSelectField
             floatingLabelText="Algorithm"
@@ -38,12 +40,15 @@ export default class AlgorithmSelection extends Component {
             autoWidth={true}
             selectedMenuItemStyle={{ color: boringBlue }}
             disabled={this.props.disabled}
-            style={{width:220}}
+            style={{ width: 220 }}
           >
             {Object.keys(algorithms).map(this.renderMenuItem.bind(this))}
           </StyledSelectField>
-          {algorithm.key && algorithms &&
-            Object.keys(algorithms[algorithm.key].parameters).map(this.renderParameter.bind(this, this.props.disabled))}
+          {algorithm.key &&
+            algorithms &&
+            Object.keys(algorithms[algorithm.key].parameters).map(
+              this.renderParameter.bind(this, this.props.disabled)
+            )}
         </StyledOptions>
       </StyledMenu>
     );
@@ -61,7 +66,8 @@ export default class AlgorithmSelection extends Component {
   }
 
   renderParameter(disabled, parameter, index) {
-    var parameterObj = this.props.algorithms[this.props.algorithm.key].parameters[parameter];
+    var parameterObj = this.props.algorithms[this.props.algorithm.key]
+      .parameters[parameter];
     return (
       <StyledTextField
         key={parameter}
@@ -75,14 +81,20 @@ export default class AlgorithmSelection extends Component {
         type="number"
         onChange={this.changeParameter.bind(this)}
         disabled={disabled}
-        style={{width:210}}
+        style={{ width: 210 }}
       />
     );
   }
 
   changeDataset(event, index, dataset) {
     const { runId, updateRun } = this.props;
-    updateRun(runId, { dataset: dataset });
+    // necessary because not all cancer types are available in every data set
+    const algorithm = {
+      cancerTypes: ["THCA"],
+      healthyTissueTypes: ["NT"],
+      sickTissueTypes: ["TP"]
+    };
+    updateRun(runId, { dataset: dataset, algorithm: algorithm });
   }
 
   changeParameter(event, index, key) {
@@ -91,7 +103,9 @@ export default class AlgorithmSelection extends Component {
       ...algorithm.parameters,
       [event.target.id]: parseInt(event.target.value, 10)
     };
-    updateRun(runId, { algorithm: {...algorithm, parameters: updatedParams} });
+    updateRun(runId, {
+      algorithm: { ...algorithm, parameters: updatedParams }
+    });
   }
 
   selectAlgorithm(event, index, key) {
@@ -104,13 +118,11 @@ export default class AlgorithmSelection extends Component {
         return { ...reducedParams, [param]: parameters[param].default };
       }, {})
     };
-    updateRun(runId, { algorithm: {...algorithm, ...updatedValues}});
+    updateRun(runId, { algorithm: { ...algorithm, ...updatedValues } });
   }
-
 }
 
-const StyledMenu = styled.div`
-`;
+const StyledMenu = styled.div``;
 
 const StyledOptions = styled.div`
   display: flex;
