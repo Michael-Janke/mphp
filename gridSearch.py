@@ -43,7 +43,7 @@ F_OPTIONS = ["combined", "classification", "clustering", "distance"]
 
 BASIC_METHODS = {
     "basic": dimReducer.getFeatures,
-    #"tree" : dimReducer.getDecisionTreeFeatures,
+    "tree" : dimReducer.getDecisionTreeFeatures,
 }
 
 NORMALIZED_METHODS = {
@@ -58,10 +58,10 @@ COMBINED_METHODS = {
 
 ALL_METHODS = [
     "basic", 
-    #"tree",
+    "tree",
     "norm",
-    #"ea",
-    #"sfs",
+    "ea",
+    "sfs",
 ]
 
 def get_result_dict(method, k, feature_set, time, statistic="", normalization="", exclude="", preselect="", fitness_method=""):
@@ -147,8 +147,8 @@ def get_combined_results(statistic = "chi2", normalization = "exclude", n = 5000
 #%%
 table = []
 table.append(["Method", "K", "Statistic", "Normalization", "Exclude", "Preselect", "Fitness_method", "Fitness_score", "Sick_F1", "Time", "Features"])
-#table.extend(get_basic_results())
-#table.extend(get_normalized_results())
+table.extend(get_basic_results())
+table.extend(get_normalized_results())
 table.extend(get_combined_results())
 print("table creation done")
 
@@ -172,9 +172,14 @@ def get_one_against_rest_results():
     id = 0
     for k in K_OPTIONS:
         for method in ALL_METHODS:
-            start = datetime.now()
-            feature_sets = dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method)
-            time = round((datetime.now()-start).total_seconds(),2)
+            if method in ["basic", "tree"]:
+                start = datetime.now()
+                feature_sets = dimReducer.getOneAgainstRestFeatures(data, '', k, method=method)
+                time = round((datetime.now()-start).total_seconds(),2)
+            else:    
+                start = datetime.now()
+                feature_sets = dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method)
+                time = round((datetime.now()-start).total_seconds(),2)
 
             validation = analyzer.computeFeatureValidationOneAgainstRest(sick, healthy, feature_sets)
             del validation["meanFitness"]
