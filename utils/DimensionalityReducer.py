@@ -17,9 +17,7 @@ from utils.EA.algorithm import ea_for_plot
 
 from utils import Expressions, binarize_labels
 
-class DimensionalityReducer:
-    ####### PCA #######
-
+class DimensionalityReducer():
     def __init__(self):
         self.method_table = {
             "chi2": chi2,
@@ -88,7 +86,7 @@ class DimensionalityReducer:
 
         # get features in sick data which do not discriminate healty data
         features = list(set(s_indices)-set(h_indices))
-        print("excluded "+str(n+k-len(features))+" features")
+        print("excluded "+str(n+k-len(features))+" features", flush=True)
         features = np.asarray(features, dtype=np.uint32)
 
         if not returnMultipleSets:
@@ -100,9 +98,9 @@ class DimensionalityReducer:
 
     ####### MULTI-VARIATE FEATURE SELECTION #######
 
-    def getEAFeatures(self, sick, healthy, normalization="substract", returnMultipleSets = False, fitness="combined", true_label=""):
+    def getEAFeatures(self, sick, healthy, k=3, n=5000, m=100, normalization="exclude", fitness="combined", returnMultipleSets = False, true_label=""):
         # preselect features to reduce runtime
-        selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, c.chromo_size, c.chromo_size)
+        selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
 
         crossover = one_point_crossover
         mutation = binary_mutation
@@ -110,9 +108,9 @@ class DimensionalityReducer:
         sick_reduced = Expressions(sick.expressions[:, selected_genes], sick.labels)
         healthy_reduced = Expressions(healthy.expressions[:, selected_genes], healthy.labels)
 
-        fitness_function = fitness_module.fitness(sick_reduced, healthy_reduced, fitness)
+        fitness_function = fitness_module.fitness(sick_reduced, healthy_reduced, fitness, k, true_label)
 
-        best, sets, _, _ = ea_for_plot(c, c.chromo_size, fitness_function, crossover, mutation)
+        best, sets, _, _ = ea_for_plot(c, m, k, fitness_function, crossover, mutation)
 
         if not returnMultipleSets:
             indices = selected_genes[phenotype(best)]
@@ -131,10 +129,10 @@ class DimensionalityReducer:
 
         sets = [best_set]
         for i in range(1,3):
-            print("finished feature set")
+            print("finished feature set", flush=True)
             sets.append(self.getFeatureSetBySFS(sick, healthy, selected_genes[i:], k, fitness))
 
-        return sets
+        return np.asarray(sets)
 
     def getFeatureSetBySFS(self, sick, healthy, genes, k, fitness, true_label=""):
         # first gene has highest score and will be selected first
@@ -155,9 +153,9 @@ class DimensionalityReducer:
                     best_fitness = fitness_score
                     best_gene = gene
             indices.append(best_gene)
-            print("added new feature")
+            print("added new feature", flush=True)
 
-        return indices
+        return np.asarray(indices)
 
     ####### EMBEDDED FEATURE SELECTION #######
 
@@ -188,7 +186,7 @@ class DimensionalityReducer:
                 healthy_binary = Expressions(healthy.expressions, h_labels)
 
                 if method == "ea":
-                    indices = self.getEAFeatures(sick, healthy, normalization, fitness=fitness, true_label=label)
+                    indices = self.getEAFeatures(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
                 elif method == "norm":
                     indices = self.getNormalizedFeatures(sick_binary, healthy_binary, normalization, k)
                 else:

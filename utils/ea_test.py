@@ -48,11 +48,11 @@ healthy_reduced = Expressions(healthy.expressions[:, selected_genes], healthy.la
 
 fitness_function = fitness(sick_reduced, healthy_reduced)
 
-best, sets, stat, stat_aver = ea_for_plot(c, chromo_size, fitness_function, crossover, mutation)
+best, sets, stat, stat_aver = ea_for_plot(c, chromo_size, 3, fitness_function, crossover, mutation)
 
 display_stat_1(stat, stat_aver)
 print(best[0])
 print(phenotype(best), best[1])
-pprint(sets)
+print(sets)
 features = selected_genes[phenotype(best)]
 print(features)
