@@ -95,15 +95,15 @@ export default class AlgorithmSelection extends Component {
       "Select discriminating genes per cancer type against all other, " +
       "disable to select one set of discriminating genes for all cancer types";
     return (
-      <DescribedCheckbox text={descriptionText}>
-        <Checkbox
+      <Description text={descriptionText}>
+        <StyledCheckbox
           label="One against rest"
           checked={this.props.oneAgainstRest}
           onCheck={this.toggleComparisonMode.bind(this)}
           iconStyle={{ fill: boringBlue }}
           disabled={!canRunOneAgainstAll(this.props.algorithm)}
         />
-      </DescribedCheckbox>
+      </Description>
     );
   }
 
@@ -158,7 +158,7 @@ const StyledOptions = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  margin: 16px;
+  margin: ${props => props.theme.mediumSpace};
 `;
 
 const StyledSelectField = styled(SelectField)`
@@ -171,7 +171,6 @@ const StyledTextField = styled(TextField)`
   margin-left: ${props => props.theme.mediumSpace};
 `;
 
-const DescribedCheckbox = styled(Description)`
+const StyledCheckbox = styled(Checkbox)`
   margin-left: ${props => props.theme.mediumSpace};
-  margin-top: ${props => props.theme.mediumSpace};
 `;
