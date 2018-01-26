@@ -19,8 +19,7 @@ export default class Card extends Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    if(nextState.open !== this.state.open) return true;
-    
+    if(nextState.open !== this.state.open) return true;    
     if(this.props.geneResult) return false; // will never change again
     if(nextProps.isLoading !== this.props.isLoading) return true;
     if(nextProps.dataset !== this.props.dataset) return true;
