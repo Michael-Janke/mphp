@@ -24,7 +24,7 @@ class GridSearch(object):
         self.K_OPTIONS = [3, 5, 10, 20] 
         self.EXCLUDE_OPTIONS = [100, 500, 1000, 5000, 10000]
         self.M_OPTIONS = [10, 50, 100, 500]
-        self.S_OPTIONS = ["chi2", "f_classif", "mutual_info_classif"]
+        self.S_OPTIONS = ["chi2", "f_classif"] #, "mutual_info_classif"
         self.NORM_OPTIONS = ["substract", "exclude"]
         self.F_OPTIONS = ["combined", "classification", "clustering", "distance"]
 

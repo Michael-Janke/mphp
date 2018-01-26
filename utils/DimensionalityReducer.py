@@ -88,7 +88,7 @@ class DimensionalityReducer():
 
         # get features in sick data which do not discriminate healty data
         features = list(set(s_indices)-set(h_indices))
-        print("excluded "+str(n+k-len(features))+" features")
+        print("excluded "+str(n+k-len(features))+" features", flush=True)
         features = np.asarray(features, dtype=np.uint32)
 
         if not returnMultipleSets:
@@ -131,7 +131,7 @@ class DimensionalityReducer():
 
         sets = [best_set]
         for i in range(1,3):
-            print("finished feature set")
+            print("finished feature set", flush=True)
             sets.append(self.getFeatureSetBySFS(sick, healthy, selected_genes[i:], k, fitness))
 
         return np.asarray(sets)
@@ -155,7 +155,7 @@ class DimensionalityReducer():
                     best_fitness = fitness_score
                     best_gene = gene
             indices.append(best_gene)
-            print("added new feature")
+            print("added new feature", flush=True)
 
         return np.asarray(indices)
 

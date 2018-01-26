@@ -76,7 +76,7 @@ def ea_for_plot(c, size_cromo, k, fitness_func, crossover, mutation):
 
         # Check if solution improved in this generation
         best_fitness = best_indiv(population)[1]
-        print(best_fitness)
+        print(best_fitness, flush=True)
 
         if best_fitness == c.max_fitness:
             #fill stat with zeros to allow plot to show values until final generation
