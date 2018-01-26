@@ -46,6 +46,7 @@ const ExpressionTable = props => {
                   <ScoreRowContent
                     geneId={key}
                     key={key}
+                    providerName="ProteinAtlas"
                     index={index}
                     entryWasFound={geneResults[key].proteinAtlas}
                     link={`https://www.proteinatlas.org/${key}`}
@@ -60,6 +61,7 @@ const ExpressionTable = props => {
                   <ScoreRowContent
                     geneId={key}
                     key={key}
+                    providerName="DisGeNet"
                     index={index}
                     entryWasFound={geneResults[key].disgenet}
                     link={`http://www.disgenet.org/web/DisGeNET/menu/search?0#${
@@ -78,9 +80,27 @@ const ExpressionTable = props => {
                   <ScoreRowContent
                     geneId={key}
                     key={key}
+                    providerName="Cancer Gene Census"
                     index={index}
                     entryWasFound={geneResults[key].cancer_gene_census}
                     link={`http://cancer.sanger.ac.uk/census`}
+                  />
+                );
+              })}
+            </tr>,
+            <tr key="EntrezGeneSummary">
+              <StyledTableHeaderColumn>
+                Entrez Gene Summary
+              </StyledTableHeaderColumn>
+              {Object.keys(geneResults).map((key, index) => {
+                return (
+                  <ScoreRowContent
+                    geneId={key}
+                    key={key}
+                    providerName="Entrez Gene Summary"
+                    index={index}
+                    entryWasFound={geneResults[key].entrezGeneSummary}
+                    link={`https://www.proteinatlas.org/${key}`}
                   />
                 );
               })}
