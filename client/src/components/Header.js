@@ -105,7 +105,7 @@ const StyledRightContainer = styled.div`
 
 const mapStateToProps = state => {
   return {
-    experimentName: state.experiment.name,
+    experimentName: state.experiment.name
   };
 };
 

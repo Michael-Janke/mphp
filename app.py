@@ -83,10 +83,10 @@ def runSpecificAlgorithm():
     regex = re.compile(r'\bNaN\b')
     return re.sub(regex, 'null', jsonResponse)
 
-def flaskrun(app, default_host="0.0.0.0", 
+def flaskrun(app, default_host="0.0.0.0",
                   default_port="5000"):
     """
-    Takes a flask.Flask instance and runs it. Parses 
+    Takes a flask.Flask instance and runs it. Parses
     command-line flags to configure the app.
     """
 
