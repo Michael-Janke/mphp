@@ -86,14 +86,11 @@ class DimensionalityReducer():
         # get features in sick data which do not discriminate healty data
         features = list(set(s_indices)-set(h_indices))
         print("excluded "+str(n+k-len(features))+" features", flush=True)
-        features = np.asarray(features, dtype=np.uint32)
 
-        if not returnMultipleSets:
-            return features[selector.scores_[features].argsort()[-k:][::-1]]
-
-        sets = self.getFeatureSets(selector.scores_[features], k, returnMultipleSets)
-
-        return [features[f_set] for f_set in sets]
+        scores = selector.scores_
+        scores[h_indices] = 0
+        
+        return self.getFeatureSets(scores, k, returnMultipleSets)
 
     ####### MULTI-VARIATE FEATURE SELECTION #######
 
