@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
-import FlatButton from 'material-ui/FlatButton';
-import Dialog from 'material-ui/Dialog';
+import FlatButton from "material-ui/FlatButton";
+import Dialog from "material-ui/Dialog";
 import { loadContext } from "../actions/contextActions";
 import { startRun, updateRun, deleteRun } from "../actions/runActions";
-import Spinner from "./Spinner"
+import Spinner from "./Spinner";
 
 import Run from "./Run";
 
@@ -22,7 +22,7 @@ class Content extends Component {
     const { runs, context, startRun, updateRun, deleteRun } = this.props;
     return (
       <ContentContainer>
-        { context.datasets ? 
+        {context.datasets ? (
           Object.keys(runs)
             .reverse()
             .map(runId => {
@@ -38,33 +38,44 @@ class Content extends Component {
                   {...context}
                 />
               );
-            }) : 
-            <Dialog
-                actions={[<FlatButton label="Retry" primary={true} disabled={!context.isError} onClick={this.props.loadContext} />]}
-                modal={false}
-                open={!context.datasets}
-              >
-                 {context.isError ? 
-                    <LoadingText>Couldn't load context data. Retry? ({context.error.message})</LoadingText> : 
-                    <StyledSpinnerContainer>
-                      <Spinner size={20} />
-                      <LoadingText>loading context data</LoadingText>
-                    </StyledSpinnerContainer>
-                 }
-            </Dialog>
-        }
+            })
+        ) : (
+          <Dialog
+            actions={[
+              <FlatButton
+                label="Retry"
+                primary={true}
+                disabled={!context.isError}
+                onClick={this.props.loadContext}
+              />
+            ]}
+            modal={false}
+            open={!context.datasets}
+          >
+            {context.isError ? (
+              <LoadingText>
+                Couldn't load context data. Retry? ({context.error.message})
+              </LoadingText>
+            ) : (
+              <StyledSpinnerContainer>
+                <Spinner size={20} />
+                <LoadingText>loading context data</LoadingText>
+              </StyledSpinnerContainer>
+            )}
+          </Dialog>
+        )}
       </ContentContainer>
     );
   }
 }
 
 const ContentContainer = styled.div`
-  display:flex;
+  display: flex;
   flex-flow: row wrap;
 `;
 
 const StyledSpinnerContainer = styled.div`
-  display:flex;
+  display: flex;
   flex-direction: row;
   align-items: center;
   height: 100px;
@@ -78,7 +89,7 @@ const LoadingText = styled.div`
 const mapStateToProps = state => {
   return {
     runs: state.runs,
-    context: state.context,
+    context: state.context
   };
 };
 
@@ -90,7 +101,7 @@ const mapDispatchToProps = dispatch => {
     startRun: (runId, params) => {
       dispatch(startRun(runId, params));
     },
-    deleteRun: (runId) => {
+    deleteRun: runId => {
       dispatch(deleteRun(runId));
     },
     updateRun: (runId, params) => {
