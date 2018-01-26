@@ -12,10 +12,11 @@ def fitness(sick, healthy, fit='combined', k=10, true_label=""):
         pheno = phenotype(indiv)
         # select features and only pass this data to evaluate
         # todo smarter penalty
-        if pheno.shape[0] > k:
-            return -10
+        # if pheno.shape[0] > k:
+        #    return -10
 
-        return fitness_func(sick, healthy, pheno, true_label=true_label)
+        f =  fitness_func(sick, healthy, pheno, true_label=true_label)
+        return f / (1 + abs(len(pheno) - k)/k)
     return fitness_
 
 def get_fitness_function_name(fit):

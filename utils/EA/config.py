@@ -1,7 +1,7 @@
 ### General ###
 maximization = True
 runs = 1
-generations = 20
+generations = 5
 population_size = 100
 chromo_size = 100
 prob_mutation = 1/generations
