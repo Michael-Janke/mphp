@@ -1,14 +1,20 @@
 import React from "react";
 import styled from "styled-components";
 
-const ScoreRowContent = ({ geneId, index, entryWasFound, link }) => {
+const ScoreRowContent = ({
+  geneId,
+  index,
+  entryWasFound,
+  link,
+  providerName
+}) => {
   const content = entryWasFound ? "+" : "-";
 
   return (
     <StyledTableRowColumn
-      key={`disgenet-${index}`}
+      key={`${providerName}-${index}`}
       entryWasFound={entryWasFound}
-      title={`DisGeNet-${geneId}`}
+      title={`${providerName}-${geneId}`}
     >
       <StyledLink href={link} target="_blank">
         {content}

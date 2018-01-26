@@ -158,7 +158,7 @@ def testGenes(request):
         entrezGeneSummary = lookupEntrezGeneSummary(gene)
 
         score = (0.4 if cancerGeneCensus else 0) + \
-            (0.2 if disgenet else 0) + (0.2 if proteinAtlas else 0) + (0.2 if proteinAtlas else 0)
+            (0.2 if disgenet else 0) + (0.2 if proteinAtlas else 0) + (0.2 if entrezGeneSummary else 0)
         response[gene] = {'proteinAtlas': proteinAtlas, 'disgenet': disgenet,
                           'cancer_gene_census': cancerGeneCensus, 'entrezGeneSummary': entrezGeneSummary, 'score': score}
 
