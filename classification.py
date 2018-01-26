@@ -33,16 +33,15 @@ gene_labels = dataLoader.getGeneLabels()
 print("got combined data")
 
 # %%
-"""
-features = dimReducer.getOneAgainstRestFeatures(sick,healthy, method="norm")
+
+features = dimReducer.getOneAgainstRestFeatures(sick,healthy)
 pprint(features)
 
 results = analyzer.computeFeatureValidationOneAgainstRest(sick, healthy, features)
 pprint(results)
 
-#expressions = analyzer.computeExpressionMatrixOneAgainstRest(sick, healthy, features)
-#pprint(expressions)
-"""
+expressions = analyzer.computeExpressionMatrixOneAgainstRest(sick, healthy, features)
+pprint(expressions)
 
 # %%
 # Feature Selection
