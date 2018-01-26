@@ -118,6 +118,31 @@ def lookupCancerGeneCensus(gene, cancer_gene_census_data):
     return False
 
 
+def lookupEntrezGeneSummary(gene):
+    entrez_file = "data/gene_names/entrez_names.npy"
+    entrez_labels_map = np.load(entrez_file).item()
+    try:
+        url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&id=' + \
+            entrez_labels_map[int(gene[4:])]
+        file_name = 'data/entrezgene/' + gene + '.xml'
+        if not os.path.exists(os.path.dirname(file_name)):
+            os.makedirs(os.path.dirname(file_name))
+        if not os.path.isfile(file_name):
+            urllib.request.urlretrieve(url, file_name)
+
+        f = open(file_name, 'r')
+        xml = f.read()
+        f.close()
+        dom = parseString(xml)
+        summary = dom.getElementsByTagName(
+            'Summary')[0].childNodes[0].nodeValue
+        if "cancer" in summary:
+            return True
+    except:
+        print("Error accessing entrez gene summary for gene: " + gene)
+    return False
+
+
 def testGenes(request):
     data = request.get_json()["genes"]
     genes = data["genes"]
@@ -130,10 +155,11 @@ def testGenes(request):
         proteinAtlas = lookupProteinAtlas(gene)
         cancerGeneCensus = lookupCancerGeneCensus(
             gene, cancer_gene_census_data)
+        entrezGeneSummary = lookupEntrezGeneSummary(gene)
 
-        score = (0.5 if cancerGeneCensus else 0) + \
-            (0.25 if disgenet else 0) + (0.25 if proteinAtlas else 0)
+        score = (0.4 if cancerGeneCensus else 0) + \
+            (0.2 if disgenet else 0) + (0.2 if proteinAtlas else 0) + (0.2 if proteinAtlas else 0)
         response[gene] = {'proteinAtlas': proteinAtlas, 'disgenet': disgenet,
-                          'cancer_gene_census': cancerGeneCensus, 'score': score}
+                          'cancer_gene_census': cancerGeneCensus, 'entrezGeneSummary': entrezGeneSummary, 'score': score}
 
     return response
