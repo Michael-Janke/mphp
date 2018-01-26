@@ -26,7 +26,7 @@ class GridSearch(object):
         self.M_OPTIONS = [10, 50, 100, 500]
         self.S_OPTIONS = ["chi2", "f_classif"] #, "mutual_info_classif"
         self.NORM_OPTIONS = ["substract", "exclude"]
-        self.F_OPTIONS = ["combined", "classification", "clustering", "distance"]
+        self.F_OPTIONS = ["combined", "classification", "clustering", "distance", "sick_vs_healthy"]
 
         self.BASIC_METHODS = {
             "basic": self.dimReducer.getFeatures,

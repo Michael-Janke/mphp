@@ -23,6 +23,7 @@ def get_fitness_function_name(fit):
     options = {
         'clustering': 'clustering_fitness',
         'classification': 'classification_fitness',
+        'sick_vs_healthy': 'sick_vs_healthy_fitness',
         'combined': 'combined_fitness',
         'distance': 'distance_fitness',
     }
@@ -37,8 +38,6 @@ def classification_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
         clf = DecisionTreeClassifier()
         sick_score = cross_validate(clf, sick_expressions, sick.labels, cv=5, scoring="f1_macro", return_train_score=False)["test_score"].mean()
         healthy_score = cross_validate(clf, healthy_expressions, healthy.labels, cv=5, scoring="f1_macro", return_train_score=False)["test_score"].mean()
-        #sick_score = cross_val_score(clf, sick_expressions, sick.labels, cv=5, scoring="f1_macro").mean()
-        #healthy_score = cross_val_score(clf, healthy_expressions, healthy.labels, cv=5, scoring="f1_macro").mean()
         return (alpha * sick_score + (1-alpha) * (1- healthy_score))
     else:
         sick_labels = binarize_labels(sick.labels, true_label)
@@ -46,10 +45,27 @@ def classification_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
         clf = DecisionTreeClassifier()
         sick_score = cross_validate(clf, sick_expressions, sick_labels, cv=5, scoring="f1", return_train_score=False)["test_score"].mean()
         healthy_score = cross_validate(clf, healthy_expressions, healthy_labels, cv=5, scoring="f1", return_train_score=False)["test_score"].mean()
-
-        #sick_score = cross_val_score(clf, sick_expressions, sick_labels, cv=5, scoring="f1").mean()
-        #healthy_score = cross_val_score(clf, healthy_expressions, healthy_labels, cv=5, scoring="f1").mean()
     return (alpha * sick_score + (1-alpha) * (1- healthy_score))
+
+@ignore_warnings
+def sick_vs_healthy_fitness(sick, healthy, genes, alpha=None, true_label=None):
+    sick_expressions = sick.expressions[:,genes]
+    healthy_expressions = healthy.expressions[:,genes]
+
+    scores = []
+    for selected_label in np.unique(sick.labels):
+        label = selected_label.split("-")[0]
+        sick_indices = np.flatnonzero(np.core.defchararray.find(sick.labels, label) != -1)
+        healthy_indices = np.flatnonzero(np.core.defchararray.find(healthy.labels, label) != -1)
+
+        data = np.vstack((sick_expressions[sick_indices, :], healthy_expressions[healthy_indices, :]))
+        labels = np.hstack((sick.labels[sick_indices], healthy.labels[healthy_indices]))
+
+        clf = DecisionTreeClassifier()
+        score = cross_validate(clf, data, labels, cv=5, scoring="f1_macro", return_train_score=False)["test_score"].mean()
+        scores.append(score)
+
+    return min(scores)
 
 def clustering_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
     sick_expressions = sick.expressions[:,genes]
@@ -67,8 +83,9 @@ def clustering_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
         return (alpha * silhoutte_sick + (1- alpha) * (1 - silhoutte_healthy))
 
 def combined_fitness(sick, healthy, genes, alpha=0.5, beta=0.5, true_label=""):
-    return beta * classification_fitness(sick, healthy, genes, alpha, true_label=true_label)\
-        + (1 - beta) * clustering_fitness(sick, healthy, genes, alpha, true_label=true_label)
+    return 1/3 * classification_fitness(sick, healthy, genes, alpha, true_label=true_label)\
+        + 1/3 * clustering_fitness(sick, healthy, genes, alpha, true_label=true_label)\
+        + 1/3 * sick_vs_healthy_fitness(sick, healthy, genes)
 
 
 def distance_fitness(sick, healthy, genes, true_label=""):

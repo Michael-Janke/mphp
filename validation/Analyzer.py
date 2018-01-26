@@ -1,7 +1,7 @@
 import numpy as np
 from validation.ClusterValidator import ClusterValidator
 from validation.ClassificationValidator import ClassificationValidator
-from utils.EA.fitness import classification_fitness, clustering_fitness, distance_fitness, combined_fitness
+from utils.EA.fitness import classification_fitness, clustering_fitness, distance_fitness, combined_fitness, sick_vs_healthy_fitness
 from utils import Expressions, binarize_labels
 from collections import defaultdict
 
@@ -41,6 +41,7 @@ class Analyzer:
         clus_fitness = clustering_fitness(sick, healthy, selected_genes, true_label=true_label)
         comb_fitness = combined_fitness(sick, healthy, selected_genes, true_label=true_label)
         dist_fitness = distance_fitness(sick, healthy, selected_genes, true_label=true_label)
+        s_vs_h_fitness = sick_vs_healthy_fitness(sick, healthy, selected_genes)
 
         return {
             "sick": sick_validation,
@@ -48,6 +49,7 @@ class Analyzer:
             "fitness": {
                 "classificationFitness": class_fitness,
                 "clusteringFitness": clus_fitness,
+                "sickVsHealthyFitness": s_vs_h_fitness,
                 "distanceFitness": dist_fitness,
                 "combinedFitness": comb_fitness,
             }
