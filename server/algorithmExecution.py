@@ -28,12 +28,16 @@ def getData(algorithm, dataLoader):
     return data
 
 
-def run(algorithm, data):
+def run(algorithm, data, one_against_rest):
     key = algorithm["key"]
     n_components = algorithm["parameters"].get("n_components")
     n_f_components = algorithm["parameters"].get("n_features_per_component")
     k = algorithm["parameters"].get("k")
     n = algorithm["parameters"].get("n")
+
+    # TODO if one_against_rest:
+        # TODO healthy = "" if not given
+        # TODO pass method and normalization
 
     if key == "getPCA":
         gene_indices = dimReducer.getPCA(
@@ -86,10 +90,12 @@ def calcExpressionMatrix(algorithm, data, gene_indices):
     return analyzer.computeExpressionMatrix(data["sick"], data["healthy"], gene_indices)
 
 
-def evaluate(algorithm, data, gene_indices):
+def evaluate(algorithm, data, gene_indices, one_against_rest):
     cancer_types = algorithm["cancerTypes"]
     sick_tissue_types = algorithm["sickTissueTypes"]
     healthy_tissue_types = algorithm["healthyTissueTypes"]
+
+    # TODO oneAgainstRest
 
     if len(cancer_types) == 1 or len(sick_tissue_types) == 0 or len(healthy_tissue_types) == 0:
         return analyzer.computeFeatureValidation(data["combined"], "", gene_indices)

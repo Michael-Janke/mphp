@@ -58,12 +58,9 @@ export function toggleTissueType(id, algorithm, tissueType) {
 
 export function startRun(id, oneAgainstRest, algorithm) {
   return dispatch => {
-    const route =
-      oneAgainstRest && canRunOneAgainstAll(algorithm)
-        ? "/runAlgorithm"
-        : "/runAlgorithm";
+    oneAgainstRest = oneAgainstRest && canRunOneAgainstAll(algorithm);
     dispatch({ type: types.START_RUN, id, algorithm });
-    postRequest(route, { algorithm }).then(response =>
+    postRequest("/runAlgorithm", { algorithm, oneAgainstRest }).then(response =>
       dispatch(_finishRun(id, response))
     );
 
