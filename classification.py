@@ -33,6 +33,7 @@ gene_labels = dataLoader.getGeneLabels()
 print("got combined data")
 
 # %%
+"""
 features = dimReducer.getOneAgainstRestFeatures(sick,healthy, method="norm")
 pprint(features)
 
@@ -41,12 +42,12 @@ pprint(results)
 
 #expressions = analyzer.computeExpressionMatrixOneAgainstRest(sick, healthy, features)
 #pprint(expressions)
-
+"""
 
 # %%
 # Feature Selection
 #selected_genes = dimReducer.getEAFeatures(sick,healthy,fitness="clustering")
-selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3, fitness="classification")
+selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3, fitness="combined")
 print(selected_genes)
 
 print("SICK REDUCED")
