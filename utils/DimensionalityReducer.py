@@ -18,8 +18,6 @@ from utils.EA.algorithm import ea_for_plot
 from utils import Expressions, binarize_labels
 
 class DimensionalityReducer():
-    ####### PCA #######
-
     def __init__(self):
         self.method_table = {
             "chi2": chi2,
