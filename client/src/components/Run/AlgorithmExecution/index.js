@@ -12,13 +12,15 @@ export default class AlgorithmExecution extends Component {
     const isRunnable = this.isRunnable();
     return (
       <div>
-        {!this.props.disabled ? <Row>
-          <AlgorithmSelection {...this.props} />
-          <SubsetSelection {...this.props} />
-          <DataSelection {...this.props} />
-        </Row> : 
-          <RunDescription {...this.props}/>
-        }
+        {!this.props.disabled ? (
+          <Row>
+            <AlgorithmSelection {...this.props} />
+            <SubsetSelection {...this.props} />
+            <DataSelection {...this.props} />
+          </Row>
+        ) : (
+          <RunDescription {...this.props} />
+        )}
         <CardActions>
           {this.props.disabled ? null : (
             <StyledButton
@@ -51,26 +53,26 @@ export default class AlgorithmExecution extends Component {
       algorithm.sickTissueTypes.length !== 0;
 
     var enoughSamples = true;
-    // test if there are more than 20 healthy samples for each cancer type (but only if healthy types are selected)
+    // test if there are more than 10 healthy samples for each cancer type (but only if healthy types are selected)
     if (algorithm.healthyTissueTypes.length !== 0) {
       algorithm.cancerTypes.forEach(cancerType => {
         var sum = 0;
         algorithm.healthyTissueTypes.forEach(tissueType => {
           sum += statistics.counts[cancerType][tissueType];
         });
-        if (sum < 20) {
+        if (sum < 10) {
           enoughSamples = false;
         }
       });
     }
-    // test if there are more than 20 sick samples for each cancer type (but only if sick types are selected)
+    // test if there are more than 10 sick samples for each cancer type (but only if sick types are selected)
     if (algorithm.sickTissueTypes.length !== 0) {
       algorithm.cancerTypes.forEach(cancerType => {
         var sum = 0;
         algorithm.sickTissueTypes.forEach(tissueType => {
           sum += statistics.counts[cancerType][tissueType];
         });
-        if (sum < 20) {
+        if (sum < 10) {
           enoughSamples = false;
         }
       });
@@ -94,8 +96,8 @@ export default class AlgorithmExecution extends Component {
         (currentAlgorithm === "getFeatures" ||
           currentAlgorithm === "getPCA" ||
           currentAlgorithm === "getDecisionTreeFeatures") &&
-        sumHealthy >= 20 &&
-        sumSick >= 20;
+        sumHealthy >= 10 &&
+        sumSick >= 10;
     }
 
     return (
