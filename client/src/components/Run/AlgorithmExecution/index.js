@@ -80,7 +80,7 @@ export default class AlgorithmExecution extends Component {
 
     var oneCancerTypeRunnable = true;
     // if only one cancer type is selected, only some algorithms are allowed and
-    // at least 20 healthy samples and 20 sick samples are necessary
+    // at least 10 healthy samples and 10 sick samples are necessary
     if (algorithm.cancerTypes.length === 1) {
       const currentAlgorithm = algorithm.key;
       const currentCancerType = algorithm.cancerTypes[0];
