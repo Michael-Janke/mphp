@@ -12,7 +12,6 @@ import utils.EA.config as c
 import utils.EA.fitness as fitness_module
 from utils.EA.crossover import *
 from utils.EA.mutation import *
-from utils.EA.population import phenotype
 from utils.EA.algorithm import ea_for_plot
 
 from utils import Expressions, binarize_labels
@@ -113,7 +112,7 @@ class DimensionalityReducer():
         best, sets, _, _ = ea_for_plot(c, m, k, fitness_function, crossover, mutation)
 
         if not returnMultipleSets:
-            indices = selected_genes[phenotype(best)]
+            indices = selected_genes[best]
             return indices
 
         return [selected_genes[feature_set] for feature_set in sets]
