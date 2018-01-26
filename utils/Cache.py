@@ -9,22 +9,13 @@ class Cache:
     def loadCache(self):
         if not os.path.exists("data/cache"):
          os.makedirs("data/cache")
-        files = glob("data/cache/*.*")
-        for file in files:
-            head, tail = os.path.split(file)
-            key, ext = os.path.splitext(tail)
-            if ext == ".npy":
-                self._cache[key] = np.load(file).flat[0]
-            elif ext == ".txt":
-                file = open(file, 'r')
-                self._cache[key] = file.read()
-                file.close()
 
     def isCached(self, key):
-        return key in self._cache
+        return len(glob("data/cache/" + key +".*")) > 0
 
     def cache(self, key, data):
-        self._cache[key] = data
+        if self.isCached(key):
+            return
         if isinstance(data, str):
             file = open("data/cache/"+key+".txt", 'w')
             file.write(data)
@@ -33,7 +24,18 @@ class Cache:
             np.save("data/cache/"+key, data)
 
     def getCache(self, key):
-        return self._cache[key]
+        files = glob("data/cache/" + key +".*")
+        if len(files) > 0:
+            file = files[0]
+            head, tail = os.path.split(file)
+            key, ext = os.path.splitext(tail)
+            if ext == ".npy":
+                result = np.load(file).flat[0]
+            elif ext == ".txt":
+                file = open(file, 'r')
+                result = file.read()
+                file.close()
+        return result
 
     
 
