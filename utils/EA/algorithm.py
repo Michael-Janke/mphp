@@ -10,9 +10,6 @@ from .population import generate_population, phenotype
 from .selection import tournament, elitism
 from .ea_utils import best_indiv, best_indivs, average_indiv
 
-from heapq import heappush, heappop
-
-
 def run(c, size_cromo, k, fitness_func, crossover, mutation):
     statistics = []
     for i in range(c.runs):
@@ -32,14 +29,14 @@ def run(c, size_cromo, k, fitness_func, crossover, mutation):
 
 # Return the best individual, best by generations, average population by generation
 def ea_for_plot(c, size_cromo, k, fitness_func, crossover, mutation):
-    heap = []
+    valid_population = []
     # initialize population: indiv = (cromo,fit)
     population = generate_population(size_cromo, k)
     population = [(indiv[0], fitness_func(indiv)) for indiv in population]
 
     for indiv in population:
         if len(phenotype(indiv)) == k:
-            heappush(heap, (-1 * indiv[1], indiv[0]))
+            valid_population.append(indiv)
 
     stat = [best_indiv(population)[1]]
     stat_aver = [average_indiv(population)]
@@ -79,7 +76,7 @@ def ea_for_plot(c, size_cromo, k, fitness_func, crossover, mutation):
 
         for indiv in population:
             if len(phenotype(indiv)) == k:
-                heappush(heap, (-1 * indiv[1], indiv[0]))
+                valid_population.append(indiv)
 
         # Statistics
         stat.append(best_indiv(population)[1])
@@ -104,8 +101,4 @@ def ea_for_plot(c, size_cromo, k, fitness_func, crossover, mutation):
             gen_without_improvement += 1
 
     #return best_indiv(population), best_indivs(population, 3), stat, stat_aver
-    best = heappop(heap)
-    second =  heappop(heap)
-    third = heappop(heap)
-    best_k = [best, second, third]
-    return (best[1], best[0]), best_k, stat, stat_aver
+    return phenotype(best_indiv(valid_population)), best_indivs(valid_population,3), stat, stat_aver
