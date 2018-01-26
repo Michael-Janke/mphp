@@ -8,6 +8,7 @@ import Spinner from "../Spinner";
 import IconButton from "../IconButton";
 import AlgorithmExecution from "./AlgorithmExecution";
 import AlgorithmResult from "./AlgorithmResult";
+import deepEqual from 'deep-equal';
 
 const CARD_TITLE_HEIGHT = 15;
 
@@ -16,6 +17,17 @@ export default class Card extends Component {
   state = {
     open: false,
   };
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if(nextState.open !== this.state.open) return true;
+    
+    if(this.props.geneResult) return false; // will never change again
+    if(nextProps.isLoading !== this.props.isLoading) return true;
+    if(nextProps.dataset !== this.props.dataset) return true;
+    if(nextProps.result !== null && this.props.result === null) return true;
+    if(nextProps.geneResult !== null && this.props.geneResult === null) return true;
+    return !deepEqual(nextProps.algorithm, this.props.algorithm);
+  }
 
   handleOpen = () => {
     this.setState({open: true});
