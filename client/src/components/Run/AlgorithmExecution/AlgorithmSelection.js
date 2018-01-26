@@ -7,6 +7,7 @@ import styled from "styled-components";
 
 import Description from "../../Description";
 import { boringBlue } from "../../../config/colors";
+import { canRunOneAgainstAll } from "../../../utils";
 
 export default class AlgorithmSelection extends Component {
   render() {
@@ -100,7 +101,7 @@ export default class AlgorithmSelection extends Component {
           checked={this.props.oneAgainstRest}
           onCheck={this.toggleComparisonMode.bind(this)}
           iconStyle={{ fill: boringBlue }}
-          disabled={this.props.algorithm.cancerTypes.length < 2}
+          disabled={!canRunOneAgainstAll(this.props.algorithm)}
         />
       </DescribedCheckbox>
     );

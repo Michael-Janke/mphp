@@ -1,6 +1,6 @@
 import * as types from "./actionTypes";
 import { postRequest } from "./_request";
-import { isHealthy } from "../utils";
+import { isHealthy, canRunOneAgainstAll } from "../utils";
 
 export function createRun({ tcgaTokens, tissueTypes }) {
   return dispatch => {
@@ -58,7 +58,10 @@ export function toggleTissueType(id, algorithm, tissueType) {
 
 export function startRun(id, oneAgainstRest, algorithm) {
   return dispatch => {
-    const route = oneAgainstRest ? "/runAlgorithm" : "/runAlgorithm";
+    const route =
+      oneAgainstRest && canRunOneAgainstAll(algorithm)
+        ? "/runAlgorithm"
+        : "/runAlgorithm";
     dispatch({ type: types.START_RUN, id, algorithm });
     postRequest(route, { algorithm }).then(response =>
       dispatch(_finishRun(id, response))
