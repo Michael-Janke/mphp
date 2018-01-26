@@ -143,14 +143,17 @@ def lookupEntrezGeneSummary(gene):
     return False
 
 
-def testGenes(request):
-    data = request.get_json()["genes"]
-    genes = data["genes"]
+def testGenes(genes, cache):
+
     response = {}
 
     cancer_gene_census_data = getCancerGeneCensusData()
 
     for gene in genes:
+        cache_key = "V1_" + gene
+        if cache.isCached(cache_key):
+            response[gene] = cache.getCache(cache_key)
+            continue
         disgenet = lookupDisgenet(gene)
         proteinAtlas = lookupProteinAtlas(gene)
         cancerGeneCensus = lookupCancerGeneCensus(
@@ -161,5 +164,7 @@ def testGenes(request):
             (0.2 if disgenet else 0) + (0.2 if proteinAtlas else 0) + (0.2 if entrezGeneSummary else 0)
         response[gene] = {'proteinAtlas': proteinAtlas, 'disgenet': disgenet,
                           'cancer_gene_census': cancerGeneCensus, 'entrezGeneSummary': entrezGeneSummary, 'score': score}
+
+        cache.cache(cache_key, response[gene])
 
     return response

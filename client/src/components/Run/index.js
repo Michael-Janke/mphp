@@ -37,6 +37,13 @@ export default class Card extends Component {
     this.setState({open: false});
   };
 
+  startRun = () => {
+    this.props.startRun(this.props.runId, {
+      ...this.props.algorithm,
+      dataset: this.props.dataset
+    })
+  }
+
   render() {
     const { isLoading, algorithm, datasets, dataset, result } = this.props;
     return (
@@ -58,7 +65,10 @@ export default class Card extends Component {
           </Dialog>
         </StyledCardTitle>
         {this.renderBody()}
-        <StyledError>{result && result.error && result.error.message}</StyledError>
+        {result && result.error ?
+          <StyledError> {result.error.message} <FlatButton label="Retry" primary={true}  onClick={this.startRun.bind(this)} /> </StyledError>
+        : null
+        }
       </StyledCard>
     );
   }
