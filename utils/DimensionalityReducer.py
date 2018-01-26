@@ -89,7 +89,7 @@ class DimensionalityReducer():
 
         scores = selector.scores_
         scores[h_indices] = 0
-        
+
         return self.getFeatureSets(scores, k, returnMultipleSets)
 
     ####### MULTI-VARIATE FEATURE SELECTION #######
@@ -210,14 +210,27 @@ class DimensionalityReducer():
     def getFeatureSet(self, scores, k):
         indices = scores.argsort()[::-1]
 
+        """
         scores /= rankdata(scores, method='min')
         scores = sorted(scores, reverse=True)
         scores /= np.sum(scores)
+        """
+
+        rank_scores = 1 * np.power(0.5, rankdata(scores, method='ordinal'))
+        normalized_scores = scores / np.sum(scores)
+
+        print(scores)
+        print(sorted(scores, reverse=True))
+
+        roulette_scores = ( normalized_scores + rank_scores ) / 2
+        roulette_scores = sorted(roulette_scores, reverse=True)
+
+        print(roulette_scores)
 
         features = []
 
         while len(features) < k:
-            feature = self.getFeature(scores)
+            feature = self.getFeature(roulette_scores)
             while feature in features:
                 feature += 1
 

@@ -29,6 +29,7 @@ healthy = dataLoader.getData(["healthy"], ["THCA","LUAD","GBM"])
 #healthy = sampler.over_sample(healthy)
 
 sick = dataLoader.getData(["sick"], ["THCA","LUAD","GBM"])
+data = dataLoader.getData(["sick", "healthy"], ["THCA","LUAD","GBM"])
 gene_labels = dataLoader.getGeneLabels()
 print("got combined data")
 
@@ -62,6 +63,6 @@ pprint(analyzer.computeFeatureValidation(sick, healthy, selected_genes)["fitness
 # %%
 #selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3, fitness="classification", returnMultipleSets = True)
 #selected_genes = dimReducer.getEAFeatures(sick, healthy, fitness="distance", returnMultipleSets = True)
-#selected_genes = dimReducer.getDecisionTreeFeatures(sick, returnMultipleSets = True)
-selected_genes = dimReducer.getNormalizedFeatures(sick, healthy, returnMultipleSets = True)
+selected_genes = dimReducer.getDecisionTreeFeatures(data, 5, returnMultipleSets = True)
+#selected_genes = dimReducer.getNormalizedFeatures(sick, healthy, returnMultipleSets = True)
 pprint(selected_genes)
