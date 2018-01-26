@@ -177,12 +177,12 @@ class GridSearch(object):
         return table
 
     def get_result_dict_one_vs_rest(self, id, cancer_type, method, k, metrics, time, features):
-        fitness = float(str(metrics["fitness"]["combinedFitness"])[0:5])
-        sick_f1 = float(str(metrics["sick"]["classification"]["decisionTree"]["f1"]["mean"])[0:5])
+        fitness = round(metrics["fitness"]["combinedFitness"], 3)
+        sick_f1 = round(metrics["sick"]["classification"]["decisionTree"]["f1"]["mean"], 3)
         return [id, cancer_type, method, k, fitness, sick_f1, time, features.tolist()]
 
     def get_result_dict_all_at_once(self, method, k, feature_set, time, statistic="", normalization="", exclude="", preselect="", fitness_method=""):
-        fitness_score = float(str(combined_fitness(self.sick, self.healthy, feature_set))[0:5])
+        fitness_score = round(combined_fitness(self.sick, self.healthy, feature_set), 3)
 
         scoring = { 'f1': make_scorer(f1_score, average='macro') }
         clf = DecisionTreeClassifier()
