@@ -201,62 +201,62 @@ class DimensionalityReducer():
         if not returnMultipleSets:
             return best_set
 
+        indices = scores.argsort()[::-1]
+        roulette_scores = self.get_roulette_scores(scores, k)
+        
         sets = [best_set]
         for i in range(1,3):
-            sets.append(self.getFeatureSet(scores, k))
+            sets.append(indices[self.getFeatureSet(roulette_scores, k)])
 
         return sets
 
-    def getFeatureSet(self, scores, k):
-        indices = scores.argsort()[::-1]
-
-        reversed_ranks = len(scores) + 1 - rankdata(scores, method='average')
-        reversed_rank_scores = 1 / (2 + reversed_ranks) # best is 1/3
+    def get_roulette_scores(self, scores, k):
+        reversed_ranks = len(scores) - rankdata(scores, method='average')
+        reversed_rank_scores = 1 / (3 + reversed_ranks) # best is 1/3
 
         penalized_scores = scores * reversed_rank_scores
 
-        k_highest = max(50, k*4)
+        k_highest = max(20, k*4)
         min_thresh = sorted(penalized_scores, reverse=True)[k_highest]
         penalized_scores[penalized_scores < min_thresh] = 0
 
         normalized_scores = penalized_scores / np.sum(penalized_scores)
-
-        print(np.sort(penalized_scores)[-5:][::-1])
-        print(np.sort(normalized_scores)[-5:][::-1])
-
-        #roulette_scores = np.mean( np.vstack((rank_scores, normalized_scores)), axis=0)
         roulette_scores = np.sort(normalized_scores)[::-1]
 
+        """
+        print(np.sort(penalized_scores)[-5:][::-1])
+        print(np.sort(normalized_scores)[-5:][::-1])
         print(roulette_scores[:5])
         print("==========\n")
+        """
+        return roulette_scores
 
-        # sort roulette scores here
+    def getFeatureSet(self, scores, k):
         features = []
 
         while len(features) < k:
-            feature = self.getFeature(roulette_scores)
+            feature = self.getFeature(scores)
             tries = 0
             while feature in features:
-                if tries > 10:
-                    feature += randint(0,5)
+                if tries > k:
+                    feature += randint(1, k*2)
                 else:
                     tries += 1
-                    feature = self.getFeature(roulette_scores, feature+1)
+                    feature = self.getFeature(scores, feature+1)
 
             tries = 0
             features.append(feature)
 
-        return indices[features]
+        return features
 
     def getFeature(self, scores, start_i=0):
         cumulated_prob = 0
         i = start_i
         rand = random()
         while cumulated_prob < rand:
+            if scores[i] == 0 or i >= len(scores):
+                i = 0
             cumulated_prob += scores[i]
             i += 1
-            
-            if scores[i] == 0:
-                i = 0
 
         return i-1

@@ -61,5 +61,5 @@ pprint(analyzer.computeFeatureValidation(sick, healthy, selected_genes)["fitness
 #selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3, fitness="classification", returnMultipleSets = True)
 #selected_genes = dimReducer.getEAFeatures(sick, healthy, fitness="distance", returnMultipleSets = True)
 #selected_genes = dimReducer.getDecisionTreeFeatures(data, 5, returnMultipleSets = True)
-selected_genes = dimReducer.getNormalizedFeatures(sick, healthy, k=10, returnMultipleSets = True)
+selected_genes = dimReducer.getNormalizedFeatures(sick, healthy, k=3, returnMultipleSets = True)
 pprint(selected_genes)
