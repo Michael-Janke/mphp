@@ -58,7 +58,7 @@ export function toggleTissueType(id, algorithm, tissueType) {
 
 export function startRun(id, algorithm) {
   return dispatch => {
-    dispatch({ type: types.START_RUN, id, algorithm });
+    dispatch({ type: types.START_RUN, id, algorithm});
     postRequest("/runAlgorithm", { algorithm }).then(response =>
       dispatch(_finishRun(id, response))
     );
