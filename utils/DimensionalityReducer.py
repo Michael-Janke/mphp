@@ -6,7 +6,7 @@ from sklearn.feature_selection import mutual_info_classif
 from sklearn.feature_selection import f_classif
 from sklearn.tree import DecisionTreeClassifier
 from scipy.stats import rankdata
-from random import random
+from random import random, randint
 
 import utils.EA.config as c
 import utils.EA.fitness as fitness_module
@@ -210,38 +210,53 @@ class DimensionalityReducer():
     def getFeatureSet(self, scores, k):
         indices = scores.argsort()[::-1]
 
-        """
-        scores /= rankdata(scores, method='min')
-        scores = sorted(scores, reverse=True)
-        scores /= np.sum(scores)
-        """
+        reversed_ranks = len(scores) + 1 - rankdata(scores, method='average')
+        reversed_rank_scores = 1 / (2 + reversed_ranks) # best is 1/3
 
-        rank_scores = 1 * np.power(0.5, rankdata(scores, method='ordinal'))
-        normalized_scores = scores / np.sum(scores)
+        penalized_scores = scores * reversed_rank_scores
 
-        print(scores)
-        print(sorted(scores, reverse=True))
+        k_highest = max(50, k*4)
+        min_thresh = sorted(penalized_scores, reverse=True)[k_highest]
+        penalized_scores[penalized_scores < min_thresh] = 0
 
-        roulette_scores = ( normalized_scores + rank_scores ) / 2
-        roulette_scores = sorted(roulette_scores, reverse=True)
+        normalized_scores = penalized_scores / np.sum(penalized_scores)
 
-        print(roulette_scores)
+        print(np.sort(penalized_scores)[-5:][::-1])
+        print(np.sort(normalized_scores)[-5:][::-1])
 
+        #roulette_scores = np.mean( np.vstack((rank_scores, normalized_scores)), axis=0)
+        roulette_scores = np.sort(normalized_scores)[::-1]
+
+        print(roulette_scores[:5])
+        print("==========\n")
+
+        # sort roulette scores here
         features = []
 
         while len(features) < k:
             feature = self.getFeature(roulette_scores)
+            tries = 0
             while feature in features:
-                feature += 1
+                if tries > 10:
+                    feature += randint(0,5)
+                else:
+                    tries += 1
+                    feature = self.getFeature(roulette_scores, feature+1)
 
+            tries = 0
             features.append(feature)
 
         return indices[features]
 
-    def getFeature(self, scores):
+    def getFeature(self, scores, start_i=0):
         cumulated_prob = 0
-        i = 0
-        while cumulated_prob < random():
+        i = start_i
+        rand = random()
+        while cumulated_prob < rand:
             cumulated_prob += scores[i]
             i += 1
-        return i
+            
+            if scores[i] == 0:
+                i = 0
+
+        return i-1
