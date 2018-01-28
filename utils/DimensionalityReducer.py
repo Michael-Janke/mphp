@@ -7,6 +7,7 @@ from sklearn.feature_selection import f_classif
 from sklearn.tree import DecisionTreeClassifier
 from scipy.stats import rankdata
 from random import random, randint
+from joblib import Parallel, delayed
 
 import utils.EA.config as c
 import utils.EA.fitness as fitness_module
@@ -118,17 +119,13 @@ class DimensionalityReducer():
         # preselect 100 genes in sick data which do not separate healthy data well
         selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
 
-        best_set = self.getFeatureSetBySFS(sick, healthy, selected_genes, k, fitness, true_label=true_label)
-
         if not returnMultipleSets:
-            return best_set
+            return self.getFeatureSetBySFS(sick, healthy, selected_genes, k, fitness, true_label=true_label)
 
-        sets = [best_set]
-        for i in range(1,3):
-            print("finished feature set", flush=True)
-            sets.append(self.getFeatureSetBySFS(sick, healthy, selected_genes[i:], k, fitness))
-
-        return np.asarray(sets)
+        results = Parallel(n_jobs=3)\
+            (delayed(self.getFeatureSetBySFS)(sick, healthy, selected_genes[i:], k, fitness) for i in range(3))
+        
+        return np.asarray(results)
 
     def getFeatureSetBySFS(self, sick, healthy, genes, k, fitness, true_label=""):
         # first gene has highest score and will be selected first
@@ -156,7 +153,7 @@ class DimensionalityReducer():
     ####### EMBEDDED FEATURE SELECTION #######
 
     def getDecisionTreeFeatures(self, data, k=20, returnMultipleSets = False):
-        tree = DecisionTreeClassifier()
+        tree = DecisionTreeClassifier(presort=True)
         tree.fit(data.expressions, data.labels)
 
         return self.getFeatureSets(tree.feature_importances_, k, returnMultipleSets)
@@ -208,7 +205,7 @@ class DimensionalityReducer():
         for i in range(1,3):
             sets.append(indices[self.getFeatureSet(roulette_scores, k)])
 
-        return sets
+        return np.asarray(sets)
 
     def get_roulette_scores(self, scores, k):
         reversed_ranks = len(scores) - rankdata(scores, method='average')
