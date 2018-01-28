@@ -162,33 +162,39 @@ class DimensionalityReducer():
     ####### 1 vs Rest #######
 
     def getOneAgainstRestFeatures(self, sick, healthy, k=3, method="sfs", normalization="exclude", fitness="combined"):
+        n_labels = np.unique(sick.labels).shape[0]
+        feature_sets = Parallel(n_jobs=n_labels)\
+                (delayed(self.getOneAgainstRestFeaturesForLabel)(sick, healthy, k, method, normalization, fitness, label) for label in np.unique(sick.labels))
+        
         features = {}
-        for label in np.unique(sick.labels):
-            label = label.split("-")[0]
-            s_labels = binarize_labels(sick.labels, label)
-            sick_binary = Expressions(sick.expressions, s_labels)
-
-            if healthy == "":
-                if method == "tree":
-                    indices = self.getDecisionTreeFeatures(sick_binary, k)
-                else:
-                    indices = self.getFeatures(sick_binary, k)
-
-            else:
-                h_labels = binarize_labels(healthy.labels, label)
-                healthy_binary = Expressions(healthy.expressions, h_labels)
-
-                if method == "ea":
-                    indices = self.getEAFeatures(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
-                elif method == "norm":
-                    indices = self.getNormalizedFeatures(sick_binary, healthy_binary, normalization, k)
-                else:
-                    indices = self.getFeaturesBySFS(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
-
+        for label, indices in feature_sets:
             features[label] = indices
 
         return features
 
+    def getOneAgainstRestFeaturesForLabel(self, sick, healthy, k, method, normalization, fitness, label):
+        label = label.split("-")[0]
+        s_labels = binarize_labels(sick.labels, label)
+        sick_binary = Expressions(sick.expressions, s_labels)
+
+        if healthy == "":
+            if method == "tree":
+                indices = self.getDecisionTreeFeatures(sick_binary, k)
+            else:
+                indices = self.getFeatures(sick_binary, k)
+
+        else:
+            h_labels = binarize_labels(healthy.labels, label)
+            healthy_binary = Expressions(healthy.expressions, h_labels)
+
+            if method == "ea":
+                indices = self.getEAFeatures(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
+            elif method == "norm":
+                indices = self.getNormalizedFeatures(sick_binary, healthy_binary, normalization, k)
+            else:
+                indices = self.getFeaturesBySFS(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
+
+        return (label, indices)
 
     ####### UTILS #######
 
