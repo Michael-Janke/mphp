@@ -14,6 +14,8 @@ def fitness(sick, healthy, fit='combined', k=10, true_label=""):
         # todo smarter penalty
         # if pheno.shape[0] > k:
         #    return -10
+        if len(pheno) > max(20, 2 * k):
+            return -10
 
         f =  fitness_func(sick, healthy, pheno, true_label=true_label)
         return f / (1 + abs(len(pheno) - k)/k)
