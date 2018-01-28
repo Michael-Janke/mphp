@@ -1,5 +1,4 @@
 import numpy as np
-import multiprocessing as mp
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_val_score, cross_validate
 from sklearn.metrics import silhouette_samples

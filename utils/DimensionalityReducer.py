@@ -130,22 +130,22 @@ class DimensionalityReducer():
     def getFeatureSetBySFS(self, sick, healthy, genes, k, fitness, true_label=""):
         # first gene has highest score and will be selected first
         indices = [genes[0]]
+        fitness_function = fitness_module.get_fitness_function_name(fitness)
+        fitness_function = getattr(fitness_module, fitness_function)
+
         # iteratively join the best next feature based on a fitness function until k features are found
         for idx in range(k-1):
-            best_fitness = -10
-            best_gene = 0
-            for i in range(1, len(genes)):
-                gene = genes[i]
-                if gene in indices:
-                    continue
 
-                fitness_function = fitness_module.get_fitness_function_name(fitness)
-                fitness_score = getattr(fitness_module, fitness_function)(sick, healthy, indices + [gene], true_label=true_label)
+            fitness_scores = Parallel(n_jobs=1)\
+                (delayed(fitness_function)(sick, healthy, indices + [genes[i]], true_label=true_label) for i in range(1, len(genes)))
 
-                if fitness_score > best_fitness:
-                    best_fitness = fitness_score
-                    best_gene = gene
-            indices.append(best_gene)
+            best_genes = np.asarray(fitness_scores).argsort()[::-1]
+
+            i = 0
+            while genes[best_genes[i]] in indices:
+                i += 1 
+
+            indices.append(genes[best_genes[i]])
             print("added new feature", flush=True)
 
         return np.asarray(indices)
