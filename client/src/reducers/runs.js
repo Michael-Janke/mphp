@@ -32,6 +32,7 @@ export function runs(state = initialState, action = {}) {
       return newState;
     case types.START_RUN:
       return updateRun(state, action.id, {
+        result: null,
         isLoading: true
       });
     case types.FINISH_RUN:

@@ -8,6 +8,7 @@ import Spinner from "../Spinner";
 import IconButton from "../IconButton";
 import AlgorithmExecution from "./AlgorithmExecution";
 import AlgorithmResult from "./AlgorithmResult";
+import deepEqual from 'deep-equal';
 
 const CARD_TITLE_HEIGHT = 15;
 
@@ -17,6 +18,16 @@ export default class Card extends Component {
     open: false,
   };
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if(nextState.open !== this.state.open) return true;    
+    if(this.props.geneResult) return false; // will never change again
+    if(nextProps.isLoading !== this.props.isLoading) return true;
+    if(nextProps.dataset !== this.props.dataset) return true;
+    if(nextProps.result && !this.props.result) return true;
+    if(nextProps.geneResult && !this.props.geneResult) return true;
+    return !deepEqual(nextProps.algorithm, this.props.algorithm);
+  }
+
   handleOpen = () => {
     this.setState({open: true});
   };
@@ -25,6 +36,13 @@ export default class Card extends Component {
     if(deleteIt) { this.props.deleteRun(this.props.runId); }
     this.setState({open: false});
   };
+
+  startRun = () => {
+    this.props.startRun(this.props.runId, {
+      ...this.props.algorithm,
+      dataset: this.props.dataset
+    })
+  }
 
   render() {
     const { isLoading, algorithm, datasets, dataset, result } = this.props;
@@ -47,7 +65,10 @@ export default class Card extends Component {
           </Dialog>
         </StyledCardTitle>
         {this.renderBody()}
-        <StyledError>{result && result.error && result.error.message}</StyledError>
+        {result && result.error ?
+          <StyledError> {result.error.message} <FlatButton label="Retry" primary={true}  onClick={this.startRun.bind(this)} /> </StyledError>
+        : null
+        }
       </StyledCard>
     );
   }

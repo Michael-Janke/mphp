@@ -1,7 +1,7 @@
 import numpy as np
 from validation.ClusterValidator import ClusterValidator
 from validation.ClassificationValidator import ClassificationValidator
-from utils.EA.fitness import classification_fitness, clustering_fitness, distance_fitness, combined_fitness
+from utils.EA.fitness import classification_fitness, clustering_fitness, distance_fitness, combined_fitness, sick_vs_healthy_fitness
 from utils import Expressions, binarize_labels
 from collections import defaultdict
 
@@ -15,15 +15,17 @@ class Analyzer:
     def computeFeatureValidationOneAgainstRest(self, sick, healthy, selected_genes_dict):
         results = {}
         for label, genes in selected_genes_dict.items():
-            #s_labels = binarize_labels(sick.labels, label)
-            #sick_binary = Expressions(sick.expressions, s_labels)
-
             if healthy == "":
                 results[label] = self.computeFeatureValidation(sick, "", genes, true_label=label)
             else:
-                #h_labels = binarize_labels(healthy.labels, label)
-                #healthy_binary = Expressions(healthy.expressions, h_labels)
                 results[label] = self.computeFeatureValidation(sick, healthy, genes, true_label=label)
+
+        if not healthy == "":
+            cumulated_fitness = 0
+            for res in results.values():
+                cumulated_fitness += res["fitness"]["combinedFitness"]
+
+            results["meanFitness"] = cumulated_fitness / len(results.keys())
 
         return results
 
@@ -39,6 +41,7 @@ class Analyzer:
         clus_fitness = clustering_fitness(sick, healthy, selected_genes, true_label=true_label)
         comb_fitness = combined_fitness(sick, healthy, selected_genes, true_label=true_label)
         dist_fitness = distance_fitness(sick, healthy, selected_genes, true_label=true_label)
+        s_vs_h_fitness = sick_vs_healthy_fitness(sick, healthy, selected_genes)
 
         return {
             "sick": sick_validation,
@@ -46,6 +49,7 @@ class Analyzer:
             "fitness": {
                 "classificationFitness": class_fitness,
                 "clusteringFitness": clus_fitness,
+                "sickVsHealthyFitness": s_vs_h_fitness,
                 "distanceFitness": dist_fitness,
                 "combinedFitness": comb_fitness,
             }

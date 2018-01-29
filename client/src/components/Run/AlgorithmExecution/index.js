@@ -53,26 +53,26 @@ export default class AlgorithmExecution extends Component {
       algorithm.sickTissueTypes.length !== 0;
 
     var enoughSamples = true;
-    // test if there are more than 20 healthy samples for each cancer type (but only if healthy types are selected)
+    // test if there are more than 10 healthy samples for each cancer type (but only if healthy types are selected)
     if (algorithm.healthyTissueTypes.length !== 0) {
       algorithm.cancerTypes.forEach(cancerType => {
         var sum = 0;
         algorithm.healthyTissueTypes.forEach(tissueType => {
           sum += statistics.counts[cancerType][tissueType];
         });
-        if (sum < 20) {
+        if (sum < 10) {
           enoughSamples = false;
         }
       });
     }
-    // test if there are more than 20 sick samples for each cancer type (but only if sick types are selected)
+    // test if there are more than 10 sick samples for each cancer type (but only if sick types are selected)
     if (algorithm.sickTissueTypes.length !== 0) {
       algorithm.cancerTypes.forEach(cancerType => {
         var sum = 0;
         algorithm.sickTissueTypes.forEach(tissueType => {
           sum += statistics.counts[cancerType][tissueType];
         });
-        if (sum < 20) {
+        if (sum < 10) {
           enoughSamples = false;
         }
       });
@@ -80,7 +80,7 @@ export default class AlgorithmExecution extends Component {
 
     var oneCancerTypeRunnable = true;
     // if only one cancer type is selected, only some algorithms are allowed and
-    // at least 20 healthy samples and 20 sick samples are necessary
+    // at least 10 healthy samples and 10 sick samples are necessary
     if (algorithm.cancerTypes.length === 1) {
       const currentAlgorithm = algorithm.key;
       const currentCancerType = algorithm.cancerTypes[0];
@@ -96,8 +96,8 @@ export default class AlgorithmExecution extends Component {
         (currentAlgorithm === "getFeatures" ||
           currentAlgorithm === "getPCA" ||
           currentAlgorithm === "getDecisionTreeFeatures") &&
-        sumHealthy >= 20 &&
-        sumSick >= 20;
+        sumHealthy >= 10 &&
+        sumSick >= 10;
     }
 
     return (

@@ -77,11 +77,10 @@ def run(algorithm, data, one_against_rest):
 
 
 def calcExpressionMatrix(algorithm, data, gene_indices):
-    key = algorithm["key"]
-    # only calc expression matrix if algorithm result allows it
-    allowedAlgorithms = ["getNormalizedFeaturesE",
-                         "getNormalizedFeaturesS", "getFeaturesBySFS"]
-    if key not in allowedAlgorithms:
+    # only calc expression matrix if doto contains sick an healthy samples
+    sick_tissue_types = algorithm["sickTissueTypes"]
+    healthy_tissue_types = algorithm["healthyTissueTypes"]
+    if len(sick_tissue_types) == 0 or len(healthy_tissue_types) == 0:
         return None
 
     X = np.vstack(

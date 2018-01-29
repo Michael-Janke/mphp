@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import styled from "styled-components";
 
-import ExpressionMatrix from "./utils/ExpressionMatrix";
+import ExpressionTable from "./utils/ExpressionTable";
 
 export default class GeneExploration extends Component {
   constructor(props) {
@@ -19,15 +18,6 @@ export default class GeneExploration extends Component {
       ? this.props.runs[this.props.runId].geneResults
       : null;
 
-    const geneExplorationList = genes.map((gene, i) => (
-      <StyledGene key={gene}>
-        <a href={`https://www.proteinatlas.org/${gene}`} target="_blank">
-          {geneNames[i]}
-        </a>
-        {geneResults && geneResults[gene].score}
-      </StyledGene>
-    ));
-
     return (
       <div>
         <h3>
@@ -37,30 +27,15 @@ export default class GeneExploration extends Component {
           The following genes were especially relevant for discriminating the
           clusters:
         </p>
-        {expressionMatrix ? (
-          <ExpressionMatrix
-            data={{
-              expressionMatrix,
-              genes,
-              geneNames,
-              geneExplorationList
-            }}
-          />
-        ) : (
-          <StyledList>{geneExplorationList}</StyledList>
-        )}
+        <ExpressionTable
+          data={{
+            expressionMatrix,
+            genes,
+            geneNames,
+            geneResults
+          }}
+        />
       </div>
     );
   }
 }
-
-const StyledList = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-`;
-
-const StyledGene = styled.span`
-  margin: 5px;
-  display: flex;
-  flex-direction: column;
-`;

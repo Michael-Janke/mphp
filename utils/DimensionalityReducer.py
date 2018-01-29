@@ -6,20 +6,17 @@ from sklearn.feature_selection import mutual_info_classif
 from sklearn.feature_selection import f_classif
 from sklearn.tree import DecisionTreeClassifier
 from scipy.stats import rankdata
-from random import random
+from random import random, randint
 
 import utils.EA.config as c
 import utils.EA.fitness as fitness_module
 from utils.EA.crossover import *
 from utils.EA.mutation import *
-from utils.EA.population import phenotype
 from utils.EA.algorithm import ea_for_plot
 
 from utils import Expressions, binarize_labels
 
-class DimensionalityReducer:
-    ####### PCA #######
-
+class DimensionalityReducer():
     def __init__(self):
         self.method_table = {
             "chi2": chi2,
@@ -88,21 +85,18 @@ class DimensionalityReducer:
 
         # get features in sick data which do not discriminate healty data
         features = list(set(s_indices)-set(h_indices))
-        print("excluded "+str(n+k-len(features))+" features")
-        features = np.asarray(features, dtype=np.uint32)
+        print("excluded "+str(n+k-len(features))+" features", flush=True)
 
-        if not returnMultipleSets:
-            return features[selector.scores_[features].argsort()[-k:][::-1]]
+        scores = selector.scores_
+        scores[h_indices] = 0
 
-        sets = self.getFeatureSets(selector.scores_[features], k, returnMultipleSets)
-
-        return [features[f_set] for f_set in sets]
+        return self.getFeatureSets(scores, k, returnMultipleSets)
 
     ####### MULTI-VARIATE FEATURE SELECTION #######
 
-    def getEAFeatures(self, sick, healthy, normalization="substract", returnMultipleSets = False, fitness="combined", true_label=""):
+    def getEAFeatures(self, sick, healthy, k=3, n=5000, m=100, normalization="exclude", fitness="combined", returnMultipleSets = False, true_label=""):
         # preselect features to reduce runtime
-        selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, c.chromo_size, c.chromo_size)
+        selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
 
         crossover = one_point_crossover
         mutation = binary_mutation
@@ -110,12 +104,12 @@ class DimensionalityReducer:
         sick_reduced = Expressions(sick.expressions[:, selected_genes], sick.labels)
         healthy_reduced = Expressions(healthy.expressions[:, selected_genes], healthy.labels)
 
-        fitness_function = fitness_module.fitness(sick_reduced, healthy_reduced, fitness)
+        fitness_function = fitness_module.fitness(sick_reduced, healthy_reduced, fitness, k, true_label)
 
-        best, sets, _, _ = ea_for_plot(c, c.chromo_size, fitness_function, crossover, mutation)
+        best, sets, _, _ = ea_for_plot(c, m, k, fitness_function, crossover, mutation)
 
         if not returnMultipleSets:
-            indices = selected_genes[phenotype(best)]
+            indices = selected_genes[best]
             return indices
 
         return [selected_genes[feature_set] for feature_set in sets]
@@ -131,10 +125,10 @@ class DimensionalityReducer:
 
         sets = [best_set]
         for i in range(1,3):
-            print("finished feature set")
+            print("finished feature set", flush=True)
             sets.append(self.getFeatureSetBySFS(sick, healthy, selected_genes[i:], k, fitness))
 
-        return sets
+        return np.asarray(sets)
 
     def getFeatureSetBySFS(self, sick, healthy, genes, k, fitness, true_label=""):
         # first gene has highest score and will be selected first
@@ -155,9 +149,9 @@ class DimensionalityReducer:
                     best_fitness = fitness_score
                     best_gene = gene
             indices.append(best_gene)
-            print("added new feature")
+            print("added new feature", flush=True)
 
-        return indices
+        return np.asarray(indices)
 
     ####### EMBEDDED FEATURE SELECTION #######
 
@@ -188,7 +182,7 @@ class DimensionalityReducer:
                 healthy_binary = Expressions(healthy.expressions, h_labels)
 
                 if method == "ea":
-                    indices = self.getEAFeatures(sick, healthy, normalization, fitness=fitness, true_label=label)
+                    indices = self.getEAFeatures(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
                 elif method == "norm":
                     indices = self.getNormalizedFeatures(sick_binary, healthy_binary, normalization, k)
                 else:
@@ -207,34 +201,62 @@ class DimensionalityReducer:
         if not returnMultipleSets:
             return best_set
 
+        indices = scores.argsort()[::-1]
+        roulette_scores = self.get_roulette_scores(scores, k)
+        
         sets = [best_set]
         for i in range(1,3):
-            sets.append(self.getFeatureSet(scores, k))
+            sets.append(indices[self.getFeatureSet(roulette_scores, k)])
 
         return sets
 
+    def get_roulette_scores(self, scores, k):
+        reversed_ranks = len(scores) - rankdata(scores, method='average')
+        reversed_rank_scores = 1 / (3 + reversed_ranks) # best is 1/3
+
+        penalized_scores = scores * reversed_rank_scores
+
+        k_highest = max(20, k*4)
+        min_thresh = sorted(penalized_scores, reverse=True)[k_highest]
+        penalized_scores[penalized_scores < min_thresh] = 0
+
+        normalized_scores = penalized_scores / np.sum(penalized_scores)
+        roulette_scores = np.sort(normalized_scores)[::-1]
+
+        """
+        print(np.sort(penalized_scores)[-5:][::-1])
+        print(np.sort(normalized_scores)[-5:][::-1])
+        print(roulette_scores[:5])
+        print("==========\n")
+        """
+        return roulette_scores
+
     def getFeatureSet(self, scores, k):
-        indices = scores.argsort()[::-1]
-
-        scores /= rankdata(scores, method='min')
-        scores = sorted(scores, reverse=True)
-        scores /= np.sum(scores)
-
         features = []
 
         while len(features) < k:
             feature = self.getFeature(scores)
+            tries = 0
             while feature in features:
-                feature += 1
+                if tries > k:
+                    feature += randint(1, k*2)
+                else:
+                    tries += 1
+                    feature = self.getFeature(scores, feature+1)
 
+            tries = 0
             features.append(feature)
 
-        return indices[features]
+        return features
 
-    def getFeature(self, scores):
+    def getFeature(self, scores, start_i=0):
         cumulated_prob = 0
-        i = 0
-        while cumulated_prob < random():
+        i = start_i
+        rand = random()
+        while cumulated_prob < rand:
+            if scores[i] == 0 or i >= len(scores):
+                i = 0
             cumulated_prob += scores[i]
             i += 1
-        return i
+
+        return i-1

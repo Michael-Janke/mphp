@@ -50,12 +50,7 @@ const StyledRoot = styled.div`
 const ScrollableArea = styled.div`
   overflow: auto;
   flex: 1;
-  margin-top: ${props =>
-    props.headerMinimized
-      ? props.theme.experimentHeaderHeight
-      : props.theme.totalHeaderHeight};
+  padding-top: ${props => props.theme.totalHeaderHeight};
 `;
 
 export default App;
-
-// scrollTop - Content has been scrolled? give prop to header to become smaller
