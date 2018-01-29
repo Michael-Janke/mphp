@@ -65,6 +65,7 @@ export function startRun(id, oneAgainstRest, algorithm) {
     );
 
     function _finishRun(id, result) {
+      console.log(result);
       return {
         type: types.FINISH_RUN,
         id,

@@ -164,7 +164,7 @@ class DimensionalityReducer():
 
     ####### 1 vs Rest #######
 
-    def getOneAgainstRestFeatures(self, sick, healthy, k=3, method="sfs", normalization="exclude", fitness="combined"):
+    def getOneAgainstRestFeatures(self, sick, healthy, k=3, method_key="getFeaturesBySFS", normalization="exclude", fitness="combined"):
         features = {}
         for label in np.unique(sick.labels):
             label = label.split("-")[0]
@@ -172,7 +172,7 @@ class DimensionalityReducer():
             sick_binary = Expressions(sick.expressions, s_labels)
 
             if healthy == "":
-                if method == "tree":
+                if method_key == "getDecisionTreeFeatures":
                     indices = self.getDecisionTreeFeatures(sick_binary, k)
                 else:
                     indices = self.getFeatures(sick_binary, k)
@@ -181,10 +181,12 @@ class DimensionalityReducer():
                 h_labels = binarize_labels(healthy.labels, label)
                 healthy_binary = Expressions(healthy.expressions, h_labels)
 
-                if method == "ea":
+                if method_key == "getEAFeatures":
                     indices = self.getEAFeatures(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
-                elif method == "norm":
-                    indices = self.getNormalizedFeatures(sick_binary, healthy_binary, normalization, k)
+                elif method_key == "getNormalizedFeaturesE":
+                    indices = self.getNormalizedFeaturesS(sick_binary, healthy_binary, k)
+                elif method_key == "getNormalizedFeaturesS":
+                    indices = self.getNormalizedFeaturesS(sick_binary, healthy_binary, k)
                 else:
                     indices = self.getFeaturesBySFS(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
 
@@ -203,7 +205,7 @@ class DimensionalityReducer():
 
         indices = scores.argsort()[::-1]
         roulette_scores = self.get_roulette_scores(scores, k)
-        
+
         sets = [best_set]
         for i in range(1,3):
             sets.append(indices[self.getFeatureSet(roulette_scores, k)])

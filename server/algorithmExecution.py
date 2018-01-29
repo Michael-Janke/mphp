@@ -35,11 +35,12 @@ def run(algorithm, data, one_against_rest):
     k = algorithm["parameters"].get("k")
     n = algorithm["parameters"].get("n")
 
-    # TODO if one_against_rest:
-        # TODO healthy = "" if not given
-        # TODO pass method and normalization
+    if one_against_rest:
+        healthy = "" if len(data["healthy"].expressions) == 0 else data["healthy"]
+        gene_indices = dimReducer.getOneAgainstRestFeatures(data["sick"], healthy, k, key)
+        labels = data["combined"].labels
 
-    if key == "getPCA":
+    elif key == "getPCA":
         gene_indices = dimReducer.getPCA(
             data["combined"].expressions, n_components, n_f_components)
         labels = data["combined"].labels
@@ -67,16 +68,27 @@ def run(algorithm, data, one_against_rest):
             data["sick"], data["healthy"])
         labels = np.hstack((data["sick"].labels, data["healthy"].labels))
 
-    X = data["combined"].expressions[:, gene_indices]
-
     response_data = {}
-    for label in np.unique(labels):
-        response_data[label] = X[labels == label, :].T.tolist()
+
+    if one_against_rest:
+        for cancer_type in gene_indices:
+            response_data[cancer_type] = collect_data(data, gene_indices[cancer_type], labels)
+    else:
+        response_data = collect_data(data, gene_indices, labels)
 
     return response_data, gene_indices
 
+def collect_data(data, gene_indices, labels):
+    X = data["combined"].expressions[:, gene_indices]
+    response_data = {}
+    for label in np.unique(labels):
+        response_data[label] = X[labels == label, :].T.tolist()
+    return response_data
 
-def calcExpressionMatrix(algorithm, data, gene_indices):
+def calcExpressionMatrix(algorithm, data, gene_indices, one_against_rest):
+    # TODO assemble the right way
+    if one_against_rest:
+        return None
     # only calc expression matrix if doto contains sick an healthy samples
     sick_tissue_types = algorithm["sickTissueTypes"]
     healthy_tissue_types = algorithm["healthyTissueTypes"]
@@ -94,10 +106,14 @@ def evaluate(algorithm, data, gene_indices, one_against_rest):
     sick_tissue_types = algorithm["sickTissueTypes"]
     healthy_tissue_types = algorithm["healthyTissueTypes"]
 
-    # TODO oneAgainstRest
-
     if len(cancer_types) == 1 or len(sick_tissue_types) == 0 or len(healthy_tissue_types) == 0:
-        return analyzer.computeFeatureValidation(data["combined"], "", gene_indices)
+        sick = data["combined"]
+        healthy = ""
     else:
-        return analyzer.computeFeatureValidation(
-            data["sick"], data["healthy"], gene_indices)
+        sick = data["sick"]
+        healthy = data["healthy"]
+
+    if one_against_rest:
+        return analyzer.computeFeatureValidationOneAgainstRest(sick, healthy, gene_indices)
+    else:
+        return analyzer.computeFeatureValidation(sick, healthy, gene_indices)

@@ -75,12 +75,14 @@ def runSpecificAlgorithm():
         "V1",
         dataset,
         algorithm["key"],
+        str(one_against_rest),
         "-".join([key+str(value) for key,value in algorithm["parameters"].items()]),
         "-".join(algorithm["cancerTypes"]),
         "-".join(algorithm["healthyTissueTypes"]),
         "-".join(algorithm["sickTissueTypes"])
         ))
     if cache.isCached(cache_key):
+        print("Return cached result", flush=True)
         return cache.getCache(cache_key)
 
     data = algorithmExecution.getData(algorithm, dataLoader)
@@ -92,6 +94,7 @@ def runSpecificAlgorithm():
     evaluation = algorithmExecution.evaluate(
         algorithm, data, gene_indices, one_against_rest)
 
+    # TODO per cancer type for one against all
     response = {
         'data': response_data,
         'genes': dataLoader.getGeneLabels()[gene_indices].tolist(),
