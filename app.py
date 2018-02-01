@@ -84,22 +84,7 @@ def runSpecificAlgorithm():
     if cache.isCached(cache_key):
         return cache.getCache(cache_key)
 
-    data = algorithmExecution.getData(algorithm, dataLoader)
-
-    response_data, gene_indices = algorithmExecution.run(
-        algorithm, data)
-    expression_matrix = algorithmExecution.calcExpressionMatrix(
-        algorithm, data, gene_indices)
-    evaluation = algorithmExecution.evaluate(
-        algorithm, data, gene_indices)
-
-    response = {
-        'data': {key: scores[0:3] for (key, scores) in response_data.items()},
-        'genes': dataLoader.getGeneLabels()[gene_indices].tolist(),
-        'expressionMatrix': expression_matrix,
-        'geneNames': dataLoader.getGeneNames()[gene_indices].tolist(),
-        'evaluation': evaluation,
-    }
+    response = algorithmExecution.execute(algorithm, dataLoader, oneAgainstRest)
 
     # workaround to replace NaN by null
     json_response = json.dumps(response)
