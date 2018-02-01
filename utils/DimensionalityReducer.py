@@ -10,6 +10,7 @@ from random import random, randint
 
 import utils.EA.config as c
 import utils.EA.fitness as fitness_module
+from utils.reliefF import reliefF
 from utils.EA.crossover import *
 from utils.EA.mutation import *
 from utils.EA.algorithm import ea_for_plot
@@ -55,6 +56,7 @@ class DimensionalityReducer():
         options = {
             'substract': self.getNormalizedFeaturesS,
             'exclude': self.getNormalizedFeaturesE,
+            'relief': self.getNormalizedFeaturesR,
         }
 
         return options[normalization](sick, healthy, k, n, m, returnMultipleSets)
@@ -91,6 +93,23 @@ class DimensionalityReducer():
         scores[h_indices] = 0
 
         return self.getFeatureSets(scores, k, returnMultipleSets)
+
+    def getNormalizedFeaturesR(self, sick, healthy, k, n, m, returnMultipleSets = False):
+        selector = SelectKBest(self.method_table[m], k=n)
+        selector.fit(healthy.expressions, healthy.labels)
+        h_indices = selector.get_support(indices=True)
+        mask = np.ones(selector.scores_.shape,dtype=bool)
+        mask[h_indices] = False
+        indices = np.where(mask == True)[0]
+
+        X = sick.expressions[:, indices]
+
+        scores = reliefF(X, sick.labels, k=k)
+
+        combined_scores = np.zeros(selector.scores_.shape)
+        combined_scores[indices] = scores
+
+        return self.getFeatureSets(combined_scores, k, returnMultipleSets)
 
     ####### MULTI-VARIATE FEATURE SELECTION #######
 
