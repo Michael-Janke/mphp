@@ -1,8 +1,10 @@
 import csv
+import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_validate
 from sklearn.metrics import make_scorer, f1_score
 from datetime import datetime
+from joblib import Parallel, delayed
 
 from utils.DimensionalityReducer import DimensionalityReducer
 from utils.EA.fitness import combined_fitness
@@ -21,11 +23,11 @@ class GridSearch(object):
         self.dimReducer = DimensionalityReducer()
         self.analyzer = Analyzer()
 
-        self.K_OPTIONS = [3, 5, 10, 20] 
+        self.K_OPTIONS = [3, 5, 10, 20]
         self.EXCLUDE_OPTIONS = [100, 500, 1000, 5000, 10000]
         self.M_OPTIONS = [10, 50, 100, 500]
-        self.S_OPTIONS = ["chi2", "f_classif"] #, "mutual_info_classif"
-        self.NORM_OPTIONS = ["substract", "exclude"]
+        self.S_OPTIONS = ["chi2", "f_classif", "mutual_info_classif"]
+        self.NORM_OPTIONS = ["substract", "exclude", "relief"]
         self.F_OPTIONS = ["combined", "classification", "clustering", "distance", "sick_vs_healthy"]
 
         self.BASIC_METHODS = {
@@ -36,6 +38,7 @@ class GridSearch(object):
         self.NORMALIZED_METHODS = {
             "subt": self.dimReducer.getNormalizedFeaturesS,
             "excl": self.dimReducer.getNormalizedFeaturesE,
+            "relief": self.dimReducer.getNormalizedFeaturesR,
         }
 
         self.COMBINED_METHODS = {
@@ -53,102 +56,147 @@ class GridSearch(object):
 
     ### ALL AT ONCE ###
     def get_basic_results(self):
+        results = Parallel(n_jobs=len(self.K_OPTIONS))\
+                (delayed(self.get_basic_results_for_k)(k) for k in self.K_OPTIONS)
+            
+        basic_results = []
+        for res in results:
+            basic_results.extend(res)
+        print("Basic methods are done", flush=True)
+        return basic_results
+
+    def get_basic_results_for_k(self, k):
         results = []
-        for k in self.K_OPTIONS:
-            for method in self.BASIC_METHODS:
-                if method == "basic":
-                    # get result for each possible statistic
-                    for stat in self.S_OPTIONS:
-                        start = datetime.now()
-                        features = self.BASIC_METHODS[method](self.data, k, stat)
-                        time = round((datetime.now()-start).total_seconds(),2)
-
-                        result = self.get_result_dict_all_at_once(method, k, features, time, statistic=stat)
-                        results.append(result)
-
-                else:
+        for method in self.BASIC_METHODS:
+            if method == "basic":
+                # get result for each possible statistic
+                for stat in self.S_OPTIONS:
                     start = datetime.now()
-                    features = self.BASIC_METHODS[method](self.data, k)
+                    features = self.BASIC_METHODS[method](self.data, k, stat)
                     time = round((datetime.now()-start).total_seconds(),2)
-                    
-                    result = self.get_result_dict_all_at_once(method, k, features, time)
+
+                    result = self.get_result_dict_all_at_once(method, k, features, time, statistic=stat)
                     results.append(result)
 
-            print("Parameter k: " + str(k) + " is done", flush=True)
-        print("Basic methods are done", flush=True)
+            else:
+                start = datetime.now()
+                features = self.BASIC_METHODS[method](self.data, k)
+                time = round((datetime.now()-start).total_seconds(),2)
+                
+                result = self.get_result_dict_all_at_once(method, k, features, time)
+                results.append(result)
+
+        print("Basic methods are done with k "+str(k), flush=True)
         return results
 
     def get_normalized_results(self, statistic = "chi2"):
+        results = Parallel(n_jobs=len(self.K_OPTIONS))\
+                (delayed(self.get_normalized_results_for_k)(k, statistic) for k in self.K_OPTIONS)
+
+        normalized_results = []
+        for res in results:
+            normalized_results.extend(res)
+        print("Normalized methods are done", flush=True)
+        return normalized_results
+
+    def get_normalized_results_for_k(self, k, statistic):
         results = []
-        for k in self.K_OPTIONS:
-            for method in self.NORMALIZED_METHODS:
-                if method == "excl":
-                    # get result for each possible exlude parameter
-                    for exclude_n in self.EXCLUDE_OPTIONS:
-                        start = datetime.now()
-                        features = self.NORMALIZED_METHODS[method](self.sick, self.healthy, k, exclude_n, statistic)
-                        time = round((datetime.now()-start).total_seconds(),2)
-
-                        result = self.get_result_dict_all_at_once(method, k, features, time, statistic=statistic, exclude=exclude_n, normalization="exclude")
-                        results.append(result)
-
-                else:
+        for method in self.NORMALIZED_METHODS:
+            if method == "relief" and np.unique(self.sick.labels).shape[0] > 2:
+                continue 
+            if method == "excl" or method == "relief":
+                # get result for each possible exclude parameter
+                for exclude_n in self.EXCLUDE_OPTIONS:
                     start = datetime.now()
-                    features = self.NORMALIZED_METHODS[method](self.sick, self.healthy, k, 42, statistic)
+                    features = self.NORMALIZED_METHODS[method](self.sick, self.healthy, k, exclude_n, statistic)
                     time = round((datetime.now()-start).total_seconds(),2)
-                    
-                    result = self.get_result_dict_all_at_once(method, k, features, time, statistic=statistic, normalization="substract")
+
+                    result = self.get_result_dict_all_at_once(method, k, features, time, statistic=statistic, exclude=exclude_n, normalization="exclude")
                     results.append(result)
 
-        print("Normalized methods are done", flush=True)
+            else:
+                start = datetime.now()
+                features = self.NORMALIZED_METHODS[method](self.sick, self.healthy, k, 42, statistic)
+                time = round((datetime.now()-start).total_seconds(),2)
+                
+                result = self.get_result_dict_all_at_once(method, k, features, time, statistic=statistic, normalization="substract")
+                results.append(result)
+
+        print("Normalized methods are done with k "+str(k), flush=True)
         return results
+
 
     def get_combined_results(self, statistic = "chi2", normalization = "exclude", n = 5000):
-        results = []
-        for k in self.K_OPTIONS:
-            for method in self.COMBINED_METHODS:
-                for m in self.M_OPTIONS:
-                    for fit in self.F_OPTIONS:
-                
-                        start = datetime.now()
-                        features = self.COMBINED_METHODS[method](self.sick, self.healthy, k, n, m, normalization, fit)
-                        time = round((datetime.now()-start).total_seconds(),2)
-                        
-                        result = self.get_result_dict_all_at_once(method, k, features, time, statistic=statistic, exclude=n, normalization="exclude", preselect=m, fitness_method=fit)
-                        results.append(result)
+        results = Parallel(n_jobs=len(self.K_OPTIONS))\
+                (delayed(self.get_combined_results_for_k)(k, statistic, normalization, n) for k in self.K_OPTIONS)
 
-                print("Method " + method + " is done", flush=True)
-            print("Parameter k: " + str(k) + " is done", flush=True)
+        combined_results = []
+        for res in results:
+            combined_results.extend(res)      
         print("Combined methods are done", flush=True)
-        return results
+        return combined_results
 
+    def get_combined_results_for_k(self, k, statistic, normalization, n):
+        results = Parallel(n_jobs=len(self.F_OPTIONS))\
+                (delayed(self.get_combined_results_for_k_f)(k, fit, statistic, normalization, n) for fit in self.F_OPTIONS)
+        
+        combined_results = []
+        for res in results:
+            combined_results.extend(res)
+
+        print("Combined methods are done with k "+str(k), flush=True)
+        return combined_results
+
+    def get_combined_results_for_k_f(self, k, fit, statistic, normalization, n):
+        results = []
+        for method in self.COMBINED_METHODS:
+            for m in self.M_OPTIONS:
+                start = datetime.now()
+                features = self.COMBINED_METHODS[method](self.sick, self.healthy, k, n, m, normalization, fit)
+                time = round((datetime.now()-start).total_seconds(),2)
+                
+                result = self.get_result_dict_all_at_once(method, k, features, time, statistic=statistic, exclude=n, normalization="exclude", preselect=m, fitness_method=fit)
+                results.append(result)
+
+            print(method + " is done with k "+str(k), flush=True)
+
+        return results
 
     ### 1 vs Rest ###
     def get_one_against_rest_results(self):
+        results = Parallel(n_jobs=len(self.K_OPTIONS))\
+                (delayed(self.get_one_against_rest_results_for_k)(k) for k in self.K_OPTIONS)
+        
+        combined_results = []
+        for res in results:
+            combined_results.extend(res)     
+        return combined_results
+
+    def get_one_against_rest_results_for_k(self, k):
         results = []
         id = 0
-        for k in self.K_OPTIONS:
-            for method in self.ALL_METHODS:
-                if method in ["basic", "tree"]:
-                    start = datetime.now()
-                    feature_sets = self.dimReducer.getOneAgainstRestFeatures(self.data, '', k, method=method)
-                    time = round((datetime.now()-start).total_seconds(),2)
-                else:    
-                    start = datetime.now()
-                    feature_sets = self.dimReducer.getOneAgainstRestFeatures(self.sick, self.healthy, k, method=method)
-                    time = round((datetime.now()-start).total_seconds(),2)
+        for method in self.ALL_METHODS:
+            if method in ["basic", "tree"]:
+                start = datetime.now()
+                feature_sets = self.dimReducer.getOneAgainstRestFeatures(self.data, '', k, method=method)
+                time = round((datetime.now()-start).total_seconds(),2)
+            else:    
+                start = datetime.now()
+                feature_sets = self.dimReducer.getOneAgainstRestFeatures(self.sick, self.healthy, k, method=method)
+                time = round((datetime.now()-start).total_seconds(),2)
 
-                validation = self.analyzer.computeFeatureValidationOneAgainstRest(self.sick, self.healthy, feature_sets)
-                del validation["meanFitness"]
+            validation = self.analyzer.computeFeatureValidationOneAgainstRest(self.sick, self.healthy, feature_sets)
+            del validation["meanFitness"]
 
-                for cancer_type, metrics in validation.items():
-                    result = self.get_result_dict_one_vs_rest(id, cancer_type, method, k, metrics, time, feature_sets[cancer_type])
-                    results.append(result)
+            for cancer_type, metrics in validation.items():
+                result = self.get_result_dict_one_vs_rest(id, cancer_type, method, k, metrics, time, feature_sets[cancer_type])
+                results.append(result)
 
-                id += 1
-                print("Method: " +  method + " is done", flush=True)
-            print("Parameter k: " + str(k) + " is done", flush=True)
+            id += 1
 
+            print("1vsRest method " + method + " is done with k "+str(k), flush=True)
+        print("1vsRest methods are done with k "+str(k), flush=True)
+           
         return results
 
 
