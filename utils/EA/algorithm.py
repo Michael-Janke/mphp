@@ -72,7 +72,6 @@ def ea_for_plot(c, size_cromo, k, fitness_func, crossover, mutation):
 
         # New population
         population = elitism(old_pop, descendents)
-        population = [(indiv[0], fitness_func(indiv)) for indiv in population]
 
         for indiv in population:
             if len(phenotype(indiv)) == k:
