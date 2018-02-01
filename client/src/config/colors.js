@@ -7,6 +7,7 @@ export const boringBlue = "rgb(0, 122, 158)";
 export const slightlyBoringBlue = "#5CABC1";
 
 export const lightGray = "#f3f3f3";
+export const darkGray = "#b3b3b3";
 export const leafGreen = "#4CAF50";
 export const royalPurple = "rgb(131, 0, 175)";
 
