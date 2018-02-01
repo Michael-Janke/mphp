@@ -16,6 +16,8 @@ class Content extends Component {
     if (!context.datasets) {
       this.props.loadContext();
     }
+    this.state = { maxRunsPerRow: 0 };
+    this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
   }
 
   render() {
@@ -23,22 +25,25 @@ class Content extends Component {
     return (
       <ContentContainer>
         {context.datasets ? (
-          Object.keys(runs)
-            .reverse()
-            .map(runId => {
-              const run = runs[runId];
-              return (
-                <Run
-                  key={runId}
-                  runId={runId}
-                  {...run}
-                  startRun={startRun}
-                  updateRun={updateRun}
-                  deleteRun={deleteRun}
-                  {...context}
-                />
-              );
-            })
+          [
+            ...Object.keys(runs)
+              .reverse()
+              .map(runId => {
+                const run = runs[runId];
+                return (
+                  <Run
+                    key={runId}
+                    runId={runId}
+                    {...run}
+                    startRun={startRun}
+                    updateRun={updateRun}
+                    deleteRun={deleteRun}
+                    {...context}
+                  />
+                );
+              }),
+            ...this.addMissingRuns()
+          ]
         ) : (
           <Dialog
             actions={[
@@ -67,6 +72,31 @@ class Content extends Component {
       </ContentContainer>
     );
   }
+
+  addMissingRuns() {
+    const currentRuns = Object.keys(this.props.runs).length;
+    const missingRuns =
+      this.state.maxRunsPerRow - currentRuns % this.state.maxRunsPerRow;
+    var result = [];
+    for (let i = 0; i < missingRuns; i++) {
+      result.push(<EmptyRun key={"missingRun" + i} />);
+    }
+    return result;
+  }
+
+  componentDidMount() {
+    this.updateWindowDimensions();
+    window.addEventListener("resize", this.updateWindowDimensions);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.updateWindowDimensions);
+  }
+
+  updateWindowDimensions() {
+    const maxRunsPerRow = Math.floor(window.innerWidth / 950);
+    this.setState({ maxRunsPerRow });
+  }
 }
 
 const ContentContainer = styled.div`
@@ -84,6 +114,14 @@ const StyledSpinnerContainer = styled.div`
 const LoadingText = styled.div`
   font-size: ${props => props.theme.h1};
   margin-left: 10px;
+`;
+
+const EmptyRun = styled.div`
+  margin: ${props => props.theme.mediumSpace};
+  padding: ${props => props.theme.mediumSpace};
+  min-width: 800px;
+  max-width: 1000px;
+  flex: 1;
 `;
 
 const mapStateToProps = state => {

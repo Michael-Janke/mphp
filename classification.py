@@ -58,8 +58,13 @@ pprint(classVal.evaluate(healthy, selected_genes, ["decisionTree"]))
 plotScatter(healthy, selected_genes, gene_labels)
 
 pprint(analyzer.computeFeatureValidation(sick, healthy, selected_genes)["fitness"])
-#selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3, fitness="classification", returnMultipleSets = True)
+from datetime import datetime
+start = datetime.now()
+
+selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 10, fitness="combined", returnMultipleSets = False)
 #selected_genes = dimReducer.getEAFeatures(sick, healthy, fitness="distance", returnMultipleSets = True)
 #selected_genes = dimReducer.getDecisionTreeFeatures(data, 5, returnMultipleSets = True)
 #selected_genes = dimReducer.getNormalizedFeatures(sick, healthy, k=3, returnMultipleSets = True)
-#pprint(selected_genes)
+
+pprint(selected_genes)
+print(datetime.now()-start)

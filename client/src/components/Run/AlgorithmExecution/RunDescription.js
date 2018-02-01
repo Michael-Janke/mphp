@@ -6,10 +6,28 @@ export default class RunDescription extends Component {
     const { algorithms, algorithm } = this.props;
     return (
       <StyledContent>
-        parameters: <span>{Object.keys(algorithm.parameters).map((param) => algorithms[algorithm.key].parameters[param].name + ":" + algorithm.parameters[param]).join(', ')}</span> |
-        cancer types: <span>{algorithm.cancerTypes.join(', ')}</span> |
-        healthy tissue: <span>{algorithm.healthyTissueTypes.join(', ')}</span> |
-        sick tissue: <span>{algorithm.sickTissueTypes.join(', ')}</span> 
+        {Object.keys(algorithm.parameters).map(param => (
+          <span key={param}>
+            <StyledText>
+              {algorithms[algorithm.key].parameters[param].name}
+            </StyledText>
+            {": " + algorithm.parameters[param] + " "}
+          </span>
+        ))}
+        <StyledText>Cancer types: </StyledText>
+        <span>{algorithm.cancerTypes.join(", ")}</span>
+        {Object.keys(algorithm.healthyTissueTypes).length !== 0 ? (
+          <span>
+            <StyledText> Healthy tissue: </StyledText>
+            {algorithm.healthyTissueTypes.join(", ")}
+          </span>
+        ) : null}
+        {Object.keys(algorithm.sickTissueTypes).length !== 0 ? (
+          <span>
+            <StyledText> Sick tissue: </StyledText>
+            {algorithm.sickTissueTypes.join(", ")}
+          </span>
+        ) : null}
       </StyledContent>
     );
   }
@@ -18,4 +36,9 @@ export default class RunDescription extends Component {
 const StyledContent = styled.div`
   margin-left: 16px;
   margin-right: 16px;
+  font-size: 0.8em;
+`;
+
+const StyledText = styled.span`
+  color: ${props => props.theme.darkGray};
 `;

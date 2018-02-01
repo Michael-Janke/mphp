@@ -14,6 +14,8 @@ def fitness(sick, healthy, fit='combined', k=10, true_label=""):
         # todo smarter penalty
         # if pheno.shape[0] > k:
         #    return -10
+        if len(pheno) > max(20, 2 * k):
+            return -10
 
         f =  fitness_func(sick, healthy, pheno, true_label=true_label)
         return f / (1 + abs(len(pheno) - k)/k)
@@ -34,15 +36,14 @@ def get_fitness_function_name(fit):
 def classification_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
     sick_expressions = sick.expressions[:,genes]
     healthy_expressions = healthy.expressions[:,genes]
+    clf = DecisionTreeClassifier(presort=True)
     if not true_label:
-        clf = DecisionTreeClassifier()
         sick_score = cross_validate(clf, sick_expressions, sick.labels, cv=5, scoring="f1_macro", return_train_score=False)["test_score"].mean()
         healthy_score = cross_validate(clf, healthy_expressions, healthy.labels, cv=5, scoring="f1_macro", return_train_score=False)["test_score"].mean()
         return (alpha * sick_score + (1-alpha) * (1- healthy_score))
     else:
         sick_labels = binarize_labels(sick.labels, true_label)
         healthy_labels = binarize_labels(healthy.labels, true_label)
-        clf = DecisionTreeClassifier()
         sick_score = cross_validate(clf, sick_expressions, sick_labels, cv=5, scoring="f1", return_train_score=False)["test_score"].mean()
         healthy_score = cross_validate(clf, healthy_expressions, healthy_labels, cv=5, scoring="f1", return_train_score=False)["test_score"].mean()
     return (alpha * sick_score + (1-alpha) * (1- healthy_score))
@@ -52,6 +53,7 @@ def sick_vs_healthy_fitness(sick, healthy, genes, alpha=None, true_label=None):
     sick_expressions = sick.expressions[:,genes]
     healthy_expressions = healthy.expressions[:,genes]
 
+    clf = DecisionTreeClassifier(presort=True)
     scores = []
     for selected_label in np.unique(sick.labels):
         label = selected_label.split("-")[0]
@@ -61,7 +63,6 @@ def sick_vs_healthy_fitness(sick, healthy, genes, alpha=None, true_label=None):
         data = np.vstack((sick_expressions[sick_indices, :], healthy_expressions[healthy_indices, :]))
         labels = np.hstack((sick.labels[sick_indices], healthy.labels[healthy_indices]))
 
-        clf = DecisionTreeClassifier()
         score = cross_validate(clf, data, labels, cv=5, scoring="f1_macro", return_train_score=False)["test_score"].mean()
         scores.append(score)
 

@@ -7,6 +7,7 @@ from sklearn.feature_selection import f_classif
 from sklearn.tree import DecisionTreeClassifier
 from scipy.stats import rankdata
 from random import random, randint
+from joblib import Parallel, delayed
 
 import utils.EA.config as c
 import utils.EA.fitness as fitness_module
@@ -137,37 +138,33 @@ class DimensionalityReducer():
         # preselect 100 genes in sick data which do not separate healthy data well
         selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
 
-        best_set = self.getFeatureSetBySFS(sick, healthy, selected_genes, k, fitness, true_label=true_label)
-
         if not returnMultipleSets:
-            return best_set
+            return self.getFeatureSetBySFS(sick, healthy, selected_genes, k, fitness, true_label=true_label)
 
-        sets = [best_set]
-        for i in range(1,3):
-            print("finished feature set", flush=True)
-            sets.append(self.getFeatureSetBySFS(sick, healthy, selected_genes[i:], k, fitness))
-
-        return np.asarray(sets)
+        results = Parallel(n_jobs=3)\
+            (delayed(self.getFeatureSetBySFS)(sick, healthy, selected_genes[i:], k, fitness) for i in range(3))
+        
+        return np.asarray(results)
 
     def getFeatureSetBySFS(self, sick, healthy, genes, k, fitness, true_label=""):
         # first gene has highest score and will be selected first
         indices = [genes[0]]
+        fitness_function = fitness_module.get_fitness_function_name(fitness)
+        fitness_function = getattr(fitness_module, fitness_function)
+
         # iteratively join the best next feature based on a fitness function until k features are found
         for idx in range(k-1):
-            best_fitness = -10
-            best_gene = 0
-            for i in range(1, len(genes)):
-                gene = genes[i]
-                if gene in indices:
-                    continue
 
-                fitness_function = fitness_module.get_fitness_function_name(fitness)
-                fitness_score = getattr(fitness_module, fitness_function)(sick, healthy, indices + [gene], true_label=true_label)
+            fitness_scores = Parallel(n_jobs=1)\
+                (delayed(fitness_function)(sick, healthy, indices + [genes[i]], true_label=true_label) for i in range(1, len(genes)))
 
-                if fitness_score > best_fitness:
-                    best_fitness = fitness_score
-                    best_gene = gene
-            indices.append(best_gene)
+            best_genes = np.asarray(fitness_scores).argsort()[::-1]
+
+            i = 0
+            while genes[best_genes[i]] in indices:
+                i += 1 
+
+            indices.append(genes[best_genes[i]])
             print("added new feature", flush=True)
 
         return np.asarray(indices)
@@ -175,7 +172,7 @@ class DimensionalityReducer():
     ####### EMBEDDED FEATURE SELECTION #######
 
     def getDecisionTreeFeatures(self, data, k=20, returnMultipleSets = False):
-        tree = DecisionTreeClassifier()
+        tree = DecisionTreeClassifier(presort=True)
         tree.fit(data.expressions, data.labels)
 
         return self.getFeatureSets(tree.feature_importances_, k, returnMultipleSets)
@@ -184,33 +181,39 @@ class DimensionalityReducer():
     ####### 1 vs Rest #######
 
     def getOneAgainstRestFeatures(self, sick, healthy, k=3, method="sfs", normalization="relief", fitness="combined"):
+        n_labels = np.unique(sick.labels).shape[0]
+        feature_sets = Parallel(n_jobs=n_labels)\
+                (delayed(self.getOneAgainstRestFeaturesForLabel)(sick, healthy, k, method, normalization, fitness, label) for label in np.unique(sick.labels))
+        
         features = {}
-        for label in np.unique(sick.labels):
-            label = label.split("-")[0]
-            s_labels = binarize_labels(sick.labels, label)
-            sick_binary = Expressions(sick.expressions, s_labels)
-
-            if healthy == "":
-                if method == "tree":
-                    indices = self.getDecisionTreeFeatures(sick_binary, k)
-                else:
-                    indices = self.getFeatures(sick_binary, k)
-
-            else:
-                h_labels = binarize_labels(healthy.labels, label)
-                healthy_binary = Expressions(healthy.expressions, h_labels)
-
-                if method == "ea":
-                    indices = self.getEAFeatures(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
-                elif method == "norm":
-                    indices = self.getNormalizedFeatures(sick_binary, healthy_binary, normalization, k)
-                else:
-                    indices = self.getFeaturesBySFS(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
-
+        for label, indices in feature_sets:
             features[label] = indices
 
         return features
 
+    def getOneAgainstRestFeaturesForLabel(self, sick, healthy, k, method, normalization, fitness, label):
+        label = label.split("-")[0]
+        s_labels = binarize_labels(sick.labels, label)
+        sick_binary = Expressions(sick.expressions, s_labels)
+
+        if healthy == "":
+            if method == "tree":
+                indices = self.getDecisionTreeFeatures(sick_binary, k)
+            else:
+                indices = self.getFeatures(sick_binary, k)
+
+        else:
+            h_labels = binarize_labels(healthy.labels, label)
+            healthy_binary = Expressions(healthy.expressions, h_labels)
+
+            if method == "ea":
+                indices = self.getEAFeatures(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
+            elif method == "norm":
+                indices = self.getNormalizedFeatures(sick_binary, healthy_binary, normalization, k)
+            else:
+                indices = self.getFeaturesBySFS(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
+
+        return (label, indices)
 
     ####### UTILS #######
 
@@ -227,7 +230,7 @@ class DimensionalityReducer():
         for i in range(1,3):
             sets.append(indices[self.getFeatureSet(roulette_scores, k)])
 
-        return sets
+        return np.asarray(sets)
 
     def get_roulette_scores(self, scores, k):
         reversed_ranks = len(scores) - rankdata(scores, method='average')
