@@ -59,8 +59,6 @@ def context():
 @app.route("/runAlgorithm", methods=["POST"])
 def runSpecificAlgorithm():
     algorithm = request.get_json()["algorithm"]
-    one_against_rest = request.get_json()["oneAgainstRest"]
-
     if "dataset" not in algorithm:
         return abort(400, "need dataset parameter")
 
@@ -75,26 +73,23 @@ def runSpecificAlgorithm():
         "V1",
         dataset,
         algorithm["key"],
-        str(one_against_rest),
         "-".join([key+str(value) for key,value in algorithm["parameters"].items()]),
         "-".join(algorithm["cancerTypes"]),
         "-".join(algorithm["healthyTissueTypes"]),
         "-".join(algorithm["sickTissueTypes"])
         ))
     if cache.isCached(cache_key):
-        print("Return cached result", flush=True)
         return cache.getCache(cache_key)
 
     data = algorithmExecution.getData(algorithm, dataLoader)
 
     response_data, gene_indices = algorithmExecution.run(
-        algorithm, data, one_against_rest)
+        algorithm, data)
     expression_matrix = algorithmExecution.calcExpressionMatrix(
         algorithm, data, gene_indices)
     evaluation = algorithmExecution.evaluate(
-        algorithm, data, gene_indices, one_against_rest)
+        algorithm, data, gene_indices)
 
-    # TODO per cancer type for one against all
     response = {
         'data': response_data,
         'genes': dataLoader.getGeneLabels()[gene_indices].tolist(),
@@ -110,10 +105,10 @@ def runSpecificAlgorithm():
     return json_respone
 
 
-def flaskrun(app, default_host="0.0.0.0",
+def flaskrun(app, default_host="0.0.0.0", 
                   default_port="5000"):
     """
-    Takes a flask.Flask instance and runs it. Parses
+    Takes a flask.Flask instance and runs it. Parses 
     command-line flags to configure the app.
     """
 
