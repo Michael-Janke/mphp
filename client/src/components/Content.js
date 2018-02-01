@@ -79,7 +79,7 @@ class Content extends Component {
       this.state.maxRunsPerRow - currentRuns % this.state.maxRunsPerRow;
     var result = [];
     for (let i = 0; i < missingRuns; i++) {
-      result.push(<EmptyRun />);
+      result.push(<EmptyRun key={"missingRun" + i} />);
     }
     return result;
   }
