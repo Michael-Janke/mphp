@@ -59,6 +59,8 @@ def context():
 @app.route("/runAlgorithm", methods=["POST"])
 def runSpecificAlgorithm():
     algorithm = request.get_json()["algorithm"]
+    oneAgainstRest = request.get_json()["oneAgainstRest"]
+
     if "dataset" not in algorithm:
         return abort(400, "need dataset parameter")
 
@@ -73,6 +75,7 @@ def runSpecificAlgorithm():
         "V1",
         dataset,
         algorithm["key"],
+        str(oneAgainstRest),
         "-".join([key+str(value) for key,value in algorithm["parameters"].items()]),
         "-".join(algorithm["cancerTypes"]),
         "-".join(algorithm["healthyTissueTypes"]),
@@ -105,10 +108,10 @@ def runSpecificAlgorithm():
     return json_respone
 
 
-def flaskrun(app, default_host="0.0.0.0", 
+def flaskrun(app, default_host="0.0.0.0",
                   default_port="5000"):
     """
-    Takes a flask.Flask instance and runs it. Parses 
+    Takes a flask.Flask instance and runs it. Parses
     command-line flags to configure the app.
     """
 
