@@ -55,7 +55,7 @@ export default class Card extends Component {
             {datasets[dataset] || ""} | {algorithm.name || "Execute Algorithm"}
           </StyledTitleText>
           {isLoading ? <Spinner size={CARD_TITLE_HEIGHT} /> : null}
-          <IconButton icon="delete" onClick={this.handleOpen} />
+          <IconButton icon="clear" onClick={this.handleOpen} />
           <Dialog
             actions={[
               <FlatButton
@@ -79,13 +79,12 @@ export default class Card extends Component {
         {this.renderBody()}
         {result && result.error ? (
           <StyledError>
-            {" "}
-            {result.error.message}{" "}
+            {result.error.message}
             <FlatButton
               label="Retry"
               primary={true}
               onClick={this.startRun.bind(this)}
-            />{" "}
+            />
           </StyledError>
         ) : null}
       </StyledCard>
@@ -125,11 +124,13 @@ const StyledCardTitle = styled(CardTitle)`
   display: flex;
   align-items: center;
   height: ${CARD_TITLE_HEIGHT}px;
+  padding-right: 0 !important;
 `;
 
 const StyledTitleText = styled.p`
   margin-right: ${props => props.theme.mediumSpace};
   font-size: ${props => props.theme.h2};
+  flex: 1;
 `;
 
 const StyledError = styled.div`

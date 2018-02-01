@@ -94,7 +94,7 @@ def runSpecificAlgorithm():
         algorithm, data, gene_indices)
 
     response = {
-        'data': response_data,
+        'data': {key: scores[0:3] for (key, scores) in response_data.items()},
         'genes': dataLoader.getGeneLabels()[gene_indices].tolist(),
         'expressionMatrix': expression_matrix,
         'geneNames': dataLoader.getGeneNames()[gene_indices].tolist(),

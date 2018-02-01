@@ -49,12 +49,6 @@ class Header extends Component {
   }
 }
 
-const StyledSpacer = styled.div`
-  margin-left: 3px;
-  margin-right: 3px;
-  color: ${props => props.theme.almostWhite};
-`;
-
 const StyledHeaderContainer = styled.div`
   position: absolute;
   display: flex;
