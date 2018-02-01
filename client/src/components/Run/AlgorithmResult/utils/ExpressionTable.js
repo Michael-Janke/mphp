@@ -41,7 +41,7 @@ const ExpressionTable = props => {
             </TableLabel>,
             <BreakingTableRow key="proteinAtlas">
               <StyledTableHeaderColumn>Protein Atlas</StyledTableHeaderColumn>
-              {Object.keys(geneResults).map((key, index) => {
+              {genes.map((key, index) => {
                 return (
                   <ScoreRowContent
                     geneId={key}
@@ -56,7 +56,7 @@ const ExpressionTable = props => {
             </BreakingTableRow>,
             <tr key="DisGeNet">
               <StyledTableHeaderColumn>DisGeNet</StyledTableHeaderColumn>
-              {Object.keys(geneResults).map((key, index) => {
+              {genes.map((key, index) => {
                 return (
                   <ScoreRowContent
                     geneId={key}
@@ -75,7 +75,7 @@ const ExpressionTable = props => {
               <StyledTableHeaderColumn>
                 Cancer Gene Census
               </StyledTableHeaderColumn>
-              {Object.keys(geneResults).map((key, index) => {
+              {genes.map((key, index) => {
                 return (
                   <ScoreRowContent
                     geneId={key}
@@ -92,7 +92,7 @@ const ExpressionTable = props => {
               <StyledTableHeaderColumn>
                 Entrez Gene Summary
               </StyledTableHeaderColumn>
-              {Object.keys(geneResults).map((key, index) => {
+              {genes.map((key, index) => {
                 return (
                   <ScoreRowContent
                     geneId={key}
@@ -107,7 +107,7 @@ const ExpressionTable = props => {
             </tr>,
             <tr key="Scores">
               <StyledTableHeaderColumn>Total Scores</StyledTableHeaderColumn>
-              {Object.keys(geneResults).map((key, index) => {
+              {genes.map((key, index) => {
                 return (
                   <StyledTableRowColumn
                     key={`score-${index}`}

@@ -23,7 +23,7 @@ class Header extends Component {
           />
           <div>
             <StyledRightContainer>
-              <IconButton
+              {/* <IconButton
                 tooltip="Open existing experiment"
                 icon="open"
                 color={almostWhite}
@@ -34,7 +34,7 @@ class Header extends Component {
                 icon="save"
                 color={almostWhite}
               />
-              <StyledSpacer />
+              <StyledSpacer /> */}
               <IconButton
                 tooltip="Add Card"
                 icon="add"
