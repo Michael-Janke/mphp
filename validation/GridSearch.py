@@ -1,4 +1,5 @@
 import csv
+import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_validate
 from sklearn.metrics import make_scorer, f1_score
@@ -26,7 +27,7 @@ class GridSearch(object):
         self.EXCLUDE_OPTIONS = [100, 500, 1000, 5000, 10000]
         self.M_OPTIONS = [10, 50, 100, 500]
         self.S_OPTIONS = ["chi2", "f_classif", "mutual_info_classif"]
-        self.NORM_OPTIONS = ["substract", "exclude"]
+        self.NORM_OPTIONS = ["substract", "exclude", "relief"]
         self.F_OPTIONS = ["combined", "classification", "clustering", "distance", "sick_vs_healthy"]
 
         self.BASIC_METHODS = {
@@ -37,6 +38,7 @@ class GridSearch(object):
         self.NORMALIZED_METHODS = {
             "subt": self.dimReducer.getNormalizedFeaturesS,
             "excl": self.dimReducer.getNormalizedFeaturesE,
+            "relief": self.dimReducer.getNormalizedFeaturesR,
         }
 
         self.COMBINED_METHODS = {
@@ -100,7 +102,9 @@ class GridSearch(object):
     def get_normalized_results_for_k(self, k, statistic):
         results = []
         for method in self.NORMALIZED_METHODS:
-            if method == "excl":
+            if method == "relief" and np.unique(self.sick.labels).shape[0] > 2:
+                continue 
+            if method == "excl" or method == "relief":
                 # get result for each possible exclude parameter
                 for exclude_n in self.EXCLUDE_OPTIONS:
                     start = datetime.now()

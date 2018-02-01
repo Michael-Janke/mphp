@@ -42,9 +42,11 @@ pprint(results)
 expressions = analyzer.computeExpressionMatrixOneAgainstRest(sick, healthy, features)
 pprint(expressions)
 
+"""
 # Feature Selection
 #selected_genes = dimReducer.getEAFeatures(sick,healthy,fitness="clustering")
-selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3, fitness="combined")
+#selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3, fitness="combined")
+selected_genes = dimReducer.getNormalizedFeatures(sick, healthy, k=3, normalization="relief")
 print(selected_genes)
 
 print("SICK REDUCED")
@@ -56,7 +58,6 @@ pprint(classVal.evaluate(healthy, selected_genes, ["decisionTree"]))
 plotScatter(healthy, selected_genes, gene_labels)
 
 pprint(analyzer.computeFeatureValidation(sick, healthy, selected_genes)["fitness"])
-"""
 from datetime import datetime
 start = datetime.now()
 

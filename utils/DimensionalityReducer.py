@@ -11,6 +11,7 @@ from joblib import Parallel, delayed
 
 import utils.EA.config as c
 import utils.EA.fitness as fitness_module
+from utils.reliefF import reliefF
 from utils.EA.crossover import *
 from utils.EA.mutation import *
 from utils.EA.algorithm import ea_for_plot
@@ -52,10 +53,11 @@ class DimensionalityReducer():
 
         return self.getFeatureSets(selector.scores_, k, returnMultipleSets)
 
-    def getNormalizedFeatures(self, sick, healthy, normalization="exclude", k=20, n=5000, m="chi2", returnMultipleSets = False):
+    def getNormalizedFeatures(self, sick, healthy, normalization="relief", k=20, n=5000, m="chi2", returnMultipleSets = False):
         options = {
             'substract': self.getNormalizedFeaturesS,
             'exclude': self.getNormalizedFeaturesE,
+            'relief': self.getNormalizedFeaturesR,
         }
 
         return options[normalization](sick, healthy, k, n, m, returnMultipleSets)
@@ -92,6 +94,23 @@ class DimensionalityReducer():
         scores[h_indices] = 0
 
         return self.getFeatureSets(scores, k, returnMultipleSets)
+
+    def getNormalizedFeaturesR(self, sick, healthy, k, n, m, returnMultipleSets = False):
+        selector = SelectKBest(self.method_table[m], k=n)
+        selector.fit(healthy.expressions, healthy.labels)
+        h_indices = selector.get_support(indices=True)
+        mask = np.ones(selector.scores_.shape,dtype=bool)
+        mask[h_indices] = False
+        indices = np.where(mask == True)[0]
+
+        X = sick.expressions[:, indices]
+
+        scores = reliefF(X, sick.labels, k=k)
+
+        combined_scores = np.zeros(selector.scores_.shape)
+        combined_scores[indices] = scores
+
+        return self.getFeatureSets(combined_scores, k, returnMultipleSets)
 
     ####### MULTI-VARIATE FEATURE SELECTION #######
 
@@ -161,7 +180,7 @@ class DimensionalityReducer():
 
     ####### 1 vs Rest #######
 
-    def getOneAgainstRestFeatures(self, sick, healthy, k=3, method="sfs", normalization="exclude", fitness="combined"):
+    def getOneAgainstRestFeatures(self, sick, healthy, k=3, method="sfs", normalization="relief", fitness="combined"):
         n_labels = np.unique(sick.labels).shape[0]
         feature_sets = Parallel(n_jobs=n_labels)\
                 (delayed(self.getOneAgainstRestFeaturesForLabel)(sick, healthy, k, method, normalization, fitness, label) for label in np.unique(sick.labels))
