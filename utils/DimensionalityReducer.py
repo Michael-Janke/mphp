@@ -52,7 +52,7 @@ class DimensionalityReducer():
 
         return self.getFeatureSets(selector.scores_, k, returnMultipleSets)
 
-    def getNormalizedFeatures(self, sick, healthy, normalization="exclude", k=20, n=5000, m="chi2", returnMultipleSets = False):
+    def getNormalizedFeatures(self, sick, healthy, normalization="relief", k=20, n=5000, m="chi2", returnMultipleSets = False):
         options = {
             'substract': self.getNormalizedFeaturesS,
             'exclude': self.getNormalizedFeaturesE,
@@ -183,7 +183,7 @@ class DimensionalityReducer():
 
     ####### 1 vs Rest #######
 
-    def getOneAgainstRestFeatures(self, sick, healthy, k=3, method="sfs", normalization="exclude", fitness="combined"):
+    def getOneAgainstRestFeatures(self, sick, healthy, k=3, method="sfs", normalization="relief", fitness="combined"):
         features = {}
         for label in np.unique(sick.labels):
             label = label.split("-")[0]
