@@ -173,7 +173,7 @@ def lookupCoxpresdb(gene):
 
         results = response["results"]
         for item in results:
-            if item["mutual_rank"] > 20:
+            if item["mutual_rank"] > 10:
                 break
             coexpressedGenes.append(item["gene"])
 
