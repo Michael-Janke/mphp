@@ -7,7 +7,11 @@ import GeneExploration from "./GeneExplorationContainer";
 
 export default class Results extends Component {
   render() {
-    const { result, runId } = this.props;
+    // TODO render tabs for oneAgainstRest results
+    let { result, runId, oneAgainstRest } = this.props;
+    if (oneAgainstRest) {
+      result = result.isError ? result : result[Object.keys(result)[0]];
+    }
     return (
       <div>
         {!result.isError ? (

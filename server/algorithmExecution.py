@@ -6,6 +6,7 @@ from validation.Analyzer import Analyzer
 dimReducer = DimensionalityReducer()
 analyzer = Analyzer()
 
+# TODO add EA
 method_table = {
     "getFeatures": "features",
     "getDecisionTreeFeatures": "tree",
@@ -14,37 +15,47 @@ method_table = {
     "getFeaturesBySFS": "sfs",
 }
 
+not_normalized_methods = ["features", "tree"]
+
 normalization_table = {
     "getNormalizedFeaturesE": "exclude",
     "getNormalizedFeaturesS": "substract",
 }
 
-def execute(algorithm, dataLoader, oneAgainstRest):
+def execute(algorithm, dataLoader, one_against_rest):
     data = getData(algorithm, dataLoader)
 
-    if oneAgainstRest:
-        features = run(algorithm, data, oneAgainstRest)
-        matrix = calcExpressionMatrix(algorithm, data, features, oneAgainstRest)
-        evaluation = evaluate(algorithm, data, features, oneAgainstRest)
+    labels, gene_indices = run(algorithm, data, one_against_rest)
+    expression_matrix = calcExpressionMatrix(algorithm, data, gene_indices, one_against_rest)
+    evaluation = evaluate(algorithm, data, gene_indices, one_against_rest)
 
-        # TODO assemble result
-
-        return None
+    if one_against_rest:
+        response = {}
+        for cancer_type, cancer_type_indices in gene_indices.items():
+            genes = dataLoader.getGeneLabels()[cancer_type_indices]
+            geneNames = dataLoader.getGeneNames()[cancer_type_indices]
+            response[cancer_type] = assembleResponse(data, labels, cancer_type_indices,
+                expression_matrix[cancer_type], evaluation[cancer_type], genes, geneNames)
+        response["meanFitness"] = evaluation["meanFitness"]
+        return response
     else:
-        response_data, gene_indices = run(
-            algorithm, data)
-        expression_matrix = calcExpressionMatrix(
-            algorithm, data, gene_indices)
-        evaluation = evaluate(
-            algorithm, data, gene_indices)
+        genes = dataLoader.getGeneLabels()[gene_indices]
+        geneNames = dataLoader.getGeneNames()[gene_indices]
+        return assembleResponse(data, labels, gene_indices, expression_matrix, evaluation, genes, geneNames)
 
-        return {
-            'data': {key: scores[0:3] for (key, scores) in response_data.items()},
-            'genes': dataLoader.getGeneLabels()[gene_indices].tolist(),
-            'expressionMatrix': expression_matrix,
-            'geneNames': dataLoader.getGeneNames()[gene_indices].tolist(),
-            'evaluation': evaluation,
-        }
+def  assembleResponse(data, labels, gene_indices, expression_matrix, evaluation, geneLabels, geneNames):
+    X = data["combined"].expressions[:, gene_indices]
+    response_data = {}
+    for label in np.unique(labels):
+        response_data[label] = X[labels == label, :].T.tolist()
+
+    return {
+        'data': {key: scores[0:3] for (key, scores) in response_data.items()},
+        'genes': geneLabels.tolist(),
+        'expressionMatrix': expression_matrix,
+        'geneNames': geneNames.tolist(),
+        'evaluation': evaluation,
+    }
 
 def getData(algorithm, dataLoader):
     cancer_types = algorithm["cancerTypes"]
@@ -75,14 +86,16 @@ def run(algorithm, data, oneAgainstRest):
     n = algorithm["parameters"].get("n")
 
     if oneAgainstRest:
-        sick = data["sick"]
-        healthy = "" if not len(data["healthy"].labels) else data["healthy"]
         method = method_table[key]
+        healthy = "" if key in not_normalized_methods else data["healthy"]
+        sick = data["combined"] if key in not_normalized_methods else data["sick"]
         normalization = normalization_table.get(key)
+
         if normalization != None:
             return dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method, normalization=normalization)
         else:
             return dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method)
+
     elif key == "getPCA":
         gene_indices = dimReducer.getPCA(
             data["combined"].expressions, n_components, n_f_components)
@@ -111,13 +124,7 @@ def run(algorithm, data, oneAgainstRest):
             data["sick"], data["healthy"])
         labels = np.hstack((data["sick"].labels, data["healthy"].labels))
 
-    X = data["combined"].expressions[:, gene_indices]
-
-    response_data = {}
-    for label in np.unique(labels):
-        response_data[label] = X[labels == label, :].T.tolist()
-
-    return response_data, gene_indices
+    return labels, gene_indices
 
 
 def calcExpressionMatrix(algorithm, data, gene_indices, oneAgainstRest):
@@ -126,9 +133,6 @@ def calcExpressionMatrix(algorithm, data, gene_indices, oneAgainstRest):
     healthy_tissue_types = algorithm["healthyTissueTypes"]
     if len(sick_tissue_types) == 0 or len(healthy_tissue_types) == 0:
         return None
-
-    X = np.vstack(
-        (data["sick"].expressions[:, gene_indices], data["healthy"].expressions[:, gene_indices]))
 
     if oneAgainstRest:
         return analyzer.computeExpressionMatrixOneAgainstRest(data["sick"], data["healthy"], gene_indices)
