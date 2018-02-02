@@ -191,17 +191,22 @@ class DimensionalityReducer():
     def getFeatureSetBySFS(self, sick, healthy, genes, k, fitness, true_label=""):
         # first gene has highest score and will be selected first
         indices = [genes[0]]
-        fitness_function = fitness_module.get_fitness_function_name(fitness)
-        fitness_function = getattr(fitness_module, fitness_function)
 
         # iteratively join the best next feature based on a fitness function until k features are found
         for idx in range(k-1):
-            n_jobs = 1
-            batch_size = int(len(genes) / n_jobs)
-            fitness_scores = Parallel(n_jobs=n_jobs, batch_size=batch_size)\
-                (delayed(fitness_function)(sick, healthy, indices + [genes[i]], true_label=true_label) for i in range(1, len(genes)))
+            if fitness == "combined" or fitness == "clustering":
+                n_jobs = int(len(genes) / 20) # 1 process for 20 iterations
+            else:
+                n_jobs = int(len(genes) / 100) # 1 process for 100 iterations
 
-            best_genes = np.asarray(fitness_scores).argsort()[::-1]
+            chunks = self.chunks(genes, int(len(genes) / n_jobs))
+            fitness_scores = Parallel(n_jobs=n_jobs)\
+                (delayed(self.call_fitness_function)(sick, healthy, indices, chunks[i], fitness, true_label) for i in range(n_jobs))
+
+            scores = []
+            for f in fitness_scores:
+                scores.extend(f)
+            best_genes = np.asarray(scores).argsort()[::-1]
 
             i = 0
             while genes[best_genes[i]] in indices:
@@ -211,6 +216,21 @@ class DimensionalityReducer():
             print("added new feature", flush=True)
 
         return np.asarray(indices)
+
+    def chunks(self, l, n):
+        n = max(1, n)
+        chunks = [l[i:i+n] for i in range(0, len(l), n)]
+        return chunks
+
+    def call_fitness_function(self, sick, healthy, indices, genes, fitness, true_label):
+        fitness_function = fitness_module.get_fitness_function_name(fitness)
+        fitness_function = getattr(fitness_module, fitness_function)
+
+        results = []
+        for gene in genes:
+            results.append(fitness_function(sick, healthy, indices + [gene], true_label=true_label))
+
+        return results
 
     ####### EMBEDDED FEATURE SELECTION #######
 
