@@ -12,15 +12,20 @@ class Analyzer:
     def __init__(self):
         pass
 
+    '''
+        case 1:
+            sick and healthy should contain at least two cancer types
+        case 2:
+            healthy = ""
+            no fitness function is calculated
+        selected_genes_dict: call with result from getOneAgainstRestFeatures
+    '''
     def computeFeatureValidationOneAgainstRest(self, sick, healthy, selected_genes_dict):
         results = {}
         for label, genes in selected_genes_dict.items():
-            if healthy == "":
-                results[label] = self.computeFeatureValidation(sick, "", genes, true_label=label)
-            else:
-                results[label] = self.computeFeatureValidation(sick, healthy, genes, true_label=label)
+            results[label] = self.computeFeatureValidation(sick, healthy, genes, true_label=label)
 
-        if not healthy == "":
+        if healthy:
             cumulated_fitness = 0
             for res in results.values():
                 cumulated_fitness += res["fitness"]["combinedFitness"]
@@ -29,10 +34,20 @@ class Analyzer:
 
         return results
 
+    '''
+        case 1:
+            sick and healthy should contain at least two cancer types
+            returns validation for sick and healthy and fitness functions
+        case 2:
+            healthy = ""
+            only data in sick is validated
+            sick should contain at least two cancer types
+        selected_genes: call with result from feature selection
+    '''
     def computeFeatureValidation(self, sick, healthy, selected_genes, true_label=""):
         sick_validation = self.assembleValidationOutput(sick, selected_genes, true_label=true_label)
 
-        if healthy == "":
+        if not healthy:
             return sick_validation
 
         healthy_validation = self.assembleValidationOutput(healthy, selected_genes, true_label=true_label)
@@ -60,7 +75,10 @@ class Analyzer:
         classification = classVal.evaluate(X, selected_genes, ["*"], true_label=true_label)
         return {"classification": classification}
 
-
+    '''
+        sick and healthy should contain at least one cancer type
+        selected_genes_dict: call with result from getOneAgainstRestFeatures
+    '''
     def computeExpressionMatrixOneAgainstRest(self, sick, healthy, selected_genes_dict):
         results = {}
         for label, genes in selected_genes_dict.items():
@@ -68,6 +86,10 @@ class Analyzer:
 
         return results
 
+    '''
+        sick and healthy should contain at least one cancer type
+        selected_genes: call with result from feature selection
+    '''
     def computeExpressionMatrix(self, sick, healthy, selected_genes):
         expressions = defaultdict(list)
         for label in np.unique(sick.labels):
