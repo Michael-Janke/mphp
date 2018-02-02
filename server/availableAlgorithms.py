@@ -16,7 +16,7 @@ algorithms = {
         "parameters": {
             "k": {
                 "name": "#Features",
-                "default": 20
+                "default": 10
             }
         },
         "name": "Decision Tree"
@@ -25,7 +25,7 @@ algorithms = {
         "parameters": {
             "k": {
                 "name": "#Features",
-                "default": 20
+                "default": 10
 
             },
             "n": {
@@ -40,7 +40,7 @@ algorithms = {
         "parameters": {
             "k": {
                 "name": "#Features",
-                "default": 20
+                "default": 10
 
             },
             "n": {
@@ -55,7 +55,7 @@ algorithms = {
         "parameters": {
             "k": {
                 "name": "#Features",
-                "default": 20
+                "default": 10
 
             }
         },
