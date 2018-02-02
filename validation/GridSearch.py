@@ -230,7 +230,7 @@ class GridSearch(object):
         return [id, cancer_type, method, k, fitness, sick_f1, time, features.tolist()]
 
     def get_result_dict_all_at_once(self, method, k, feature_set, time, statistic="", normalization="", exclude="", preselect="", fitness_method=""):
-        fitness_score = round(combined_fitness(self.sick, self.healthy, feature_set), 3)
+        fitness_score = round(combined_fitness(self.sick, self.healthy, feature_set, cv=5), 3)
 
         scoring = { 'f1': make_scorer(f1_score, average='macro') }
         clf = DecisionTreeClassifier()

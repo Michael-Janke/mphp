@@ -33,7 +33,7 @@ def get_fitness_function_name(fit):
     return options.get(fit, 'combined_fitness')
 
 @ignore_warnings
-def classification_fitness(sick, healthy, genes, alpha=0.5, true_label="", cv=2):
+def classification_fitness(sick, healthy, genes, alpha=0.5, true_label="", cv=3):
     sick_expressions = sick.expressions[:,genes]
     healthy_expressions = healthy.expressions[:,genes]
     clf = DecisionTreeClassifier(presort=True)
@@ -49,7 +49,7 @@ def classification_fitness(sick, healthy, genes, alpha=0.5, true_label="", cv=2)
     return (alpha * sick_score + (1-alpha) * (1- healthy_score))
 
 @ignore_warnings
-def sick_vs_healthy_fitness(sick, healthy, genes, alpha=None, true_label=None, cv=2):
+def sick_vs_healthy_fitness(sick, healthy, genes, alpha=None, true_label=None, cv=3):
     sick_expressions = sick.expressions[:,genes]
     healthy_expressions = healthy.expressions[:,genes]
 
@@ -83,7 +83,7 @@ def clustering_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
         silhoutte_healthy = np.mean(healthy_silhouette_samples[healthy.labels==true_label+"-healthy"])
         return (alpha * silhoutte_sick + (1- alpha) * (1 - silhoutte_healthy))
 
-def combined_fitness(sick, healthy, genes, alpha=0.5, beta=0.5, true_label="", cv=2):
+def combined_fitness(sick, healthy, genes, alpha=0.5, beta=0.5, true_label="", cv=3):
     return 1/3 * classification_fitness(sick, healthy, genes, alpha, true_label=true_label, cv=cv)\
         + 1/3 * clustering_fitness(sick, healthy, genes, alpha, true_label=true_label)\
         + 1/3 * sick_vs_healthy_fitness(sick, healthy, genes, cv=cv)
