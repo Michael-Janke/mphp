@@ -31,7 +31,11 @@ export default class Results extends Component {
         />
         <Tabs inkBarStyle={{ backgroundColor: sunYellow }}>
           {Object.keys(tabData).map(label => (
-            <Tab label={label} style={{ backgroundColor: slightlyBoringBlue }}>
+            <Tab
+              key={`tab-${label}`}
+              label={label}
+              style={{ backgroundColor: slightlyBoringBlue }}
+            >
               {this.renderResult(tabData[label])}
             </Tab>
           ))}
@@ -47,7 +51,6 @@ export default class Results extends Component {
     if (typeof result === "number") return null;
 
     const { runId } = this.props;
-    console.log(result);
     return (
       <StyledContent>
         <Columns>
