@@ -66,7 +66,7 @@ def lookupDisgenet(gene):
         results = json.load(f)
         f.close()
     except:
-        print("Error getting / reading disgenet file")
+        print("Error disgenet: " + gene)
 
     if results is not None:
 
@@ -113,7 +113,7 @@ def lookupProteinAtlas(gene):
             if c.attributes['name'].value == "Cancer-related genes":
                 return True
     except:
-        print("Error accessing proteinatlas for gene: " + gene)
+        print("Error protein atlas: " + gene)
     return False
 
 
@@ -148,7 +148,7 @@ def lookupEntrezGeneSummary(gene):
         if "cancer" in summary:
             return True
     except:
-        print("Error accessing entrez gene summary for gene: " + gene)
+        print("Error entrez gene summary: " + gene)
     return False
 
 
@@ -178,7 +178,7 @@ def lookupCoxpresdb(gene):
             coexpressedGenes.append(item["gene"])
 
     except:
-        print("Error getting / reading coxpresdb file")
+        print("Error coxpresdb: " + gene)
 
     return coexpressedGenes
 
