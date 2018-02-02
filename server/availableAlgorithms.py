@@ -29,7 +29,7 @@ algorithms = {
 
             },
             "n": {
-                "name": "#Considered features",
+                "name": "#Excluded features",
                 "default": 5000
 
             }
@@ -44,7 +44,7 @@ algorithms = {
 
             },
             "n": {
-                "name": "#Considered features",
+                "name": "#Excluded features",
                 "default": 5000
 
             }
