@@ -12,6 +12,15 @@ def getCancerGeneCensusData():
     csv_file = 'data/cancer_gene_census.csv'
     return pd.read_csv(csv_file)
 
+def getInvertedEntrezNamesMap():
+    inverted_file = "data/gene_names/entrez_names_inverted"
+
+    if not os.path.isfile(inverted_file + ".npy"):
+        entrez_labels_map = np.load("data/gene_names/entrez_names.npy").item()
+        inverted_entrez_labels_map = {v: k for k, v in entrez_labels_map.items()}
+        np.save(inverted_file, inverted_entrez_labels_map)
+    
+    return np.load(inverted_file+ ".npy").item()
 
 def lookupDisgenet(gene):
     entrez_file = "data/gene_names/entrez_names.npy"
@@ -143,27 +152,75 @@ def lookupEntrezGeneSummary(gene):
     return False
 
 
+def lookupCoxpresdb(gene):
+    entrez_file = "data/gene_names/entrez_names.npy"
+    entrez_labels_map = np.load(entrez_file).item()
+
+    coexpressedGenes = []
+    try:
+        url = 'http://coxpresdb.jp/cgi-bin/api2.cgi?gene=' + entrez_labels_map[int(gene[4:])]
+        file_name = 'data/coxpresdb/' + gene + '.json'
+
+        if not os.path.exists(os.path.dirname(file_name)):
+            os.makedirs(os.path.dirname(file_name))
+        if not os.path.isfile(file_name):
+            urllib.request.urlretrieve(url, file_name)
+            
+
+        f = open(file_name, 'r')
+        response = json.load(f)
+        f.close()
+
+        results = response["results"]
+        for item in results:
+            if item["mutual_rank"] > 20:
+                break
+            coexpressedGenes.append(item["gene"])
+
+    except:
+        print("Error getting / reading coxpresdb file")
+
+    return coexpressedGenes
+
 def testGenes(genes, cache):
-
     response = {}
-
     cancer_gene_census_data = getCancerGeneCensusData()
 
     for gene in genes:
-        cache_key = "V1_" + gene
+        cache_key = "V2_" + gene
         if cache.isCached(cache_key):
             response[gene] = cache.getCache(cache_key)
             continue
         disgenet = lookupDisgenet(gene)
         proteinAtlas = lookupProteinAtlas(gene)
-        cancerGeneCensus = lookupCancerGeneCensus(
-            gene, cancer_gene_census_data)
+        cancerGeneCensus = lookupCancerGeneCensus(gene, cancer_gene_census_data)
         entrezGeneSummary = lookupEntrezGeneSummary(gene)
+        
+        coexpressedGenes = lookupCoxpresdb(gene)        
+        inverted_entrez_labels_map = getInvertedEntrezNamesMap()
+        
+        for coGene in coexpressedGenes:
+            coGeneName = "ENSG" + str(inverted_entrez_labels_map[coGene]).zfill(11)
+            if not disgenet:
+                disgenet = lookupDisgenet(coGeneName)
+            if not proteinAtlas:
+                proteinAtlas = lookupProteinAtlas(coGeneName)
+            if not cancerGeneCensus:
+                cancerGeneCensus = lookupCancerGeneCensus(coGeneName, cancer_gene_census_data)
+            if not entrezGeneSummary:
+                entrezGeneSummary = lookupEntrezGeneSummary(coGeneName)
 
         score = (0.4 if cancerGeneCensus else 0) + \
             (0.2 if disgenet else 0) + (0.2 if proteinAtlas else 0) + (0.2 if entrezGeneSummary else 0)
-        response[gene] = {'proteinAtlas': proteinAtlas, 'disgenet': disgenet,
-                          'cancer_gene_census': cancerGeneCensus, 'entrezGeneSummary': entrezGeneSummary, 'score': score}
+        score = round(score, 2)
+        
+        response[gene] = {
+            'proteinAtlas': proteinAtlas,
+            'disgenet': disgenet,
+            'cancer_gene_census': cancerGeneCensus,
+            'entrezGeneSummary': entrezGeneSummary,
+            'score': score
+        }
 
         cache.cache(cache_key, response[gene])
 
