@@ -5,6 +5,7 @@ from sklearn.model_selection import cross_validate
 from sklearn.metrics import make_scorer, f1_score
 from datetime import datetime
 from joblib import Parallel, delayed
+import itertools
 
 from utils.DimensionalityReducer import DimensionalityReducer
 from utils.EA.fitness import combined_fitness
@@ -127,24 +128,14 @@ class GridSearch(object):
 
 
     def get_combined_results(self, statistic = "chi2", normalization = "exclude", n = 5000):
-        results = Parallel(n_jobs=len(self.K_OPTIONS))\
-                (delayed(self.get_combined_results_for_k)(k, statistic, normalization, n) for k in self.K_OPTIONS)
+        combinations = list(itertools.product(self.K_OPTIONS, self.F_OPTIONS))
+        results = Parallel(n_jobs=len(combinations))\
+                (delayed(self.get_combined_results_for_k_f)(k, fit, statistic, normalization, n) for k, fit in combinations)
 
         combined_results = []
         for res in results:
             combined_results.extend(res)      
         print("Combined methods are done", flush=True)
-        return combined_results
-
-    def get_combined_results_for_k(self, k, statistic, normalization, n):
-        results = Parallel(n_jobs=len(self.F_OPTIONS))\
-                (delayed(self.get_combined_results_for_k_f)(k, fit, statistic, normalization, n) for fit in self.F_OPTIONS)
-        
-        combined_results = []
-        for res in results:
-            combined_results.extend(res)
-
-        print("Combined methods are done with k "+str(k), flush=True)
         return combined_results
 
     def get_combined_results_for_k_f(self, k, fit, statistic, normalization, n):
