@@ -52,11 +52,14 @@ class Analyzer:
 
         healthy_validation = self.assembleValidationOutput(healthy, selected_genes, true_label=true_label)
 
-        class_fitness = classification_fitness(sick, healthy, selected_genes, true_label=true_label, cv=5)
-        clus_fitness = clustering_fitness(sick, healthy, selected_genes, true_label=true_label)
-        comb_fitness = combined_fitness(sick, healthy, selected_genes, true_label=true_label, cv=5)
-        dist_fitness = distance_fitness(sick, healthy, selected_genes, true_label=true_label)
-        s_vs_h_fitness = sick_vs_healthy_fitness(sick, healthy, selected_genes, cv=5)
+        sick = sick.select_genes(selected_genes)
+        healthy = healthy.select_genes(selected_genes)
+
+        class_fitness = classification_fitness(sick, healthy, true_label=true_label, cv=5)
+        clus_fitness = clustering_fitness(sick, healthy, true_label=true_label)
+        comb_fitness = combined_fitness(sick, healthy, true_label=true_label, cv=5)
+        dist_fitness = distance_fitness(sick, healthy, true_label=true_label)
+        s_vs_h_fitness = sick_vs_healthy_fitness(sick, healthy, cv=5)
 
         return {
             "sick": sick_validation,

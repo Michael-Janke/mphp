@@ -23,7 +23,7 @@ from multiprocessing.managers import BaseManager, NamespaceProxy
 
 
 class Worker:
-    def __init__(self, fitness_function, true_label, n_jobs=1):
+    def __init__(self, fitness_function, true_label, n_jobs=cpu_count()):
         self.fitness_function = fitness_function
         self.true_label = true_label
         self.inQ = Queue()
@@ -244,7 +244,6 @@ class DimensionalityReducer():
     def getFeatureSetBySFS(self, sick, healthy, genes, k, fitness, true_label=""):
         # first gene has highest score and will be selected first
         indices = [0]
-        n_jobs = int(cpu_count())
 
         reduced_sick = sick.select_genes(genes)
         reduced_healthy = healthy.select_genes(genes)
@@ -252,7 +251,7 @@ class DimensionalityReducer():
         fitness_function = fitness_module.get_fitness_function_name(fitness)
         fitness_function = getattr(fitness_module, fitness_function)
 
-        worker = Worker(fitness_function, true_label, n_jobs)
+        worker = Worker(fitness_function, true_label)
         for idx in range(k-1):
             for i, gene in enumerate(genes):
                 if i in indices: 

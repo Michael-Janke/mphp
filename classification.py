@@ -74,7 +74,5 @@ if __name__ == '__main__':
     start = datetime.now()
     selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 10, m=100 ,fitness="classification", returnMultipleSets = False)
     print(datetime.now() - start)
-    import json
-    print(json.dumps(selected_genes.tolist()))
-    #pprint(analyzer.computeFeatureValidation(sick, healthy, selected_genes)["fitness"])
+    pprint(analyzer.computeFeatureValidation(sick, healthy, selected_genes)["fitness"])
     
