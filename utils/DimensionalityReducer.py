@@ -152,7 +152,11 @@ class DimensionalityReducer():
 
         # iteratively join the best next feature based on a fitness function until k features are found
         for idx in range(k-1):
-            n_jobs = int(len(genes) / 20) # 5 processes for 100 iterations
+            if fitness == "combined" or fitness == "clustering":
+                n_jobs = int(len(genes) / 20) # 1 process for 20 iterations
+            else:
+                n_jobs = int(len(genes) / 100) # 1 process for 100 iterations
+
             chunks = self.chunks(genes, int(len(genes) / n_jobs))
             fitness_scores = Parallel(n_jobs=n_jobs)\
                 (delayed(self.call_fitness_function)(sick, healthy, indices, chunks[i], fitness, true_label) for i in range(n_jobs))

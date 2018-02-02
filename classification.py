@@ -72,6 +72,6 @@ if __name__ == '__main__':
 
 
     start = datetime.now()
-    selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 10, m=100 ,fitness="combined", returnMultipleSets = False)
+    selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 10, m=100 ,fitness="classification", returnMultipleSets = False)
     pprint(analyzer.computeFeatureValidation(sick, healthy, selected_genes)["fitness"])
     print(datetime.now() - start)
