@@ -23,9 +23,15 @@ class DimensionalityReducer():
         self.method_table = {
             "chi2": chi2,
             "f_classif": f_classif,
-            "mutual_info_classif": mutual_info_classif
+            "mutual_info_classif": mutual_info_classif # extremely slow
         }
 
+    '''
+        do not use for feature selection
+        data input has no restrictions
+        n_components: number of principal components
+        n_features_per_component: number of features with highest weight per component
+    '''
     def getPCA(self, data, n_components, n_features_per_component=10):
         pca = PCA(n_components=n_components, svd_solver='full')
         pca.fit(data)
@@ -47,21 +53,36 @@ class DimensionalityReducer():
 
     ####### FEATURE SELECTION BY STATISTICS #######
 
-    def getFeatures(self,  data, k=20, m="chi2", returnMultipleSets = False):
+    '''
+        data has to have at least two different labels
+        k: amount of features in result
+        m: statistical measure
+    '''
+    def getFeatures(self, data, k=20, m="chi2", returnMultipleSets = False):
         selector = SelectKBest(self.method_table[m], k=k)
         selector.fit(data.expressions, data.labels)
 
         return self.getFeatureSets(selector.scores_, k, returnMultipleSets)
 
-    def getNormalizedFeatures(self, sick, healthy, normalization="relief", k=20, n=5000, m="chi2", returnMultipleSets = False):
+    '''
+        sick and healthy need to contain at least two different cancer types
+        normalization: see below
+        k: amount of features in result
+        n: excluded features
+        m: statistical measure
+    '''
+    def getNormalizedFeatures(self, sick, healthy, normalization="exclude", k=20, n=5000, m="chi2", returnMultipleSets = False):
         options = {
             'substract': self.getNormalizedFeaturesS,
             'exclude': self.getNormalizedFeaturesE,
-            'relief': self.getNormalizedFeaturesR,
+            'relief': self.getNormalizedFeaturesR, # slow
         }
 
         return options[normalization](sick, healthy, k, n, m, returnMultipleSets)
 
+    '''
+        does not use parameter n
+    '''
     def getNormalizedFeaturesS(self, sick, healthy, k, n, m, returnMultipleSets = False):
         selector = SelectKBest(self.method_table[m], k="all")
         selector.fit(healthy.expressions, healthy.labels)
@@ -114,6 +135,15 @@ class DimensionalityReducer():
 
     ####### MULTI-VARIATE FEATURE SELECTION #######
 
+    '''
+        sick and healthy need to contain at least two different cancer types
+        k: amount of features in result
+        n: excluded features
+        m: preselected features
+        normalization: normalization method for preselection
+        fitness: fitness function -> "combined", "classification", "clustering", "sick_vs_healthy", "distance"
+        true_label: is only set by one against rest function (do not set manually)
+    '''
     def getEAFeatures(self, sick, healthy, k=3, n=5000, m=100, normalization="exclude", fitness="combined", returnMultipleSets = False, true_label=""):
         # preselect features to reduce runtime
         selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
@@ -134,6 +164,15 @@ class DimensionalityReducer():
 
         return [selected_genes[feature_set] for feature_set in sets]
 
+    '''
+        sick and healthy need to contain at least two different cancer types
+        k: amount of features in result
+        n: excluded features
+        m: preselected features
+        normalization: normalization method for preselection
+        fitness: fitness function -> "combined", "classification", "clustering", "sick_vs_healthy", "distance"
+        true_label: is only set by one against rest function (do not set manually)
+    '''
     def getFeaturesBySFS(self, sick, healthy, k=3, n=5000, m=100, normalization="exclude", fitness="combined", returnMultipleSets = False, true_label=""):
         # preselect 100 genes in sick data which do not separate healthy data well
         selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
@@ -146,19 +185,28 @@ class DimensionalityReducer():
 
         return np.asarray(results)
 
+    '''
+        called by getFeaturesBySFS
+    '''
     def getFeatureSetBySFS(self, sick, healthy, genes, k, fitness, true_label=""):
         # first gene has highest score and will be selected first
         indices = [genes[0]]
-        fitness_function = fitness_module.get_fitness_function_name(fitness)
-        fitness_function = getattr(fitness_module, fitness_function)
 
         # iteratively join the best next feature based on a fitness function until k features are found
         for idx in range(k-1):
+            if fitness == "combined" or fitness == "clustering":
+                n_jobs = int(len(genes) / 20) # 1 process for 20 iterations
+            else:
+                n_jobs = int(len(genes) / 100) # 1 process for 100 iterations
 
-            fitness_scores = Parallel(n_jobs=1)\
-                (delayed(fitness_function)(sick, healthy, indices + [genes[i]], true_label=true_label) for i in range(1, len(genes)))
+            chunks = self.chunks(genes, int(len(genes) / n_jobs))
+            fitness_scores = Parallel(n_jobs=n_jobs)\
+                (delayed(self.call_fitness_function)(sick, healthy, indices, chunks[i], fitness, true_label) for i in range(n_jobs))
 
-            best_genes = np.asarray(fitness_scores).argsort()[::-1]
+            scores = []
+            for f in fitness_scores:
+                scores.extend(f)
+            best_genes = np.asarray(scores).argsort()[::-1]
 
             i = 0
             while genes[best_genes[i]] in indices:
@@ -169,8 +217,27 @@ class DimensionalityReducer():
 
         return np.asarray(indices)
 
+    def chunks(self, l, n):
+        n = max(1, n)
+        chunks = [l[i:i+n] for i in range(0, len(l), n)]
+        return chunks
+
+    def call_fitness_function(self, sick, healthy, indices, genes, fitness, true_label):
+        fitness_function = fitness_module.get_fitness_function_name(fitness)
+        fitness_function = getattr(fitness_module, fitness_function)
+
+        results = []
+        for gene in genes:
+            results.append(fitness_function(sick, healthy, indices + [gene], true_label=true_label))
+
+        return results
+
     ####### EMBEDDED FEATURE SELECTION #######
 
+    '''
+        data should contain at least two different labels
+        k: amount of features in result
+    '''
     def getDecisionTreeFeatures(self, data, k=20, returnMultipleSets = False):
         tree = DecisionTreeClassifier(presort=True)
         tree.fit(data.expressions, data.labels)
@@ -180,7 +247,19 @@ class DimensionalityReducer():
 
     ####### 1 vs Rest #######
 
-    # Beware that sick can be combined data in case of feature selection or decision tree
+    '''
+        case 1:
+            sick and healthy need to contain at least two different cancer types
+            method can be "ea", "norm", or "sfs"
+        case 2:
+            healthy = ""
+            sick should contain at least two different labels
+            if method = "tree": decision tree features
+            else: basic feature selection
+        k: amount of features in result
+        normalization: normalization method for preselection
+        fitness: fitness function -> "combined", "classification", "clustering", "sick_vs_healthy", "distance"
+    '''
     def getOneAgainstRestFeatures(self, sick, healthy, k=3, method="sfs", normalization="relief", fitness="combined"):
         n_labels = np.unique(sick.labels).shape[0]
         feature_sets = Parallel(n_jobs=n_labels)\
