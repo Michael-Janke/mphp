@@ -31,27 +31,24 @@ def get_fitness_function_name(fit):
     }
 
     return options.get(fit, 'combined_fitness')
-
+from datetime import datetime
 @ignore_warnings
-def classification_fitness(sick, healthy, genes, alpha=0.5, true_label="", cv=3):
-    sick_expressions = sick.expressions[:,genes]
-    healthy_expressions = healthy.expressions[:,genes]
+def classification_fitness(sick, healthy, alpha=0.5, true_label="", cv=3):
+
     clf = DecisionTreeClassifier(presort=True)
     if not true_label:
-        sick_score = cross_validate(clf, sick_expressions, sick.labels, cv=cv, scoring="f1_macro", return_train_score=False)["test_score"].mean()
-        healthy_score = cross_validate(clf, healthy_expressions, healthy.labels, cv=cv, scoring="f1_macro", return_train_score=False)["test_score"].mean()
+        sick_score = cross_validate(clf, sick.expressions, sick.labels, cv=cv, scoring="f1_macro", return_train_score=False)["test_score"].mean()
+        healthy_score = cross_validate(clf, healthy.expressions, healthy.labels, cv=cv, scoring="f1_macro", return_train_score=False)["test_score"].mean()
         return (alpha * sick_score + (1-alpha) * (1- healthy_score))
     else:
         sick_labels = binarize_labels(sick.labels, true_label)
         healthy_labels = binarize_labels(healthy.labels, true_label)
-        sick_score = cross_validate(clf, sick_expressions, sick_labels, cv=cv, scoring="f1", return_train_score=False)["test_score"].mean()
-        healthy_score = cross_validate(clf, healthy_expressions, healthy_labels, cv=cv, scoring="f1", return_train_score=False)["test_score"].mean()
+        sick_score = cross_validate(clf, sick.expressions, sick_labels, cv=cv, scoring="f1", return_train_score=False)["test_score"].mean()
+        healthy_score = cross_validate(clf, healthy.expressions, healthy_labels, cv=cv, scoring="f1", return_train_score=False)["test_score"].mean()
     return (alpha * sick_score + (1-alpha) * (1- healthy_score))
 
 @ignore_warnings
-def sick_vs_healthy_fitness(sick, healthy, genes, alpha=None, true_label=None, cv=3):
-    sick_expressions = sick.expressions[:,genes]
-    healthy_expressions = healthy.expressions[:,genes]
+def sick_vs_healthy_fitness(sick, healthy, alpha=None, true_label=None, cv=3):
 
     clf = DecisionTreeClassifier(presort=True)
     scores = []
@@ -60,7 +57,7 @@ def sick_vs_healthy_fitness(sick, healthy, genes, alpha=None, true_label=None, c
         sick_indices = np.flatnonzero(np.core.defchararray.find(sick.labels, label) != -1)
         healthy_indices = np.flatnonzero(np.core.defchararray.find(healthy.labels, label) != -1)
 
-        data = np.vstack((sick_expressions[sick_indices, :], healthy_expressions[healthy_indices, :]))
+        data = np.vstack((sick.expressions[sick_indices, :], healthy.expressions[healthy_indices, :]))
         labels = np.hstack((sick.labels[sick_indices], healthy.labels[healthy_indices]))
 
         score = cross_validate(clf, data, labels, cv=cv, scoring="f1_macro", return_train_score=False)["test_score"].mean()
@@ -68,11 +65,9 @@ def sick_vs_healthy_fitness(sick, healthy, genes, alpha=None, true_label=None, c
 
     return min(scores)
 
-def clustering_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
-    sick_expressions = sick.expressions[:,genes]
-    healthy_expressions = healthy.expressions[:,genes]
-    sick_silhouette_samples = (silhouette_samples(sick_expressions, sick.labels) + 1) / 2
-    healthy_silhouette_samples = (silhouette_samples(healthy_expressions, healthy.labels) + 1) / 2
+def clustering_fitness(sick, healthy, alpha=0.5, true_label=""):
+    sick_silhouette_samples = (silhouette_samples(sick.expressions, sick.labels) + 1) / 2
+    healthy_silhouette_samples = (silhouette_samples(healthy.expressions, healthy.labels) + 1) / 2
 
     if not true_label:
         sick_cluster_silhouettes = [np.mean(sick_silhouette_samples[sick.labels==label]) for label in np.unique(sick.labels)]
@@ -83,15 +78,15 @@ def clustering_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
         silhoutte_healthy = np.mean(healthy_silhouette_samples[healthy.labels==true_label+"-healthy"])
         return (alpha * silhoutte_sick + (1- alpha) * (1 - silhoutte_healthy))
 
-def combined_fitness(sick, healthy, genes, alpha=0.5, beta=0.5, true_label="", cv=3):
-    return 1/3 * classification_fitness(sick, healthy, genes, alpha, true_label=true_label, cv=cv)\
-        + 1/3 * clustering_fitness(sick, healthy, genes, alpha, true_label=true_label)\
-        + 1/3 * sick_vs_healthy_fitness(sick, healthy, genes, cv=cv)
+def combined_fitness(sick, healthy, alpha=0.5, beta=0.5, true_label="", cv=3):
+    return 1/3 * classification_fitness(sick, healthy, alpha, true_label=true_label, cv=cv)\
+        + 1/3 * clustering_fitness(sick, healthy, alpha, true_label=true_label)\
+        + 1/3 * sick_vs_healthy_fitness(sick, healthy, cv=cv)
 
 
-def distance_fitness(sick, healthy, genes, true_label=""):
-    sick_intra_distance, sick_inner_distance = compute_cluster_distance(sick, genes, true_label)
-    healthy_intra_distance, healthy_inner_distance = compute_cluster_distance(healthy, genes, true_label)
+def distance_fitness(sick, healthy, true_label=""):
+    sick_intra_distance, sick_inner_distance = compute_cluster_distance(sick, true_label)
+    healthy_intra_distance, healthy_inner_distance = compute_cluster_distance(healthy, true_label)
 
     fitness_sick = 5*sick_intra_distance - sick_inner_distance
     fitness_healthy = 5*healthy_intra_distance + healthy_inner_distance
@@ -99,8 +94,8 @@ def distance_fitness(sick, healthy, genes, true_label=""):
     return fitness
 
 
-def compute_cluster_distance(data, genes, true_label=""):
-    normalized_data = data.expressions[:,genes] / np.max(data.expressions[:,genes], axis=0)
+def compute_cluster_distance(data, true_label=""):
+    normalized_data = data.expressions / np.max(data.expressions, axis=0)
 
     centers = []
     deviations = []
@@ -116,10 +111,6 @@ def compute_cluster_distance(data, genes, true_label=""):
         for j in range(i+1, len(unique_labels)-1):
             if true_label in unique_labels[i] or true_label in unique_labels[j] or not true_label:
                 dist += np.linalg.norm(centers[i][0] - centers[j][0])
-    # for index, label in enumerate(unique_labels):
-    #     unique_labels = np.delete(unique_labels, 0)
-    #     for _ in unique_labels:
-    #         dist += np.linalg.norm(centers[index][0] - centers[index+1][0])
 
     number_types = np.unique(data.labels).shape[0]
     deviation = np.sum(deviations)/number_types
