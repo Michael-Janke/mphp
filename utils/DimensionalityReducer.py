@@ -18,6 +18,59 @@ from utils.EA.algorithm import ea_for_plot
 
 from utils import Expressions, binarize_labels
 
+from multiprocessing import Process, Manager, Queue, cpu_count
+from multiprocessing.managers import BaseManager, NamespaceProxy
+
+
+class Worker:
+    def __init__(self, fitness_function, true_label, n_jobs=1):
+        self.fitness_function = fitness_function
+        self.true_label = true_label
+        self.inQ = Queue()
+        self.outQ = Queue()
+        # instantiate workers
+        self.workers = [Process(target=self.do_work, args=())
+               for i in range(n_jobs)]
+        for w in self.workers:
+            w.start()
+
+    def do_work(self):
+        while True:
+            # get a new message
+            data = self.inQ.get()
+            # this is the 'TERM' signal
+            if data is None:
+                break
+            if data == 0:
+                self.outQ.put("DONE")
+                continue
+            score = self.fitness_function(data["sick"], data["healthy"], true_label=self.true_label)
+            self.outQ.put(score)
+    
+    def put(self, data):
+        self.inQ.put(data)
+
+    def getResult(self):
+        for i in range(len(self.workers)):
+            self.inQ.put(0)
+        result = []
+        i = len(self.workers)
+        while i > 0:
+            val = self.outQ.get()
+            if val is None:
+                continue
+            if val == "DONE":
+                i = i -1
+                continue
+            result.append(val)
+        return result
+
+    def stop(self):
+        for i in range(len(self.workers)):
+            self.inQ.put(None)
+        for w in self.workers:
+            w.join()
+
 class DimensionalityReducer():
     def __init__(self):
         self.method_table = {
@@ -191,7 +244,7 @@ class DimensionalityReducer():
     def getFeatureSetBySFS(self, sick, healthy, genes, k, fitness, true_label=""):
         # first gene has highest score and will be selected first
         indices = [0]
-        n_jobs = 20
+        n_jobs = int(cpu_count())
 
         reduced_sick = sick.select_genes(genes)
         reduced_healthy = healthy.select_genes(genes)
@@ -199,21 +252,18 @@ class DimensionalityReducer():
         fitness_function = fitness_module.get_fitness_function_name(fitness)
         fitness_function = getattr(fitness_module, fitness_function)
 
-        workers = Parallel(n_jobs=n_jobs)
-
+        worker = Worker(fitness_function, true_label, n_jobs)
         for idx in range(k-1):
-            jobData = []
             for i, gene in enumerate(genes):
                 if i in indices: 
                     continue
-                jobData.append({
-                    "healthy": reduced_healthy.select_genes(indices+[i]),
-                    "sick": reduced_sick.select_genes(indices+[i])
-                })
-
-            scores = workers(delayed(fitness_function)(data["sick"], data["healthy"], true_label=true_label) for data in jobData)
+                data = {}
+                data["healthy"] = reduced_healthy.select_genes(indices+[i])
+                data["sick"]= reduced_sick.select_genes(indices+[i])
+                worker.put(data)
+            
+            scores = worker.getResult()
             best_genes = np.asarray(scores).argsort()[::-1]
-
             i = 0
             while best_genes[i] in indices:
                 i += 1 
@@ -221,6 +271,7 @@ class DimensionalityReducer():
             indices.append(best_genes[i])
             print("added new feature", flush=True)
 
+        worker.stop()
         return np.asarray([genes[i] for i in indices])
 
     ####### EMBEDDED FEATURE SELECTION #######
