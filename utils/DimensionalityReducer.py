@@ -154,8 +154,9 @@ class DimensionalityReducer():
 
         # iteratively join the best next feature based on a fitness function until k features are found
         for idx in range(k-1):
-
-            fitness_scores = Parallel(n_jobs=1)\
+            n_jobs = 1
+            batch_size = int(len(genes) / n_jobs)
+            fitness_scores = Parallel(n_jobs=n_jobs, batch_size=batch_size)\
                 (delayed(fitness_function)(sick, healthy, indices + [genes[i]], true_label=true_label) for i in range(1, len(genes)))
 
             best_genes = np.asarray(fitness_scores).argsort()[::-1]

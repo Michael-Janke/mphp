@@ -240,6 +240,6 @@ class GridSearch(object):
         return [method, k, statistic, normalization, exclude, preselect, fitness_method, fitness_score, f1, time, feature_set.tolist()]
 
     def save_table_to_disk(self, table, name="grid_table"):
-        with open(name+".csv","w") as f:
+        with open("results/" + name + ".csv","w") as f:
             wr = csv.writer(f)
             wr.writerows(table)
