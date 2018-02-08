@@ -73,7 +73,7 @@ def runSpecificAlgorithm():
 
     cache_key = "_".join((
         "V2",
-        dataset, 
+        dataset,
         algorithm["key"],
         str(oneAgainstRest),
         "-".join([key+str(value) for key,value in algorithm["parameters"].items()]),

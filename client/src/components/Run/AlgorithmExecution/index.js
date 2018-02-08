@@ -93,9 +93,9 @@ export default class AlgorithmExecution extends Component {
         sumSick += statistics.counts[currentCancerType][x];
       });
       oneCancerTypeRunnable =
-        (currentAlgorithm === "getFeatures" ||
-          currentAlgorithm === "getPCA" ||
-          currentAlgorithm === "getDecisionTreeFeatures") &&
+        (currentAlgorithm === "basic" ||
+          currentAlgorithm === "pca" ||
+          currentAlgorithm === "tree") &&
         sumHealthy >= 10 &&
         sumSick >= 10;
     }
