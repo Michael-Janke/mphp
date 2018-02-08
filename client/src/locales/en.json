@@ -27,13 +27,13 @@
   "Algorithms": {
     "getPCA": "Principal Component Analysis. Add further description here.",
     "getDecisionTreeFeatures": "Decision Tree. Add further description here.",
-    "getNormalizedFeaturesE":
-      "Normalized Feature Selection - Exclude variant. Add further description here.",
-    "getNormalizedFeaturesS":
-      "Normalized Feature Selection - Substract variant. Add further description here.",
+    "getNormalizedFeatures":
+      "Normalized Feature Selection. Add further description here.",
     "getFeatures": "Feature Selection. Add further description here.",
     "getFeaturesBySFS":
-      "Sequential Forward Selection. Add further description here."
+      "Sequential Forward Selection. Add further description here.",
+    "ea":
+      "Evolutionary Algorithm. Add further description here."
   },
   "Parameters": {
     "k": "The number of features (genes) that are returned.",

@@ -117,11 +117,16 @@ def run(algorithm, data, oneAgainstRest):
             data["sick"], data["healthy"], k, n, m, norm, fitness)
         labels = np.hstack((data["sick"].labels, data["healthy"].labels))
 
+    elif key == "ea":
+        gene_indices = dimReducer.getEAFeatures(
+            data["sick"], data["healthy"], k, n, m, norm, fitness)
+        labels = np.hstack((data["sick"].labels, data["healthy"].labels))
+
     return labels, gene_indices
 
 
 def calcExpressionMatrix(algorithm, data, gene_indices, oneAgainstRest):
-    # only calc expression matrix if doto contains sick an healthy samples
+    # only calc expression matrix if data contains sick and healthy samples
     sick_tissue_types = algorithm["sickTissueTypes"]
     healthy_tissue_types = algorithm["healthyTissueTypes"]
     if len(sick_tissue_types) == 0 or len(healthy_tissue_types) == 0:
