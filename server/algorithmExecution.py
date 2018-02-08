@@ -11,17 +11,12 @@ analyzer = Analyzer()
 method_table = {
     "getFeatures": "features",
     "getDecisionTreeFeatures": "tree",
-    "getNormalizedFeaturesE": "norm",
-    "getNormalizedFeaturesS": "norm",
+    "getNormalizedFeatures": "norm",
     "getFeaturesBySFS": "sfs",
 }
 
 not_normalized_methods = ["features", "tree"]
 
-normalization_table = {
-    "getNormalizedFeaturesE": "exclude",
-    "getNormalizedFeaturesS": "substract",
-}
 
 def execute(algorithm, dataLoader, one_against_rest):
     data = getData(algorithm, dataLoader)
@@ -91,10 +86,9 @@ def run(algorithm, data, oneAgainstRest):
         method = method_table[key]
         healthy = "" if method in not_normalized_methods else data["healthy"]
         sick = data["combined"] if method in not_normalized_methods else data["sick"]
-        normalization = normalization_table.get(key)
 
-        if normalization != None:
-            return dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method, normalization=normalization)
+        if norm != None:
+            return dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method, normalization=norm)
         else:
             return dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method)
 
