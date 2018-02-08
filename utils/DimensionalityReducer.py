@@ -262,27 +262,32 @@ class DimensionalityReducer():
         fitness: fitness function -> "combined", "classification", "clustering", "sick_vs_healthy", "distance"
     '''
     def getOneAgainstRestFeatures(self, sick, healthy, k=3, method="sfs", normalization="relief", fitness="combined"):
-        n_labels = np.unique(sick.labels).shape[0]
+        labels = sick.labels
+        n_labels = np.unique(labels).shape[0]
         feature_sets = Parallel(n_jobs=n_labels)\
-                (delayed(self.getOneAgainstRestFeaturesForLabel)(sick, healthy, k, method, normalization, fitness, label) for label in np.unique(sick.labels))
+                (delayed(self.getOneAgainstRestFeaturesForLabel)(sick, healthy, k, method, normalization, fitness, label) for label in np.unique(labels))
 
+        # Filter None which is returned when healthy data is passed to getOneAgainstRestFeaturesForLabel
+        feature_sets = [set for set in feature_sets if set != None]
         features = {}
-        labels = []
         for label, indices in feature_sets:
             features[label] = indices
-            labels.append(label)
 
         return labels, features
 
     def getOneAgainstRestFeaturesForLabel(self, sick, healthy, k, method, normalization, fitness, label):
-        label = label.split("-")[0]
+        # If combined data is entered we only want results for sick data after all
+        if label.split("-")[1] == "healthy":
+            return None
+
         s_labels = binarize_labels(sick.labels, label)
         sick_binary = Expressions(sick.expressions, s_labels)
+        label = label.split("-")[0]
 
         if healthy == "":
             if method == "tree":
                 indices = self.getDecisionTreeFeatures(sick_binary, k)
-            else:
+            else: # method == "basic"
                 indices = self.getFeatures(sick_binary, k)
 
         else:
@@ -293,7 +298,7 @@ class DimensionalityReducer():
                 indices = self.getEAFeatures(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
             elif method == "norm":
                 indices = self.getNormalizedFeatures(sick_binary, healthy_binary, normalization, k)
-            else:
+            else: # method == "sfs"
                 indices = self.getFeaturesBySFS(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
 
         return (label, indices)
@@ -302,10 +307,8 @@ class DimensionalityReducer():
 
     def getFeatureSets(self, scores, k, returnMultipleSets):
         best_set = scores.argsort()[-k:][::-1]
-
         if not returnMultipleSets:
             return best_set
-
         indices = scores.argsort()[::-1]
         roulette_scores = self.get_roulette_scores(scores, k)
 
@@ -317,7 +320,7 @@ class DimensionalityReducer():
 
     def get_roulette_scores(self, scores, k):
         reversed_ranks = len(scores) - rankdata(scores, method='average')
-        reversed_rank_scores = 1 / (3 + reversed_ranks) # best is 1/3
+        reversed_rank_scores = np.power(0.8, reversed_ranks) / 5
 
         penalized_scores = scores * reversed_rank_scores
 

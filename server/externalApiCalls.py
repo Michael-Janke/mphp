@@ -187,14 +187,14 @@ def testGenes(genes, cache):
     cancer_gene_census_data = getCancerGeneCensusData()
 
     for gene in genes:
-        cache_key = "V2_" + gene
+        cache_key = "V3_" + gene
         if cache.isCached(cache_key):
             response[gene] = cache.getCache(cache_key)
             continue
-        disgenet = lookupDisgenet(gene)
-        proteinAtlas = lookupProteinAtlas(gene)
-        cancerGeneCensus = lookupCancerGeneCensus(gene, cancer_gene_census_data)
-        entrezGeneSummary = lookupEntrezGeneSummary(gene)
+        disgenet = gene if lookupDisgenet(gene) else None
+        proteinAtlas = gene if lookupProteinAtlas(gene) else None
+        cancerGeneCensus = gene if lookupCancerGeneCensus(gene, cancer_gene_census_data) else None
+        entrezGeneSummary = gene if lookupEntrezGeneSummary(gene) else None
 
         coexpressedGenes = lookupCoxpresdb(gene)
         inverted_entrez_labels_map = getInvertedEntrezNamesMap()
@@ -203,18 +203,20 @@ def testGenes(genes, cache):
             for coGene in coexpressedGenes:
                 coGeneName = "ENSG" + str(inverted_entrez_labels_map[coGene]).zfill(11)
                 if not disgenet:
-                    disgenet = lookupDisgenet(coGeneName)
+                    disgenet = coGeneName if lookupDisgenet(coGeneName) else None
                 if not proteinAtlas:
-                    proteinAtlas = lookupProteinAtlas(coGeneName)
+                    proteinAtlas = coGeneName if lookupProteinAtlas(coGeneName) else None
                 if not cancerGeneCensus:
-                    cancerGeneCensus = lookupCancerGeneCensus(coGeneName, cancer_gene_census_data)
+                    cancerGeneCensus = coGeneName if lookupCancerGeneCensus(coGeneName, cancer_gene_census_data) else None
                 if not entrezGeneSummary:
-                    entrezGeneSummary = lookupEntrezGeneSummary(coGeneName)
+                    entrezGeneSummary = coGeneName if lookupEntrezGeneSummary(coGeneName) else None
         except:
             print("Error. No Inverted Entrez Label Entry.")
 
         score = (0.4 if cancerGeneCensus else 0) + \
-            (0.2 if disgenet else 0) + (0.2 if proteinAtlas else 0) + (0.2 if entrezGeneSummary else 0)
+            (0.2 if disgenet else 0) + \
+            (0.2 if proteinAtlas else 0) + \
+            (0.2 if entrezGeneSummary else 0)
         score = round(score, 2)
 
         response[gene] = {

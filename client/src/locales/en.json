@@ -25,21 +25,23 @@
     "TP": "Primary Solid Tumor"
   },
   "Algorithms": {
-    "getPCA": "Principal Component Analysis. Add further description here.",
-    "getDecisionTreeFeatures": "Decision Tree. Add further description here.",
-    "getNormalizedFeatures":
-      "Normalized Feature Selection. Add further description here.",
-
-    "getFeatures": "Feature Selection. Add further description here.",
-    "getFeaturesBySFS":
-      "Sequential Forward Selection. Add further description here."
+    "pca": "Principal Component Analysis. Add further description here.",
+    "tree": "Decision Tree. Add further description here.",
+    "norm": "Normalized Feature Selection. Add further description here.",
+    "basic": "Feature Selection. Add further description here.",
+    "sfs": "Sequential Forward Selection. Add further description here.",
+    "ea": "Evolutionary Algorithm. Add further description here."
   },
   "Parameters": {
     "k": "The number of features (genes) that are returned.",
     "n":
       "The number of features (genes) that is excluded from the calculation to increase performance.",
+    "m":
+      "The number of preselected features (genes) that are used for the calculation to increase performance.",
     "norm":
       "The normalization method used to reduce the impact of underlying differences in healthy tissue.",
+    "fitness":
+      "The fitness function used to evaluate the intermediate results.",
     "n_components": "The number of principal components gathered by the PCA.",
     "n_features_per_component":
       "The number of features that should be returned per prinicpal component."

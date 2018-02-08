@@ -4,17 +4,47 @@ import styled from "styled-components";
 const ScoreRowContent = ({
   geneId,
   index,
-  entryWasFound,
+  entryFound,
   link,
-  providerName
+  linkCoexpressed,
+  providerName,
+  coexpressed
 }) => {
-  const content = entryWasFound ? "+" : "-";
-
-  return (
+  const content = entryFound ? "+" : "-";
+  coexpressed = entryFound !== geneId;
+  return entryFound && coexpressed ? (
+    <SplitWrapperWrapper>
+      <SplitWrapper>
+        <SplitStyledTableRowColumn
+          key={`${providerName}-${index}-1`}
+          isLeft={true}
+          title={geneId}
+        >
+          <StyledLink href={link} target="_blank">
+            -
+          </StyledLink>
+        </SplitStyledTableRowColumn>
+        <SplitStyledTableRowColumn
+          key={`${providerName}-${index}-2`}
+          isLeft={false}
+          title={"coexpressed: " + entryFound}
+        >
+          <StyledLink href={linkCoexpressed} target="_blank">
+            +
+          </StyledLink>
+        </SplitStyledTableRowColumn>
+      </SplitWrapper>
+    </SplitWrapperWrapper>
+  ) : (
     <StyledTableRowColumn
       key={`${providerName}-${index}`}
-      entryWasFound={entryWasFound}
-      title={`${providerName}-${geneId}`}
+      entryFound={entryFound}
+      title={
+        entryFound
+          ? coexpressed ? "coexpressed: " + entryFound : entryFound
+          : geneId
+      }
+      coexpressed={coexpressed}
     >
       <StyledLink href={link} target="_blank">
         {content}
@@ -23,13 +53,34 @@ const ScoreRowContent = ({
   );
 };
 
+const SplitWrapperWrapper = styled.td`
+  border-left: solid 1px white;
+  padding: 0;
+  min-width: 70px;
+`;
+
+const SplitWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  height: 58px;
+`;
+
+const SplitStyledTableRowColumn = styled.div`
+  background: ${props =>
+    props.isLeft ? props.theme.lightGray : props.theme.leafGreen};
+  text-align: center;
+  font-size: 1em;
+  flex: 1;
+`;
+
 const StyledTableRowColumn = styled.td`
   background: ${props =>
-    props.entryWasFound ? props.theme.leafGreen : props.theme.lightGray};
+    props.entryFound ? props.theme.leafGreen : props.theme.lightGray};
   text-align: center;
   font-size: 1em;
   border-left: solid 1px white;
-  min-width: 60px;
+  min-width: 70px;
   padding: 0;
   height: 56px;
 `;
