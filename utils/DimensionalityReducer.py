@@ -80,7 +80,7 @@ class DimensionalityReducer():
         }
 
         return options[normalization](sick, healthy, k, n, m, returnMultipleSets)
-    
+
     '''
         does not use parameter n
     '''
@@ -183,9 +183,9 @@ class DimensionalityReducer():
 
         results = Parallel(n_jobs=3)\
             (delayed(self.getFeatureSetBySFS)(sick, healthy, selected_genes[i:], k, fitness) for i in range(3))
-        
+
         return np.asarray(results)
-    
+
     '''
         called by getFeaturesBySFS
     '''
@@ -211,7 +211,7 @@ class DimensionalityReducer():
 
             i = 0
             while genes[best_genes[i]] in indices:
-                i += 1 
+                i += 1
 
             indices.append(genes[best_genes[i]])
             print("added new feature", flush=True)
@@ -265,12 +265,14 @@ class DimensionalityReducer():
         n_labels = np.unique(sick.labels).shape[0]
         feature_sets = Parallel(n_jobs=n_labels)\
                 (delayed(self.getOneAgainstRestFeaturesForLabel)(sick, healthy, k, method, normalization, fitness, label) for label in np.unique(sick.labels))
-        
+
         features = {}
+        labels = []
         for label, indices in feature_sets:
             features[label] = indices
+            labels.append(label)
 
-        return features
+        return labels, features
 
     def getOneAgainstRestFeaturesForLabel(self, sick, healthy, k, method, normalization, fitness, label):
         label = label.split("-")[0]
@@ -306,7 +308,7 @@ class DimensionalityReducer():
 
         indices = scores.argsort()[::-1]
         roulette_scores = self.get_roulette_scores(scores, k)
-        
+
         sets = [best_set]
         for i in range(1,3):
             sets.append(indices[self.getFeatureSet(roulette_scores, k)])

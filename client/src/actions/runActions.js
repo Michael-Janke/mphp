@@ -1,6 +1,6 @@
 import * as types from "./actionTypes";
 import { postRequest } from "./_request";
-import { isHealthy } from "../utils";
+import { isHealthy, canRunOneAgainstAll } from "../utils";
 
 export function createRun({ tcgaTokens, tissueTypes }) {
   return dispatch => {
@@ -11,13 +11,13 @@ export function createRun({ tcgaTokens, tissueTypes }) {
 
 export function updateRun(id, updates) {
   return dispatch => {
-    dispatch({ type: types.UPDATE_RUN, id, updates});
+    dispatch({ type: types.UPDATE_RUN, id, updates });
   };
 }
 
 export function deleteRun(id) {
   return dispatch => {
-    dispatch({ type: types.DELETE_RUN, id});
+    dispatch({ type: types.DELETE_RUN, id });
   };
 }
 
@@ -27,7 +27,7 @@ export function toggleTcgaToken(id, algorithm, tcgaToken) {
       type: types.UPDATE_RUN,
       id,
       updates: {
-          algorithm: {
+        algorithm: {
           ...algorithm,
           cancerTypes: arrayToggle(algorithm.cancerTypes, tcgaToken)
         }
@@ -56,10 +56,11 @@ export function toggleTissueType(id, algorithm, tissueType) {
   };
 }
 
-export function startRun(id, algorithm) {
+export function startRun(id, oneAgainstRest, algorithm) {
   return dispatch => {
-    dispatch({ type: types.START_RUN, id, algorithm});
-    postRequest("/runAlgorithm", { algorithm }).then(response =>
+    oneAgainstRest = oneAgainstRest && canRunOneAgainstAll(algorithm);
+    dispatch({ type: types.START_RUN, id, algorithm });
+    postRequest("/runAlgorithm", { algorithm, oneAgainstRest }).then(response =>
       dispatch(_finishRun(id, response))
     );
 

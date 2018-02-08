@@ -17,21 +17,28 @@ import { createStore, applyMiddleware, compose } from "redux";
 import thunk from "redux-thunk"; // needed for async actions
 import reducers from "./reducers";
 
+// locales
+import { IntlProvider } from "react-intl";
+import locales from "./locales/en.json";
+import flatten from "flat";
+
 // Needed for onTouchTap
 // http://stackoverflow.com/a/34015469/988941
 import injectTapEventPlugin from "react-tap-event-plugin";
+
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 let store = createStore(reducers, composeEnhancers(applyMiddleware(thunk)));
-
 const App = () => (
-  <ThemeProvider theme={{ ...colors, ...fontSizes, ...spacings }}>
-    <MuiThemeProvider>
-      <Provider store={store}>
-        <EpicApp />
-      </Provider>
-    </MuiThemeProvider>
-  </ThemeProvider>
+  <IntlProvider locale="en" messages={flatten(locales)}>
+    <ThemeProvider theme={{ ...colors, ...fontSizes, ...spacings }}>
+      <MuiThemeProvider>
+        <Provider store={store}>
+          <EpicApp />
+        </Provider>
+      </MuiThemeProvider>
+    </ThemeProvider>
+  </IntlProvider>
 );
 
 injectGlobal`

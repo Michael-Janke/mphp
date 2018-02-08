@@ -10,8 +10,8 @@ import optparse
 import os
 
 datasets = {
-    "dataset4": "Dataset 4 | TCGA",
-    "dataset5": "Dataset 5 | TCGA + GTEX"
+    "dataset4": "TCGA",
+    "dataset5": "TCGA + GTEX"
 }
 dataLoaders = {dataset: DataLoader(dataset) for dataset in datasets}
 statistics = {dataset: dataLoader.getStatistics()
@@ -59,6 +59,8 @@ def context():
 @app.route("/runAlgorithm", methods=["POST"])
 def runSpecificAlgorithm():
     algorithm = request.get_json()["algorithm"]
+    oneAgainstRest = request.get_json()["oneAgainstRest"]
+
     if "dataset" not in algorithm:
         return abort(400, "need dataset parameter")
 
@@ -73,6 +75,7 @@ def runSpecificAlgorithm():
         "V2",
         dataset, 
         algorithm["key"],
+        str(oneAgainstRest),
         "-".join([key+str(value) for key,value in algorithm["parameters"].items()]),
         "-".join(algorithm["cancerTypes"]),
         "-".join(algorithm["healthyTissueTypes"]),
@@ -81,19 +84,7 @@ def runSpecificAlgorithm():
     if cache.isCached(cache_key):
         return cache.getCache(cache_key)
 
-    data = algorithmExecution.getData(algorithm, dataLoader)
-
-    response_data, gene_indices = algorithmExecution.run(algorithm, data)
-    expression_matrix = algorithmExecution.calcExpressionMatrix(algorithm, data, gene_indices)
-    evaluation = algorithmExecution.evaluate(algorithm, data, gene_indices)
-
-    response = {
-        'data': {key: scores[0:3] for (key, scores) in response_data.items()},
-        'genes': dataLoader.getGeneLabels()[gene_indices].tolist(),
-        'expressionMatrix': expression_matrix,
-        'geneNames': dataLoader.getGeneNames()[gene_indices].tolist(),
-        'evaluation': evaluation,
-    }
+    response = algorithmExecution.execute(algorithm, dataLoader, oneAgainstRest)
 
     # workaround to replace NaN by null
     json_response = json.dumps(response)

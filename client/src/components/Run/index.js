@@ -22,6 +22,7 @@ export default class Card extends Component {
     if (this.props.geneResult) return false; // will never change again
     if (nextProps.isLoading !== this.props.isLoading) return true;
     if (nextProps.dataset !== this.props.dataset) return true;
+    if (nextProps.oneAgainstRest !== this.props.oneAgainstRest) return true;
     if (nextProps.result && !this.props.result) return true;
     if (nextProps.geneResult && !this.props.geneResult) return true;
     return !deepEqual(nextProps.algorithm, this.props.algorithm);
@@ -39,7 +40,7 @@ export default class Card extends Component {
   };
 
   startRun = () => {
-    this.props.startRun(this.props.runId, {
+    this.props.startRun(this.props.runId, this.props.oneAgainstRest, {
       ...this.props.algorithm,
       dataset: this.props.dataset
     });
@@ -50,10 +51,13 @@ export default class Card extends Component {
     return (
       <StyledCard zDepth={1}>
         <StyledCardTitle>
-          <StyledTitleText>
-            {datasets[dataset] || ""} | {algorithm.name || "Execute Algorithm"}
-          </StyledTitleText>
-          {isLoading ? <Spinner size={CARD_TITLE_HEIGHT} /> : null}
+          <TextContainer>
+            <StyledTitleText>
+              {datasets[dataset] || ""} |{" "}
+              {algorithm.name || "Execute Algorithm"}
+            </StyledTitleText>
+            {isLoading ? <Spinner size={CARD_TITLE_HEIGHT} /> : null}
+          </TextContainer>
           <IconButton icon="clear" onClick={this.handleOpen} />
           <Dialog
             actions={[
@@ -126,10 +130,15 @@ const StyledCardTitle = styled(CardTitle)`
   padding-right: 0 !important;
 `;
 
+const TextContainer = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+`;
+
 const StyledTitleText = styled.p`
   margin-right: ${props => props.theme.mediumSpace};
   font-size: ${props => props.theme.h2};
-  flex: 1;
 `;
 
 const StyledError = styled.div`

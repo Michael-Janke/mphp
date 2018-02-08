@@ -43,14 +43,16 @@ const ExpressionTable = props => {
               <StyledTableHeaderColumn>Protein Atlas</StyledTableHeaderColumn>
               {genes.map((key, index) => {
                 return (
-                  <ScoreRowContent
-                    geneId={key}
-                    key={key}
-                    providerName="ProteinAtlas"
-                    index={index}
-                    entryWasFound={geneResults[key].proteinAtlas}
-                    link={`https://www.proteinatlas.org/${key}`}
-                  />
+                  geneResults[key] && (
+                    <ScoreRowContent
+                      geneId={key}
+                      key={key}
+                      providerName="ProteinAtlas"
+                      index={index}
+                      entryWasFound={geneResults[key].proteinAtlas}
+                      link={`https://www.proteinatlas.org/${key}`}
+                    />
+                  )
                 );
               })}
             </BreakingTableRow>,
@@ -58,16 +60,18 @@ const ExpressionTable = props => {
               <StyledTableHeaderColumn>DisGeNet</StyledTableHeaderColumn>
               {genes.map((key, index) => {
                 return (
-                  <ScoreRowContent
-                    geneId={key}
-                    key={key}
-                    providerName="DisGeNet"
-                    index={index}
-                    entryWasFound={geneResults[key].disgenet}
-                    link={`http://www.disgenet.org/web/DisGeNET/menu/search?0#${
-                      geneNames[index]
-                    }`}
-                  />
+                  geneResults[key] && (
+                    <ScoreRowContent
+                      geneId={key}
+                      key={key}
+                      providerName="DisGeNet"
+                      index={index}
+                      entryWasFound={geneResults[key].disgenet}
+                      link={`http://www.disgenet.org/web/DisGeNET/menu/search?0#${
+                        geneNames[index]
+                      }`}
+                    />
+                  )
                 );
               })}
             </tr>,
@@ -77,14 +81,16 @@ const ExpressionTable = props => {
               </StyledTableHeaderColumn>
               {genes.map((key, index) => {
                 return (
-                  <ScoreRowContent
-                    geneId={key}
-                    key={key}
-                    providerName="Cancer Gene Census"
-                    index={index}
-                    entryWasFound={geneResults[key].cancer_gene_census}
-                    link={`http://cancer.sanger.ac.uk/census`}
-                  />
+                  geneResults[key] && (
+                    <ScoreRowContent
+                      geneId={key}
+                      key={key}
+                      providerName="Cancer Gene Census"
+                      index={index}
+                      entryWasFound={geneResults[key].cancer_gene_census}
+                      link={`http://cancer.sanger.ac.uk/census`}
+                    />
+                  )
                 );
               })}
             </tr>,
@@ -94,14 +100,16 @@ const ExpressionTable = props => {
               </StyledTableHeaderColumn>
               {genes.map((key, index) => {
                 return (
-                  <ScoreRowContent
-                    geneId={key}
-                    key={key}
-                    providerName="Entrez Gene Summary"
-                    index={index}
-                    entryWasFound={geneResults[key].entrezGeneSummary}
-                    link={`https://www.proteinatlas.org/${key}`}
-                  />
+                  geneResults[key] && (
+                    <ScoreRowContent
+                      geneId={key}
+                      key={key}
+                      providerName="Entrez Gene Summary"
+                      index={index}
+                      entryWasFound={geneResults[key].entrezGeneSummary}
+                      link={`https://www.proteinatlas.org/${key}`}
+                    />
+                  )
                 );
               })}
             </tr>,
@@ -109,13 +117,15 @@ const ExpressionTable = props => {
               <StyledTableHeaderColumn>Total Scores</StyledTableHeaderColumn>
               {genes.map((key, index) => {
                 return (
-                  <StyledTableRowColumn
-                    key={`score-${index}`}
-                    background="white"
-                    title={`Score-${key}`}
-                  >
-                    {geneResults[key].score}
-                  </StyledTableRowColumn>
+                  geneResults[key] && (
+                    <StyledTableRowColumn
+                      key={`score-${index}`}
+                      background="white"
+                      title={`Score-${key}`}
+                    >
+                      {geneResults[key].score}
+                    </StyledTableRowColumn>
+                  )
                 );
               })}
             </tr>

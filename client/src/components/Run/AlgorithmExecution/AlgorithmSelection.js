@@ -2,9 +2,15 @@ import React, { Component } from "react";
 import SelectField from "material-ui/SelectField";
 import MenuItem from "material-ui/MenuItem";
 import TextField from "material-ui/TextField";
+import Checkbox from "material-ui/Checkbox";
 import styled from "styled-components";
+import { FormattedMessage } from "react-intl";
+import HelpIcon from "material-ui/svg-icons/action/help";
 
+import Description from "../../Description";
+import TooltipBox from "../../TooltipBox";
 import { boringBlue } from "../../../config/colors";
+import { canRunOneAgainstAll } from "../../../utils";
 
 export default class AlgorithmSelection extends Component {
   render() {
@@ -47,9 +53,16 @@ export default class AlgorithmSelection extends Component {
           {algorithm.key &&
             algorithms &&
             Object.keys(algorithms[algorithm.key].parameters).map(
-              this.renderParameter.bind(this, this.props.disabled)
+              this.renderParameter.bind(this)
+            )}
+          {algorithm.key &&
+            algorithms && (
+              <StyledAlgorithmDescription>
+                <FormattedMessage id={`Algorithms.${algorithm.key}`} />
+              </StyledAlgorithmDescription>
             )}
         </StyledOptions>
+        {this.renderComparisonModeSelection()}
       </StyledMenu>
     );
   }
@@ -65,59 +78,91 @@ export default class AlgorithmSelection extends Component {
     );
   }
 
-  renderParameter(disabled, parameter, index) {
-    var parameterObj = this.props.algorithms[this.props.algorithm.key]
-      .parameters[parameter];
-    if (parameterObj.available) {
-      return this.renderTextSelectionParameter(disabled, parameter, index);
+  renderParameter(parameterName, index) {
+    const { algorithms, algorithm } = this.props;
+    const parameter = algorithms[algorithm.key].parameters[parameterName];
+    if (parameter.available) {
+      return this.renderTextSelectionParameter(parameterName, index);
     } else {
-      return this.renderNumericParameter(disabled, parameter, index);
+      return this.renderNumericParameter(parameterName, index);
     }
   }
 
-  renderTextSelectionParameter(disabled, parameter, index) {
-    var parameterObj = this.props.algorithms[this.props.algorithm.key]
-      .parameters[parameter];
+  renderTextSelectionParameter(parameterName, index) {
+    const { disabled, algorithms, algorithm } = this.props;
+    const parameter = algorithms[algorithm.key].parameters[parameterName];
     return (
-      <StyledInnerSelectField
-        key={parameter}
-        id={parameter}
-        value={
-          this.props.algorithm.parameters[parameter] || parameterObj.default
-        }
-        onChange={this.changeTextSelectionParameter.bind(this, parameter)}
-        floatingLabelText={parameterObj.name}
-        floatingLabelFixed={true}
-        autoWidth={true}
-        selectedMenuItemStyle={{ color: boringBlue }}
-        disabled={disabled}
-        style={{ width: 210 }}
-      >
-        {parameterObj.available.map(x => {
-          return <MenuItem key={x} id={parameter} value={x} primaryText={x} />;
-        })}
-      </StyledInnerSelectField>
+      <StyledParameter key={parameterName}>
+        <StyledInnerSelectField
+          key={parameterName}
+          id={parameterName}
+          value={
+            this.props.algorithm.parameters[parameterName] || parameter.default
+          }
+          onChange={this.changeTextSelectionParameter.bind(this, parameterName)}
+          floatingLabelText={parameter.name}
+          floatingLabelFixed={true}
+          autoWidth={true}
+          selectedMenuItemStyle={{ color: boringBlue }}
+          disabled={disabled}
+          style={{ width: 210 }}
+        >
+          {parameter.available.map(x => {
+            return (
+              <MenuItem key={x} id={parameterName} value={x} primaryText={x} />
+            );
+          })}
+        </StyledInnerSelectField>
+        <TooltipBox
+          text={<FormattedMessage id={`Parameters.${parameterName}`} />}
+        >
+          <HelpIcon />
+        </TooltipBox>
+      </StyledParameter>
     );
   }
 
-  renderNumericParameter(disabled, parameter, index) {
-    var parameterObj = this.props.algorithms[this.props.algorithm.key]
-      .parameters[parameter];
+  renderNumericParameter(parameterName, index) {
+    const { disabled, algorithms, algorithm } = this.props;
+    const parameter = algorithms[algorithm.key].parameters[parameterName];
     return (
-      <StyledTextField
-        key={parameter}
-        id={parameter}
-        value={
-          this.props.algorithm.parameters[parameter] || parameterObj.default
-        }
-        hintText={parameterObj.default}
-        floatingLabelText={parameterObj.name}
-        floatingLabelFixed={true}
-        type="number"
-        onChange={this.changeNumericParameter.bind(this)}
-        disabled={disabled}
-        style={{ width: 210 }}
-      />
+      <StyledParameter key={parameterName}>
+        <StyledTextField
+          id={parameterName}
+          value={
+            this.props.algorithm.parameters[parameterName] || parameter.default
+          }
+          hintText={parameter.default}
+          floatingLabelText={parameter.name}
+          floatingLabelFixed={true}
+          type="number"
+          onChange={this.changeNumericParameter.bind(this)}
+          disabled={disabled}
+          style={{ width: 210 }}
+        />
+        <TooltipBox
+          text={<FormattedMessage id={`Parameters.${parameterName}`} />}
+        >
+          <HelpIcon />
+        </TooltipBox>
+      </StyledParameter>
+    );
+  }
+
+  renderComparisonModeSelection() {
+    const descriptionText =
+      "Select discriminating genes per cancer type against all other, " +
+      "disable to select one set of discriminating genes for all cancer types";
+    return (
+      <Description text={descriptionText}>
+        <StyledCheckbox
+          label="One against rest"
+          checked={this.props.oneAgainstRest}
+          onCheck={this.toggleComparisonMode.bind(this)}
+          iconStyle={{ fill: boringBlue }}
+          disabled={!canRunOneAgainstAll(this.props.algorithm)}
+        />
+      </Description>
     );
   }
 
@@ -154,6 +199,11 @@ export default class AlgorithmSelection extends Component {
     });
   }
 
+  toggleComparisonMode() {
+    const { oneAgainstRest, runId, updateRun } = this.props;
+    updateRun(runId, { oneAgainstRest: !oneAgainstRest });
+  }
+
   selectAlgorithm(event, index, key) {
     const { algorithm, algorithms, runId, updateRun } = this.props;
     const parameters = algorithms[key].parameters;
@@ -168,13 +218,28 @@ export default class AlgorithmSelection extends Component {
   }
 }
 
-const StyledMenu = styled.div``;
+const StyledParameter = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const StyledAlgorithmDescription = styled.div`
+  padding-top: 8px;
+  max-width: 220px;
+  color: ${props => props.theme.deepGray};
+`;
+
+const StyledMenu = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
 
 const StyledOptions = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  margin: 16px;
+  margin: ${props => props.theme.mediumSpace};
 `;
 
 const StyledSelectField = styled(SelectField)`
@@ -188,5 +253,9 @@ const StyledInnerSelectField = styled(SelectField)`
 `;
 
 const StyledTextField = styled(TextField)`
+  margin-left: ${props => props.theme.mediumSpace};
+`;
+
+const StyledCheckbox = styled(Checkbox)`
   margin-left: ${props => props.theme.mediumSpace};
 `;

@@ -56,15 +56,18 @@ class Content extends Component {
             ]}
             modal={false}
             open={!context.datasets}
+            overlayStyle={{ opacity: 0.2 }}
           >
             {context.isError ? (
               <LoadingText>
-                Couldn't load context data. Retry? ({context.error.message})
+                {`Couldn't load context data. Retry? (Error: ${
+                  context.error.message
+                })`}
               </LoadingText>
             ) : (
               <StyledSpinnerContainer>
-                <Spinner size={20} />
-                <LoadingText>loading context data</LoadingText>
+                <LoadingText>Loading context data...</LoadingText>
+                <Spinner size={15} />
               </StyledSpinnerContainer>
             )}
           </Dialog>
@@ -112,8 +115,8 @@ const StyledSpinnerContainer = styled.div`
 `;
 
 const LoadingText = styled.div`
-  font-size: ${props => props.theme.h1};
-  margin-left: 10px;
+  margin-right: ${props => props.theme.mediumSpace};
+  font-size: ${props => props.theme.largeText};
 `;
 
 const EmptyRun = styled.div`
@@ -136,8 +139,8 @@ const mapDispatchToProps = dispatch => {
     loadContext: () => {
       dispatch(loadContext());
     },
-    startRun: (runId, params) => {
-      dispatch(startRun(runId, params));
+    startRun: (runId, oneAgainstRest, algorithm) => {
+      dispatch(startRun(runId, oneAgainstRest, algorithm));
     },
     deleteRun: runId => {
       dispatch(deleteRun(runId));
