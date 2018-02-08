@@ -36,7 +36,7 @@ export default class Results extends Component {
               label={label}
               style={{ backgroundColor: slightlyBoringBlue }}
             >
-              {this.renderResult(tabData[label])}
+              {this.renderResult(tabData[label], label)}
             </Tab>
           ))}
         </Tabs>
@@ -46,18 +46,23 @@ export default class Results extends Component {
     );
   }
 
-  renderResult(result) {
+  renderResult(result, label = "") {
     // skip evaluation score
     if (typeof result === "number") return null;
 
-    const { runId } = this.props;
+    const { runId, oneAgainstRest } = this.props;
     return (
       <StyledContent>
         <Columns>
           <Plot {...result} />
           <Evaluation {...result.evaluation} />
         </Columns>
-        <GeneExploration runId={runId} {...result} />
+        <GeneExploration
+          runId={runId}
+          oneAgainstRest={oneAgainstRest}
+          cancerType={label}
+          {...result}
+        />
       </StyledContent>
     );
   }
@@ -72,6 +77,7 @@ const StyledEvaluationValue = styled(EvaluationValue)`
   background: none !important;
   div {
     padding-left: 0 !important;
+    padding-top: 0 !important;
     cursor: default !important;
   }
 `;

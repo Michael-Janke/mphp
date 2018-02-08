@@ -5,18 +5,20 @@ import ExpressionTable from "./utils/ExpressionTable";
 export default class GeneExploration extends Component {
   constructor(props) {
     super(props);
-    if (!props.runs[props.runId].geneResults) {
+    const { runId, genes, oneAgainstRest, cancerType, testGenes } = this.props;
+
+    if (!this.geneResults()) {
       // trigger the gene test once in the beginning
-      this.props.testGenes(props.runId, { genes: props.genes });
+      testGenes(runId, {
+        genes,
+        oneAgainstRest,
+        cancerType
+      });
     }
   }
 
   render() {
     const { genes, geneNames, expressionMatrix } = this.props;
-
-    const geneResults = this.props.runs[this.props.runId].geneResults
-      ? this.props.runs[this.props.runId].geneResults
-      : null;
 
     return (
       <div>
@@ -32,10 +34,21 @@ export default class GeneExploration extends Component {
             expressionMatrix,
             genes,
             geneNames,
-            geneResults
+            geneResults: this.geneResults()
           }}
         />
       </div>
     );
+  }
+
+  geneResults() {
+    const { runs, runId, oneAgainstRest, cancerType } = this.props;
+    const results = runs[runId].geneResults;
+
+    if (oneAgainstRest) {
+      return results && results[cancerType] ? results[cancerType] : null;
+    } else {
+      return results;
+    }
   }
 }

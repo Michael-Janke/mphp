@@ -42,7 +42,7 @@ def servemedia(path):
 
 @app.route('/testGenes', methods=["POST"])
 def test_genes():
-    genes = request.get_json()["genes"]["genes"]
+    genes = request.get_json()["genes"]
     return json.dumps(externalApiCalls.testGenes(genes, cache))
 
 

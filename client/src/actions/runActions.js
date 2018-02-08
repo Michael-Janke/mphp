@@ -82,14 +82,17 @@ function arrayToggle(array, element) {
 
 export function testGenes(id, params) {
   return dispatch => {
+    const { genes, oneAgainstRest, cancerType } = params;
     postRequest("/testGenes", {
-      genes: params
+      genes
     }).then(response => dispatch(_testGenes(id, response)));
 
     function _testGenes(id, result) {
       return {
         type: types.GENE_RESULTS,
         id,
+        oneAgainstRest,
+        cancerType,
         result
       };
     }

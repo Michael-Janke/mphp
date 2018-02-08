@@ -43,8 +43,8 @@ const ExpressionTable = props => {
             />
           ]}
           {geneResults && [
-            <TableLabel key="gene_score_label">
-              <TableLabelContent key="gene_score_label_content">
+            <TableLabel key="gene_total_score_label">
+              <TableLabelContent key="gene_total_score_label_content">
                 Cancer related according to:
                 <StyledTooltipBox
                   text={

@@ -41,9 +41,19 @@ export function runs(state = initialState, action = {}) {
         result: action.result
       });
     case types.GENE_RESULTS:
+      let geneResults;
+      if (action.oneAgainstRest) {
+        const presentGeneResults = state[action.id].geneResults || {};
+        geneResults = {
+          ...presentGeneResults,
+          [action.cancerType]: action.result
+        };
+      } else {
+        geneResults = action.result;
+      }
       return updateRun(state, action.id, {
         isLoading: false,
-        geneResults: action.result
+        geneResults
       });
     default:
       return state;
