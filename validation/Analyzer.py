@@ -82,7 +82,8 @@ class Analyzer:
     def computeExpressionMatrixOneAgainstRest(self, sick, healthy, selected_genes_dict):
         results = {}
         for label, genes in selected_genes_dict.items():
-            results[label] = self.computeExpressionMatrix(sick, healthy, genes)
+            matrix = self.computeExpressionMatrix(sick, healthy, genes)
+            results[label] = {label: matrix[label]}
 
         return results
 
