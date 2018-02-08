@@ -302,10 +302,8 @@ class DimensionalityReducer():
 
     def getFeatureSets(self, scores, k, returnMultipleSets):
         best_set = scores.argsort()[-k:][::-1]
-
         if not returnMultipleSets:
             return best_set
-
         indices = scores.argsort()[::-1]
         roulette_scores = self.get_roulette_scores(scores, k)
 
@@ -317,7 +315,7 @@ class DimensionalityReducer():
 
     def get_roulette_scores(self, scores, k):
         reversed_ranks = len(scores) - rankdata(scores, method='average')
-        reversed_rank_scores = 1 / (3 + reversed_ranks) # best is 1/3
+        reversed_rank_scores = np.power(0.8, reversed_ranks) / 5
 
         penalized_scores = scores * reversed_rank_scores
 

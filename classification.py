@@ -28,8 +28,8 @@ if __name__ == '__main__':
     healthy = dataLoader.getData(["healthy"], ["THCA","LUAD"])
     #healthy = sampler.over_sample(healthy)
 
-    sick = dataLoader.getData(["sick"], ["THCA","LUAD"])
-    data = dataLoader.getData(["sick", "healthy"], ["THCA","LUAD"])
+    sick = dataLoader.getData(["sick"], ["THCA","LUAD", "HNSC", "KIRC", "UCEC"])
+    data = dataLoader.getData(["sick", "healthy"], ["THCA","LUAD", "HNSC", "KIRC", "UCEC"])
     gene_labels = dataLoader.getGeneLabels()
     print("got combined data")
 
@@ -71,7 +71,9 @@ if __name__ == '__main__':
     """
 
 
-    start = datetime.now()
-    selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 10, m=100 ,fitness="classification", returnMultipleSets = False)
-    pprint(analyzer.computeFeatureValidation(sick, healthy, selected_genes)["fitness"])
-    print(datetime.now() - start)
+    #start = datetime.now()
+    #selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 10, m=100 ,fitness="classification", returnMultipleSets = False)
+    selected_genes = dimReducer.getNormalizedFeaturesE(sick, healthy, k=3, n=10000, m="chi2", returnMultipleSets=True)
+    print(selected_genes)
+    #pprint(analyzer.computeFeatureValidation(sick, healthy, selected_genes)["fitness"])
+    #print(datetime.now() - start)
