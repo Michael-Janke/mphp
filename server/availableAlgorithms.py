@@ -54,6 +54,34 @@ algorithms = {
     },
     "getFeaturesBySFS": {
         "name": "Sequential Forward Selection (normalized)",
-        "parameters": {}
+        "parameters": {
+            "k": {
+                "name": "#Features",
+                "default": 10
+
+            },
+            "n": {
+                "name": "#Excluded features",
+                "default": 5000
+
+            },
+            "m": {
+                "name": "#Preselected features",
+                "default": 100
+
+            },
+            "norm": {
+                "name": "Normalization for preselection",
+                "default": "exclude",
+                "available": ["subtract", "exclude", "relief"]
+
+            },
+            "fitness": {
+                "name": "Fitness function",
+                "default": "combined",
+                "available": ["combined", "classification", "clustering", "sick_vs_healthy", "distance"]
+
+            }
+        }
     }
 }

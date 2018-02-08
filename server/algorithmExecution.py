@@ -80,7 +80,9 @@ def run(algorithm, data, oneAgainstRest):
     n_f_components = algorithm["parameters"].get("n_features_per_component")
     k = algorithm["parameters"].get("k")
     n = algorithm["parameters"].get("n")
+    m = algorithm["parameters"].get("m")
     norm = algorithm["parameters"].get("norm")
+    fitness = algorithm["parameters"].get("fitness")
 
     if oneAgainstRest:
         method = method_table[key]
@@ -112,7 +114,7 @@ def run(algorithm, data, oneAgainstRest):
 
     elif key == "getFeaturesBySFS":
         gene_indices = dimReducer.getFeaturesBySFS(
-            data["sick"], data["healthy"])
+            data["sick"], data["healthy"], k, n, m, norm, fitness)
         labels = np.hstack((data["sick"].labels, data["healthy"].labels))
 
     return labels, gene_indices
