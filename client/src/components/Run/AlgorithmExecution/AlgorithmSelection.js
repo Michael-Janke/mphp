@@ -4,8 +4,11 @@ import MenuItem from "material-ui/MenuItem";
 import TextField from "material-ui/TextField";
 import Checkbox from "material-ui/Checkbox";
 import styled from "styled-components";
+import { FormattedMessage } from "react-intl";
+import HelpIcon from "material-ui/svg-icons/action/help";
 
 import Description from "../../Description";
+import TooltipBox from "../../TooltipBox";
 import { boringBlue } from "../../../config/colors";
 import { canRunOneAgainstAll } from "../../../utils";
 
@@ -52,6 +55,12 @@ export default class AlgorithmSelection extends Component {
             Object.keys(algorithms[algorithm.key].parameters).map(
               this.renderParameter.bind(this)
             )}
+          {algorithm.key &&
+            algorithms && (
+              <StyledAlgorithmDescription>
+                <FormattedMessage id={`Algorithms.${algorithm.key}`} />
+              </StyledAlgorithmDescription>
+            )}
         </StyledOptions>
         {this.renderComparisonModeSelection()}
       </StyledMenu>
@@ -73,20 +82,26 @@ export default class AlgorithmSelection extends Component {
     const { disabled, algorithms, algorithm } = this.props;
     var parameter = algorithms[algorithm.key].parameters[parameterName];
     return (
-      <StyledTextField
-        key={parameterName}
-        id={parameterName}
-        value={
-          this.props.algorithm.parameters[parameterName] || parameter.default
-        }
-        hintText={parameter.default}
-        floatingLabelText={parameter.name}
-        floatingLabelFixed={true}
-        type="number"
-        onChange={this.changeParameter.bind(this)}
-        disabled={disabled}
-        style={{ width: 210 }}
-      />
+      <StyledParameter key={parameterName}>
+        <StyledTextField
+          id={parameterName}
+          value={
+            this.props.algorithm.parameters[parameterName] || parameter.default
+          }
+          hintText={parameter.default}
+          floatingLabelText={parameter.name}
+          floatingLabelFixed={true}
+          type="number"
+          onChange={this.changeParameter.bind(this)}
+          disabled={disabled}
+          style={{ width: 210 }}
+        />
+        <TooltipBox
+          text={<FormattedMessage id={`Parameters.${parameterName}`} />}
+        >
+          <HelpIcon />
+        </TooltipBox>
+      </StyledParameter>
     );
   }
 
@@ -147,6 +162,17 @@ export default class AlgorithmSelection extends Component {
     updateRun(runId, { algorithm: { ...algorithm, ...updatedValues } });
   }
 }
+
+const StyledParameter = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const StyledAlgorithmDescription = styled.div`
+  padding-top: 8px;
+  max-width: 220px;
+  color: ${props => props.theme.deepGray};
+`;
 
 const StyledMenu = styled.div`
   display: flex;

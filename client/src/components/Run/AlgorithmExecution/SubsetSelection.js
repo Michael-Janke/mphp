@@ -4,14 +4,18 @@ import RaisedButton from "material-ui/RaisedButton";
 import { List } from "material-ui/List";
 import Subheader from "material-ui/Subheader";
 import { connect } from "react-redux";
+import { FormattedMessage } from "react-intl";
 
 import { toggleTcgaToken, toggleTissueType } from "../../../actions/runActions";
 import { isHealthy } from "../../../utils";
+import TooltipBox from "../../TooltipBox";
 
 class SubsetSelection extends PureComponent {
   render() {
     const { algorithm, disabled } = this.props;
-    const { cancerTypes, sampleTypes }  = this.props.statistics[this.props.dataset];
+    const { cancerTypes, sampleTypes } = this.props.statistics[
+      this.props.dataset
+    ];
     const healthyTissueTypes = sampleTypes.filter(tissueType =>
       isHealthy(tissueType)
     );
@@ -28,15 +32,20 @@ class SubsetSelection extends PureComponent {
           {cancerTypes.map(
             tcgaToken =>
               disabled && !algorithm.cancerTypes.includes(tcgaToken) ? null : (
-                <StyledButton
-                  label={tcgaToken}
+                <TooltipBox
                   key={tcgaToken}
-                  value={tcgaToken}
-                  onClick={() => this.transferTcgaToken(tcgaToken)}
-                  selected={algorithm.cancerTypes.includes(tcgaToken)}
-                  primary={algorithm.cancerTypes.includes(tcgaToken)}
-                  disabled={disabled}
-                />
+                  text={<FormattedMessage id={`CancerTypes.${tcgaToken}`} />}
+                  position={"right"}
+                >
+                  <StyledButton
+                    label={tcgaToken}
+                    value={tcgaToken}
+                    onClick={() => this.transferTcgaToken(tcgaToken)}
+                    selected={algorithm.cancerTypes.includes(tcgaToken)}
+                    primary={algorithm.cancerTypes.includes(tcgaToken)}
+                    disabled={disabled}
+                  />
+                </TooltipBox>
               )
           )}
         </StyledList>
@@ -46,15 +55,20 @@ class SubsetSelection extends PureComponent {
             tissueType =>
               disabled &&
               !selectedHealthyTissueTypes.includes(tissueType) ? null : (
-                <StyledButton
-                  label={tissueType}
+                <TooltipBox
                   key={tissueType}
-                  value={tissueType}
-                  onClick={() => this.transferTissueType(tissueType)}
-                  selected={selectedHealthyTissueTypes.includes(tissueType)}
-                  primary={selectedHealthyTissueTypes.includes(tissueType)}
-                  disabled={disabled}
-                />
+                  text={<FormattedMessage id={`HealthyTissue.${tissueType}`} />}
+                  position={"right"}
+                >
+                  <StyledButton
+                    label={tissueType}
+                    value={tissueType}
+                    onClick={() => this.transferTissueType(tissueType)}
+                    selected={selectedHealthyTissueTypes.includes(tissueType)}
+                    primary={selectedHealthyTissueTypes.includes(tissueType)}
+                    disabled={disabled}
+                  />
+                </TooltipBox>
               )
           )}
           <Subheader>Sick Tissue</Subheader>
@@ -62,15 +76,20 @@ class SubsetSelection extends PureComponent {
             tissueType =>
               disabled &&
               !selectedSickTissueTypes.includes(tissueType) ? null : (
-                <StyledButton
-                  label={tissueType}
+                <TooltipBox
                   key={tissueType}
-                  value={tissueType}
-                  onClick={() => this.transferTissueType(tissueType)}
-                  selected={selectedSickTissueTypes.includes(tissueType)}
-                  primary={selectedSickTissueTypes.includes(tissueType)}
-                  disabled={disabled}
-                />
+                  text={<FormattedMessage id={`SickTissue.${tissueType}`} />}
+                  position={"right"}
+                >
+                  <StyledButton
+                    label={tissueType}
+                    value={tissueType}
+                    onClick={() => this.transferTissueType(tissueType)}
+                    selected={selectedSickTissueTypes.includes(tissueType)}
+                    primary={selectedSickTissueTypes.includes(tissueType)}
+                    disabled={disabled}
+                  />
+                </TooltipBox>
               )
           )}
         </StyledList>
@@ -97,6 +116,7 @@ const StyledRoot = styled.div`
 
 const StyledButton = styled(RaisedButton)`
   margin: 1px;
+  width: 100%;
   button {
     background-color: ${props =>
       props.selected

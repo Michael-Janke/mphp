@@ -1,0 +1,46 @@
+{
+  "CancerTypes": {
+    "PRAD": "Prostate adenocarcinoma",
+    "OV": "Ovarian serous cystadenocarcinoma",
+    "BLCA": "Bladder Urothelial Carcinoma",
+    "CESC": "Cervical squamous cell carcinoma and endocervical adenocarcinoma",
+    "COAD": "Colon adenocarcinoma",
+    "BRCA": "Breast invasive carcinoma",
+    "ESCA": "Esophageal carcinoma",
+    "KIRC": "Kidney renal clear cell carcinoma",
+    "STAD": "Stomach adenocarcinoma",
+    "THCA": "Thyroid carcinoma",
+    "GBM": "Glioblastoma multiforme",
+    "LAML": "Acute Myeloid Leukemia",
+    "UCEC": "Uterine Corpus Endometrial Carcinoma",
+    "SARC": "Sarcoma",
+    "LUAD": "Lung adenocarcinoma",
+    "HNSC": "Head and Neck squamous cell carcinoma"
+  },
+  "HealthyTissue": {
+    "NT": "Normal Tissue"
+  },
+  "SickTissue": {
+    "TM": "Metastatic",
+    "TP": "Primary Solid Tumor"
+  },
+  "Algorithms": {
+    "getPCA": "Principal Component Analysis. Add further description here.",
+    "getDecisionTreeFeatures": "Decision Tree. Add further description here.",
+    "getNormalizedFeaturesE":
+      "Normalized Feature Selection - Exclude variant. Add further description here.",
+    "getNormalizedFeaturesS":
+      "Normalized Feature Selection - Substract variant. Add further description here.",
+    "getFeatures": "Feature Selection. Add further description here.",
+    "getFeaturesBySFS":
+      "Sequential Forward Selection. Add further description here."
+  },
+  "Parameters": {
+    "k": "The number of features (genes) that are returned.",
+    "n":
+      "The number of features (genes) that is excluded from the calculation to increase performance.",
+    "n_components": "The number of principal components gathered by the PCA.",
+    "n_features_per_component":
+      "The number of features that should be returned per prinicpal component."
+  }
+}

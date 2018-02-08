@@ -10,8 +10,8 @@ import optparse
 import os
 
 datasets = {
-    "dataset4": "Dataset 4 | TCGA",
-    "dataset5": "Dataset 5 | TCGA + GTEX"
+    "dataset4": "TCGA",
+    "dataset5": "TCGA + GTEX"
 }
 dataLoaders = {dataset: DataLoader(dataset) for dataset in datasets}
 statistics = {dataset: dataLoader.getStatistics()
