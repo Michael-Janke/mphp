@@ -49,8 +49,11 @@ const ExpressionTable = props => {
                       key={key}
                       providerName="ProteinAtlas"
                       index={index}
-                      entryWasFound={geneResults[key].proteinAtlas}
+                      entryFound={geneResults[key].proteinAtlas}
                       link={`https://www.proteinatlas.org/${key}`}
+                      linkCoexpressed={`https://www.proteinatlas.org/${
+                        geneResults[key].proteinAtlas
+                      }`}
                     />
                   )
                 );
@@ -66,10 +69,9 @@ const ExpressionTable = props => {
                       key={key}
                       providerName="DisGeNet"
                       index={index}
-                      entryWasFound={geneResults[key].disgenet}
-                      link={`http://www.disgenet.org/web/DisGeNET/menu/search?0#${
-                        geneNames[index]
-                      }`}
+                      entryFound={geneResults[key].disgenet}
+                      link={`http://www.disgenet.org/web/DisGeNET/menu/search`}
+                      linkCoexpressed={`http://www.disgenet.org/web/DisGeNET/menu/search`}
                     />
                   )
                 );
@@ -87,8 +89,9 @@ const ExpressionTable = props => {
                       key={key}
                       providerName="Cancer Gene Census"
                       index={index}
-                      entryWasFound={geneResults[key].cancer_gene_census}
+                      entryFound={geneResults[key].cancer_gene_census}
                       link={`http://cancer.sanger.ac.uk/census`}
+                      linkCoexpressed={`http://cancer.sanger.ac.uk/census`}
                     />
                   )
                 );
@@ -106,8 +109,11 @@ const ExpressionTable = props => {
                       key={key}
                       providerName="Entrez Gene Summary"
                       index={index}
-                      entryWasFound={geneResults[key].entrezGeneSummary}
+                      entryFound={geneResults[key].entrezGeneSummary}
                       link={`https://www.proteinatlas.org/${key}`}
+                      linkCoexpressed={`https://www.proteinatlas.org/${
+                        geneResults[key].entrezGeneSummary
+                      }`}
                     />
                   )
                 );
