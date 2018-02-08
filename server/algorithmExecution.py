@@ -73,42 +73,44 @@ def run(algorithm, data, oneAgainstRest):
     norm = algorithm["parameters"].get("norm")
     fitness = algorithm["parameters"].get("fitness")
 
+    method_is_normalized = is_normalized(method)
+    if method_is_normalized:
+        labels = np.hstack((data["sick"].labels, data["healthy"].labels))
+    else:
+        labels = data["combined"].labels
+
     if oneAgainstRest:
-        sick = data["sick"] if is_normalized(method) else data["combined"]
-        healthy = data["healthy"] if is_normalized(method) else ""
+        sick = data["sick"] if method_is_normalized else data["combined"]
+        healthy = data["healthy"] if method_is_normalized else ""
 
         if norm != None:
-            return dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method, normalization=norm)
+            features = dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method, normalization=norm)
         else:
-            return dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method)
+            features = dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method)
+
+        return labels, features
 
     elif method == "pca":
         gene_indices = dimReducer.getPCA(
             data["combined"].expressions, n_components, n_f_components)
-        labels = data["combined"].labels
 
     elif method == "basic":
         gene_indices = dimReducer.getFeatures(data["combined"], k)
-        labels = data["combined"].labels
 
     elif method == "tree":
         gene_indices = dimReducer.getDecisionTreeFeatures(data["combined"], k)
-        labels = data["combined"].labels
 
     elif method == "norm":
         gene_indices = dimReducer.getNormalizedFeatures(
             data["sick"], data["healthy"], norm, k, n, "chi2")
-        labels = np.hstack((data["sick"].labels, data["healthy"].labels))
 
     elif method == "sfs":
         gene_indices = dimReducer.getFeaturesBySFS(
             data["sick"], data["healthy"], k, n, m, norm, fitness)
-        labels = np.hstack((data["sick"].labels, data["healthy"].labels))
 
     elif method == "ea":
         gene_indices = dimReducer.getEAFeatures(
             data["sick"], data["healthy"], k, n, m, norm, fitness)
-        labels = np.hstack((data["sick"].labels, data["healthy"].labels))
 
     return labels, gene_indices
 
