@@ -68,6 +68,41 @@ export default class AlgorithmSelection extends Component {
   renderParameter(disabled, parameter, index) {
     var parameterObj = this.props.algorithms[this.props.algorithm.key]
       .parameters[parameter];
+    if (parameterObj.available) {
+      return this.renderTextSelectionParameter(disabled, parameter, index);
+    } else {
+      return this.renderNumericParameter(disabled, parameter, index);
+    }
+  }
+
+  renderTextSelectionParameter(disabled, parameter, index) {
+    var parameterObj = this.props.algorithms[this.props.algorithm.key]
+      .parameters[parameter];
+    return (
+      <StyledInnerSelectField
+        key={parameter}
+        id={parameter}
+        value={
+          this.props.algorithm.parameters[parameter] || parameterObj.default
+        }
+        onChange={this.changeTextSelectionParameter.bind(this, parameter)}
+        floatingLabelText={parameterObj.name}
+        floatingLabelFixed={true}
+        autoWidth={true}
+        selectedMenuItemStyle={{ color: boringBlue }}
+        disabled={disabled}
+        style={{ width: 210 }}
+      >
+        {parameterObj.available.map(x => {
+          return <MenuItem key={x} id={parameter} value={x} primaryText={x} />;
+        })}
+      </StyledInnerSelectField>
+    );
+  }
+
+  renderNumericParameter(disabled, parameter, index) {
+    var parameterObj = this.props.algorithms[this.props.algorithm.key]
+      .parameters[parameter];
     return (
       <StyledTextField
         key={parameter}
@@ -79,7 +114,7 @@ export default class AlgorithmSelection extends Component {
         floatingLabelText={parameterObj.name}
         floatingLabelFixed={true}
         type="number"
-        onChange={this.changeParameter.bind(this)}
+        onChange={this.changeNumericParameter.bind(this)}
         disabled={disabled}
         style={{ width: 210 }}
       />
@@ -97,7 +132,18 @@ export default class AlgorithmSelection extends Component {
     updateRun(runId, { dataset: dataset, algorithm: algorithm });
   }
 
-  changeParameter(event, index, key) {
+  changeTextSelectionParameter(parameterName, event, index, key) {
+    const { algorithm, runId, updateRun } = this.props;
+    const updatedParams = {
+      ...algorithm.parameters,
+      [parameterName]: key
+    };
+    updateRun(runId, {
+      algorithm: { ...algorithm, parameters: updatedParams }
+    });
+  }
+
+  changeNumericParameter(event, index, key) {
     const { algorithm, runId, updateRun } = this.props;
     const updatedParams = {
       ...algorithm.parameters,
@@ -135,6 +181,10 @@ const StyledSelectField = styled(SelectField)`
   button {
     fill: ${props => props.theme.textColor} !important;
   }
+`;
+
+const StyledInnerSelectField = styled(SelectField)`
+  margin-left: ${props => props.theme.mediumSpace};
 `;
 
 const StyledTextField = styled(TextField)`

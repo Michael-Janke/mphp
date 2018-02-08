@@ -73,7 +73,8 @@ class DimensionalityReducer():
     '''
     def getNormalizedFeatures(self, sick, healthy, normalization="exclude", k=20, n=5000, m="chi2", returnMultipleSets = False):
         options = {
-            'substract': self.getNormalizedFeaturesS,
+            'subtract': self.getNormalizedFeaturesS,
+            'substract': self.getNormalizedFeaturesS, # typo
             'exclude': self.getNormalizedFeaturesE,
             'relief': self.getNormalizedFeaturesR, # slow
         }

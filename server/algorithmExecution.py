@@ -34,6 +34,7 @@ def run(algorithm, data):
     n_f_components = algorithm["parameters"].get("n_features_per_component")
     k = algorithm["parameters"].get("k")
     n = algorithm["parameters"].get("n")
+    norm = algorithm["parameters"].get("norm")
 
     if key == "getPCA":
         gene_indices = dimReducer.getPCA(
@@ -48,14 +49,9 @@ def run(algorithm, data):
         gene_indices = dimReducer.getDecisionTreeFeatures(data["combined"], k)
         labels = data["combined"].labels
 
-    elif key == "getNormalizedFeaturesE":
-        gene_indices = dimReducer.getNormalizedFeaturesE(
-            data["sick"], data["healthy"], k, n, "chi2")
-        labels = np.hstack((data["sick"].labels, data["healthy"].labels))
-
-    elif key == "getNormalizedFeaturesS":
-        gene_indices = dimReducer.getNormalizedFeaturesS(
-            data["sick"], data["healthy"], k, n, "chi2")
+    elif key == "getNormalizedFeatures":
+        gene_indices = dimReducer.getNormalizedFeatures(
+            data["sick"], data["healthy"], norm, k, n, "chi2")
         labels = np.hstack((data["sick"].labels, data["healthy"].labels))
 
     elif key == "getFeaturesBySFS":

@@ -21,7 +21,7 @@ algorithms = {
         },
         "name": "Decision Tree"
     },
-    'getNormalizedFeaturesE': {
+    'getNormalizedFeatures': {
         "parameters": {
             "k": {
                 "name": "#Features",
@@ -32,24 +32,15 @@ algorithms = {
                 "name": "#Excluded features",
                 "default": 5000
 
-            }
-        },
-        "name": "Feature Selection Normalization:Exclude"
-    },
-    'getNormalizedFeaturesS': {
-        "parameters": {
-            "k": {
-                "name": "#Features",
-                "default": 10
-
             },
-            "n": {
-                "name": "#Excluded features",
-                "default": 5000
+            "norm": {
+                "name": "Normalization method",
+                "default": "exclude",
+                "available": ["subtract", "exclude", "relief"]
 
             }
         },
-        "name": "Feature Selection Normalization:Substract"
+        "name": "Normalized Feature Selection"
     },
     "getFeatures": {
         "parameters": {
