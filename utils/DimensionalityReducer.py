@@ -262,22 +262,27 @@ class DimensionalityReducer():
         fitness: fitness function -> "combined", "classification", "clustering", "sick_vs_healthy", "distance"
     '''
     def getOneAgainstRestFeatures(self, sick, healthy, k=3, method="sfs", normalization="relief", fitness="combined"):
-        n_labels = np.unique(sick.labels).shape[0]
+        labels = sick.labels
+        n_labels = np.unique(labels).shape[0]
         feature_sets = Parallel(n_jobs=n_labels)\
-                (delayed(self.getOneAgainstRestFeaturesForLabel)(sick, healthy, k, method, normalization, fitness, label) for label in np.unique(sick.labels))
+                (delayed(self.getOneAgainstRestFeaturesForLabel)(sick, healthy, k, method, normalization, fitness, label) for label in np.unique(labels))
 
+        # Filter None which is returned when healthy data is passed to getOneAgainstRestFeaturesForLabel
+        feature_sets = [set for set in feature_sets if set != None]
         features = {}
-        labels = []
         for label, indices in feature_sets:
             features[label] = indices
-            labels.append(label)
 
         return labels, features
 
     def getOneAgainstRestFeaturesForLabel(self, sick, healthy, k, method, normalization, fitness, label):
-        label = label.split("-")[0]
+        # If combined data is entered we only want results for sick data after all
+        if label.split("-")[1] == "healthy":
+            return None
+
         s_labels = binarize_labels(sick.labels, label)
         sick_binary = Expressions(sick.expressions, s_labels)
+        label = label.split("-")[0]
 
         if healthy == "":
             if method == "tree":

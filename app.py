@@ -89,7 +89,7 @@ def runSpecificAlgorithm():
     # workaround to replace NaN by null
     json_response = json.dumps(response)
     json_respone = re.sub(r'\bNaN\b', 'null', json_response)
-    cache.cache(cache_key, json_respone)
+    # cache.cache(cache_key, json_respone)
     return json_respone
 
 
