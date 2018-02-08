@@ -46,6 +46,16 @@ const ExpressionTable = props => {
             <TableLabel key="gene_score_label">
               <TableLabelContent key="gene_score_label_content">
                 Cancer related according to:
+                <StyledTooltipBox
+                  text={
+                    <FormattedMessage
+                      id={`GeneExpression.GeneScoreExplanation`}
+                    />
+                  }
+                  position="top right"
+                >
+                  <HelpIcon />
+                </StyledTooltipBox>
               </TableLabelContent>
             </TableLabel>,
             <BreakingTableRow key="proteinAtlas">

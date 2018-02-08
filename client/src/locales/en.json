@@ -55,7 +55,9 @@
   "GeneExpression": {
     "General": "Genes are differently expressed. Edit me.",
     "TotalScores":
-      "The calculated total scores that reflect how much a gene is already connected with cancer."
+      "The calculated total scores that reflect how much a gene is already connected with cancer.",
+    "GeneScoreExplanation":
+      "If a gene is not found in one of the databases, we also check for coexpressed genes. This can result in two results being displayed in one cell (in case the coexpressed gene returned a positive result). "
   },
   "General": {
     "Run": "Some combinations not allowed, yo! Edit me."
