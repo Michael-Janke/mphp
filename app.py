@@ -73,7 +73,7 @@ def runSpecificAlgorithm():
 
     cache_key = "_".join((
         "V2",
-        dataset, 
+        dataset,
         algorithm["key"],
         str(oneAgainstRest),
         "-".join([key+str(value) for key,value in algorithm["parameters"].items()]),
@@ -89,7 +89,7 @@ def runSpecificAlgorithm():
     # workaround to replace NaN by null
     json_response = json.dumps(response)
     json_respone = re.sub(r'\bNaN\b', 'null', json_response)
-    # cache.cache(cache_key, json_respone)
+    cache.cache(cache_key, json_respone)
     return json_respone
 
 
