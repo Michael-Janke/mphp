@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 import styled from "styled-components";
-import IconButton from "./IconButton";
-import { deepGray } from "../config/colors";
 import TooltipBox from "./TooltipBox";
 import QuestionIcon from "material-ui/svg-icons/action/help-outline";
 
