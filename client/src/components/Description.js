@@ -2,21 +2,17 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import IconButton from "./IconButton";
 import { deepGray } from "../config/colors";
+import TooltipBox from "./TooltipBox";
+import QuestionIcon from "material-ui/svg-icons/action/help-outline";
 
 export default class Description extends Component {
   render() {
     return (
       <Container>
         <ChildrenContainer>{this.props.children}</ChildrenContainer>
-        <IconButton
-          icon="help"
-          tooltip={this.props.text}
-          tooltipPosition={"bottom-right"}
-          color={deepGray}
-          cursor={"default"}
-          padding={"0px"}
-          size={"28px"}
-        />
+        <TooltipBox text={this.props.text}>
+          <QuestionIcon />
+        </TooltipBox>
       </Container>
     );
   }

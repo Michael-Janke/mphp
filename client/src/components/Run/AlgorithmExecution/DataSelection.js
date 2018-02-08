@@ -87,10 +87,6 @@ export default class DataSelection extends Component {
   }
 }
 
-const XAxisLabel = styled.span`
-  color: blue;
-`;
-
 const StyledContent = styled.div`
   display: flex;
 `;

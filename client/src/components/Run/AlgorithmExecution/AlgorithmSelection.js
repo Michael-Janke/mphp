@@ -5,7 +5,7 @@ import TextField from "material-ui/TextField";
 import Checkbox from "material-ui/Checkbox";
 import styled from "styled-components";
 import { FormattedMessage } from "react-intl";
-import HelpIcon from "material-ui/svg-icons/action/help";
+import HelpIcon from "material-ui/svg-icons/action/help-outline";
 
 import Description from "../../Description";
 import TooltipBox from "../../TooltipBox";

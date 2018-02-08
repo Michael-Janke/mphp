@@ -19,7 +19,7 @@ def getInvertedEntrezNamesMap():
         entrez_labels_map = np.load("data/gene_names/entrez_names.npy").item()
         inverted_entrez_labels_map = {v: k for k, v in entrez_labels_map.items()}
         np.save(inverted_file, inverted_entrez_labels_map)
-    
+
     return np.load(inverted_file+ ".npy").item()
 
 def lookupDisgenet(gene):
@@ -165,7 +165,7 @@ def lookupCoxpresdb(gene):
             os.makedirs(os.path.dirname(file_name))
         if not os.path.isfile(file_name):
             urllib.request.urlretrieve(url, file_name)
-            
+
 
         f = open(file_name, 'r')
         response = json.load(f)
@@ -195,25 +195,28 @@ def testGenes(genes, cache):
         proteinAtlas = lookupProteinAtlas(gene)
         cancerGeneCensus = lookupCancerGeneCensus(gene, cancer_gene_census_data)
         entrezGeneSummary = lookupEntrezGeneSummary(gene)
-        
-        coexpressedGenes = lookupCoxpresdb(gene)        
+
+        coexpressedGenes = lookupCoxpresdb(gene)
         inverted_entrez_labels_map = getInvertedEntrezNamesMap()
-        
-        for coGene in coexpressedGenes:
-            coGeneName = "ENSG" + str(inverted_entrez_labels_map[coGene]).zfill(11)
-            if not disgenet:
-                disgenet = lookupDisgenet(coGeneName)
-            if not proteinAtlas:
-                proteinAtlas = lookupProteinAtlas(coGeneName)
-            if not cancerGeneCensus:
-                cancerGeneCensus = lookupCancerGeneCensus(coGeneName, cancer_gene_census_data)
-            if not entrezGeneSummary:
-                entrezGeneSummary = lookupEntrezGeneSummary(coGeneName)
+
+        try:
+            for coGene in coexpressedGenes:
+                coGeneName = "ENSG" + str(inverted_entrez_labels_map[coGene]).zfill(11)
+                if not disgenet:
+                    disgenet = lookupDisgenet(coGeneName)
+                if not proteinAtlas:
+                    proteinAtlas = lookupProteinAtlas(coGeneName)
+                if not cancerGeneCensus:
+                    cancerGeneCensus = lookupCancerGeneCensus(coGeneName, cancer_gene_census_data)
+                if not entrezGeneSummary:
+                    entrezGeneSummary = lookupEntrezGeneSummary(coGeneName)
+        except:
+            print("Error. No Inverted Entrez Label Entry.")
 
         score = (0.4 if cancerGeneCensus else 0) + \
             (0.2 if disgenet else 0) + (0.2 if proteinAtlas else 0) + (0.2 if entrezGeneSummary else 0)
         score = round(score, 2)
-        
+
         response[gene] = {
             'proteinAtlas': proteinAtlas,
             'disgenet': disgenet,

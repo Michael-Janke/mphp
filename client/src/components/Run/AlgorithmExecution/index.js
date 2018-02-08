@@ -1,7 +1,10 @@
 import React, { Component } from "react";
 import RaisedButton from "material-ui/RaisedButton";
 import styled from "styled-components";
+import { FormattedMessage } from "react-intl";
+import HelpIcon from "material-ui/svg-icons/action/help-outline";
 
+import TooltipBox from "../../TooltipBox";
 import DataSelection from "./DataSelection";
 import AlgorithmSelection from "./AlgorithmSelection";
 import SubsetSelection from "./SubsetSelection";
@@ -23,19 +26,24 @@ export default class AlgorithmExecution extends Component {
         )}
         <CardActions>
           {this.props.disabled ? null : (
-            <StyledButton
-              title={
-                isRunnable
-                  ? `Run ${this.props.algorithm.name}`
-                  : `Please select appropriate parameters`
-              }
-              label="Run"
-              primary={true}
-              onClick={() => {
-                this.executeAlgorithm();
-              }}
-              disabled={!isRunnable}
-            />
+            <StyledButtonContainer>
+              <TooltipBox text={<FormattedMessage id="General.Run" />}>
+                <HelpIcon />
+              </TooltipBox>
+              <StyledButton
+                title={
+                  isRunnable
+                    ? `Run ${this.props.algorithm.name}`
+                    : `Please select appropriate parameters`
+                }
+                label="Run"
+                primary={true}
+                onClick={() => {
+                  this.executeAlgorithm();
+                }}
+                disabled={!isRunnable}
+              />
+            </StyledButtonContainer>
           )}
         </CardActions>
       </div>
@@ -126,6 +134,11 @@ const CardActions = styled.div`
   margin-top: ${props => props.theme.smallSpace};
   display: flex;
   flex-direction: row-reverse;
+`;
+
+const StyledButtonContainer = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
 const StyledButton = styled(RaisedButton)`

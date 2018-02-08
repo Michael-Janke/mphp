@@ -27,10 +27,9 @@
   "Algorithms": {
     "getPCA": "Principal Component Analysis. Add further description here.",
     "getDecisionTreeFeatures": "Decision Tree. Add further description here.",
-    "getNormalizedFeaturesE":
-      "Normalized Feature Selection - Exclude variant. Add further description here.",
-    "getNormalizedFeaturesS":
-      "Normalized Feature Selection - Substract variant. Add further description here.",
+    "getNormalizedFeatures":
+      "Normalized Feature Selection. Add further description here.",
+
     "getFeatures": "Feature Selection. Add further description here.",
     "getFeaturesBySFS":
       "Sequential Forward Selection. Add further description here."
@@ -44,5 +43,19 @@
     "n_components": "The number of principal components gathered by the PCA.",
     "n_features_per_component":
       "The number of features that should be returned per prinicpal component."
+  },
+  "Evaluation": {
+    "F1Sick": "F1 score for reeeeally sick stuff. Edit description please.",
+    "F1Healthy": "F1 score for the healthy shizzle. Edit description please.",
+    "CombinedFitness":
+      "CombinedFitness score of our evluation. Edit description to be helpful, please."
+  },
+  "GeneExpression": {
+    "General": "Genes are differently expressed. Edit me.",
+    "TotalScores":
+      "The calculated total scores that reflect how much a gene is already connected with cancer."
+  },
+  "General": {
+    "Run": "Some combinations not allowed, yo! Edit me."
   }
 }

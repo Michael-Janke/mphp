@@ -1,9 +1,12 @@
 import React from "react";
 import styled from "styled-components";
+import { FormattedMessage } from "react-intl";
+import HelpIcon from "material-ui/svg-icons/action/help-outline";
 
 import Spinner from "../../../Spinner.js";
 import ScoreRowContent from "./ScoreRowContent";
 import ExpressionMatrixContent from "./ExpressionMatrixContent";
+import TooltipBox from "../../../TooltipBox";
 
 const ExpressionTable = props => {
   const { expressionMatrix, genes, geneNames, geneResults } = props.data;
@@ -25,7 +28,13 @@ const ExpressionTable = props => {
           {expressionMatrix && [
             <TableLabel key="cancer_data_label">
               <TableLabelContent key="cancer_data_label_content">
-                Over- or underexpression in different cancer types
+                <div>Expression levels</div>
+                <StyledTooltipBox
+                  text={<FormattedMessage id={`GeneExpression.General`} />}
+                  position="top right"
+                >
+                  <HelpIcon />
+                </StyledTooltipBox>
               </TableLabelContent>
             </TableLabel>,
             <ExpressionMatrixContent
@@ -40,7 +49,13 @@ const ExpressionTable = props => {
               </TableLabelContent>
             </TableLabel>,
             <BreakingTableRow key="proteinAtlas">
-              <StyledTableHeaderColumn>Protein Atlas</StyledTableHeaderColumn>
+              <StyledTableHeaderColumn
+                title={
+                  "The Human Protein Atlas is a Swedish-based program initiated in 2003 with the aim to map all the human proteins in cells, tissues and organs using integration of various omics technologies, including antibody-based imaging, mass spectrometry-based proteomics, transcriptomics and systems biology."
+                }
+              >
+                Protein Atlas
+              </StyledTableHeaderColumn>
               {genes.map((key, index) => {
                 return (
                   geneResults[key] && (
@@ -57,7 +72,9 @@ const ExpressionTable = props => {
               })}
             </BreakingTableRow>,
             <tr key="DisGeNet">
-              <StyledTableHeaderColumn>DisGeNet</StyledTableHeaderColumn>
+              <StyledTableHeaderColumn title="The DisGeNET database integrates human gene-disease associations (GDAs) from various expert curated databases and text-mining derived associations including Mendelian, complex and environmental diseases.">
+                DisGeNet
+              </StyledTableHeaderColumn>
               {genes.map((key, index) => {
                 return (
                   geneResults[key] && (
@@ -76,7 +93,7 @@ const ExpressionTable = props => {
               })}
             </tr>,
             <tr key="CancerGeneCensus">
-              <StyledTableHeaderColumn>
+              <StyledTableHeaderColumn title="The Cancer Gene Census (CGC) is an ongoing effort to catalogue those genes which contain mutations that have been causally implicated in cancer.">
                 Cancer Gene Census
               </StyledTableHeaderColumn>
               {genes.map((key, index) => {
@@ -95,7 +112,7 @@ const ExpressionTable = props => {
               })}
             </tr>,
             <tr key="EntrezGeneSummary">
-              <StyledTableHeaderColumn>
+              <StyledTableHeaderColumn title="Entrez Gene is NCBI's database for gene-specific information. Entrez Gene includes records from genomes that have been completely sequenced, that have an active research community to contribute gene-specific information or that are scheduled for intense sequence analysis.">
                 Entrez Gene Summary
               </StyledTableHeaderColumn>
               {genes.map((key, index) => {
@@ -113,6 +130,17 @@ const ExpressionTable = props => {
                 );
               })}
             </tr>,
+            <TableLabel key="gene_score_label">
+              <TableLabelContent key="gene_score_label_content">
+                <div>Total calculated Scores</div>
+                <StyledTooltipBox
+                  text={<FormattedMessage id={`GeneExpression.TotalScores`} />}
+                  position="top right"
+                >
+                  <HelpIcon />
+                </StyledTooltipBox>
+              </TableLabelContent>
+            </TableLabel>,
             <tr key="Scores">
               <StyledTableHeaderColumn>Total Scores</StyledTableHeaderColumn>
               {genes.map((key, index) => {
@@ -132,7 +160,12 @@ const ExpressionTable = props => {
           ]}
         </tbody>
       </StyledTable>
-      {!geneResults && <Spinner />}
+      {!geneResults && (
+        <span>
+          Loading Gene Results
+          <Spinner />{" "}
+        </span>
+      )}
     </StyledRoot>
   );
 };
@@ -189,6 +222,10 @@ const StyledTableRowColumn = styled.td`
   min-width: 60px;
   padding: 0;
   height: 56px !important;
+`;
+
+const StyledTooltipBox = styled(TooltipBox)`
+  display: inline-block;
 `;
 
 export default ExpressionTable;
