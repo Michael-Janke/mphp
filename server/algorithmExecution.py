@@ -7,6 +7,7 @@ dimReducer = DimensionalityReducer()
 analyzer = Analyzer()
 
 # TODO add EA
+# TODO maybe move as methods to available algorithms?
 method_table = {
     "getFeatures": "features",
     "getDecisionTreeFeatures": "tree",
@@ -87,8 +88,8 @@ def run(algorithm, data, oneAgainstRest):
 
     if oneAgainstRest:
         method = method_table[key]
-        healthy = "" if key in not_normalized_methods else data["healthy"]
-        sick = data["combined"] if key in not_normalized_methods else data["sick"]
+        healthy = "" if method in not_normalized_methods else data["healthy"]
+        sick = data["combined"] if method in not_normalized_methods else data["sick"]
         normalization = normalization_table.get(key)
 
         if normalization != None:
