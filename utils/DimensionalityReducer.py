@@ -287,7 +287,7 @@ class DimensionalityReducer():
         if healthy == "":
             if method == "tree":
                 indices = self.getDecisionTreeFeatures(sick_binary, k)
-            else:
+            else: # method == "basic"
                 indices = self.getFeatures(sick_binary, k)
 
         else:
@@ -298,7 +298,7 @@ class DimensionalityReducer():
                 indices = self.getEAFeatures(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
             elif method == "norm":
                 indices = self.getNormalizedFeatures(sick_binary, healthy_binary, normalization, k)
-            else:
+            else: # method == "sfs"
                 indices = self.getFeaturesBySFS(sick, healthy, k, normalization=normalization, fitness=fitness, true_label=label)
 
         return (label, indices)
