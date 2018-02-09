@@ -3,31 +3,41 @@ import styled from "styled-components";
 
 export default class RunDescription extends Component {
   render() {
-    const { algorithms, algorithm } = this.props;
+    const { algorithms, algorithm, datasets, dataset } = this.props;
     return (
       <StyledContent>
-        {Object.keys(algorithm.parameters).map(param => (
-          <span key={param}>
-            <StyledText>
-              {algorithms[algorithm.key].parameters[param].name}
-            </StyledText>
-            {": " + algorithm.parameters[param] + " "}
-          </span>
-        ))}
-        <StyledText>Cancer types: </StyledText>
-        <span>{algorithm.cancerTypes.join(", ")}</span>
-        {Object.keys(algorithm.healthyTissueTypes).length !== 0 ? (
-          <span>
-            <StyledText> Healthy tissue: </StyledText>
-            {algorithm.healthyTissueTypes.join(", ")}
-          </span>
-        ) : null}
-        {Object.keys(algorithm.sickTissueTypes).length !== 0 ? (
-          <span>
-            <StyledText> Sick tissue: </StyledText>
-            {algorithm.sickTissueTypes.join(", ")}
-          </span>
-        ) : null}
+        <Row>
+          <GrayText>Dataset: </GrayText>
+          {datasets[dataset]}
+          <GrayText>, Cancer types: </GrayText>
+          <span>{algorithm.cancerTypes.join(", ")}</span>
+          {Object.keys(algorithm.healthyTissueTypes).length !== 0 ? (
+            <span>
+              <GrayText>, Healthy tissue: </GrayText>
+              {algorithm.healthyTissueTypes.join(", ")}
+            </span>
+          ) : null}
+          {Object.keys(algorithm.sickTissueTypes).length !== 0 ? (
+            <span>
+              <GrayText>, Sick tissue: </GrayText>
+              {algorithm.sickTissueTypes.join(", ")}
+            </span>
+          ) : null}
+        </Row>
+        <Row>
+          {Object.keys(algorithm.parameters).map((param, index) => (
+            <span key={param}>
+              <GrayText>
+                {`${index === 0 ? "" : ", "}${
+                  algorithms[algorithm.key].parameters[param].name
+                }: `}
+              </GrayText>
+              {algorithm.parameters[param]}
+            </span>
+          ))}
+          {this.props.oneAgainstRest ? <GrayText>, </GrayText> : null}
+          {this.props.oneAgainstRest ? "One against rest" : ""}
+        </Row>
       </StyledContent>
     );
   }
@@ -37,8 +47,14 @@ const StyledContent = styled.div`
   margin-left: 16px;
   margin-right: 16px;
   font-size: 0.8em;
+  display: flex;
+  flex-direction: column;
 `;
 
-const StyledText = styled.span`
+const Row = styled.div`
+  margin-top: ${props => props.theme.smallSpace};
+`;
+
+const GrayText = styled.span`
   color: ${props => props.theme.darkGray};
 `;

@@ -47,14 +47,14 @@ export default class Card extends Component {
   };
 
   render() {
-    const { isLoading, algorithm, datasets, dataset, result } = this.props;
+    const { isLoading, algorithm, result } = this.props;
     return (
       <StyledCard zDepth={1}>
         <StyledCardTitle>
           <TextContainer>
             <StyledTitleText>
-              {datasets[dataset] || ""} |{" "}
-              {algorithm.name || "Execute Algorithm"}
+              {((result || isLoading) && algorithm.name) ||
+                "Algorithm Specification"}
             </StyledTitleText>
             {isLoading ? <Spinner size={CARD_TITLE_HEIGHT} /> : null}
           </TextContainer>
