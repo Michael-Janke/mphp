@@ -1,17 +1,4 @@
 algorithms = {
-    'pca': {
-        "parameters": {
-            "n_components": {
-                "name": "#Components",
-                "default": 3
-            },
-            "n_features_per_component": {
-                "name": "#Features per component",
-                "default": 10
-            }
-        },
-        "name": "PCA"
-    },
     'tree': {
         "parameters": {
             "k": {

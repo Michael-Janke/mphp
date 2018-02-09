@@ -64,8 +64,6 @@ def getData(algorithm, dataLoader):
 
 def run(algorithm, data, oneAgainstRest):
     method = algorithm["key"]
-    n_components = algorithm["parameters"].get("n_components")
-    n_f_components = algorithm["parameters"].get("n_features_per_component")
     k = algorithm["parameters"].get("k")
     n = algorithm["parameters"].get("n")
     m = algorithm["parameters"].get("m")
@@ -88,10 +86,6 @@ def run(algorithm, data, oneAgainstRest):
             features = dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method)
 
         return labels, features
-
-    elif method == "pca":
-        gene_indices = dimReducer.getPCA(
-            data["combined"].expressions, n_components, n_f_components)
 
     elif method == "basic":
         gene_indices = dimReducer.getFeatures(data["combined"], k)

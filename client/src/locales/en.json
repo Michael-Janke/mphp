@@ -25,7 +25,6 @@
     "TP": "Primary Solid Tumor"
   },
   "Algorithms": {
-    "pca": "Principal Component Analysis. Add further description here.",
     "tree": "Decision Tree. Add further description here.",
     "norm": "Normalized Feature Selection. Add further description here.",
     "basic": "Feature Selection. Add further description here.",
@@ -41,10 +40,7 @@
     "norm":
       "The normalization method used to reduce the impact of underlying differences in healthy tissue.",
     "fitness":
-      "The fitness function used to evaluate the intermediate results.",
-    "n_components": "The number of principal components gathered by the PCA.",
-    "n_features_per_component":
-      "The number of features that should be returned per prinicpal component."
+      "The fitness function used to evaluate the intermediate results."
   },
   "Evaluation": {
     "F1Sick": "F1 score for reeeeally sick stuff. Edit description please.",

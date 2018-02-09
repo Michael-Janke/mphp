@@ -22,8 +22,8 @@ export default class AlgorithmExecution extends Component {
             <DataSelection {...this.props} />
           </Row>
         ) : (
-          <RunDescription {...this.props} />
-        )}
+            <RunDescription {...this.props} />
+          )}
         <CardActions>
           {this.props.disabled ? null : (
             <StyledButtonContainer>
@@ -102,7 +102,6 @@ export default class AlgorithmExecution extends Component {
       });
       oneCancerTypeRunnable =
         (currentAlgorithm === "basic" ||
-          currentAlgorithm === "pca" ||
           currentAlgorithm === "tree") &&
         sumHealthy >= 10 &&
         sumSick >= 10;
@@ -141,7 +140,7 @@ const StyledButtonContainer = styled.div`
   align-items: center;
 `;
 
-const StyledButton = styled(RaisedButton)`
+const StyledButton = styled(RaisedButton) `
   && {
     margin: 12px;
   }
