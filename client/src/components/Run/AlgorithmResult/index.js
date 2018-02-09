@@ -42,8 +42,8 @@ export default class Results extends Component {
         </Tabs>
       </div>
     ) : (
-      this.renderResult(result)
-    );
+        this.renderResult(result)
+      );
   }
 
   renderResult(result, label = "") {
@@ -77,13 +77,14 @@ const Container = styled.div`
 `;
 
 // remove background on hover
-const StyledEvaluationValue = styled(EvaluationValue)`
+const StyledEvaluationValue = styled(EvaluationValue) `
   background: none !important;
   div {
     padding-left: 0 !important;
     padding-top: 0 !important;
     cursor: default !important;
   }
+  text-align: right;
 `;
 
 const StyledContent = styled.div`
