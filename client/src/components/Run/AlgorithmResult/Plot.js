@@ -37,12 +37,20 @@ export default class InteractivePlot extends Component {
       oldColor,
       color,
       colorIndex = 0;
-    const { data, geneNames } = this.props;
+    const { data, geneNames, oneAgainstRest } = this.props;
     let plotData, plotLayout;
     if (data && geneNames) {
       plotData = Object.keys(data).map((key, index) => {
         const cancerType = key.split("-")[0];
-        if (oldCancerType !== cancerType) {
+        const tissueType = key.split("-")[1];
+
+        if (oneAgainstRest) {
+          if (cancerType === this.props.cancerType && tissueType === "sick") {
+            color = Color(statisticsColors[5]);
+          } else {
+            color = Color(statisticsColors[2]);
+          }
+        } else if (oldCancerType !== cancerType) {
           color = Color(statisticsColors[colorIndex++]);
           oldCancerType = cancerType;
           oldColor = color;
@@ -54,6 +62,7 @@ export default class InteractivePlot extends Component {
           }
           oldColor = color;
         }
+
         return {
           type: "scatter3d",
           mode: "markers",

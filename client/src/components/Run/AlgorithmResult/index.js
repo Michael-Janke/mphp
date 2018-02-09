@@ -54,7 +54,11 @@ export default class Results extends Component {
     return (
       <StyledContent>
         <Columns>
-          <Plot {...result} />
+          <Plot
+            {...result}
+            oneAgainstRest={oneAgainstRest}
+            cancerType={label}
+          />
           <Evaluation {...result.evaluation} />
         </Columns>
         <GeneExploration

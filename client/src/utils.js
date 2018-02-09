@@ -3,5 +3,5 @@ export function isHealthy(tissueType) {
 }
 
 export function canRunOneAgainstAll(algorithm) {
-  return algorithm.cancerTypes.length >= 2;
+  return algorithm.key !== "pca" && algorithm.cancerTypes.length >= 2;
 }
