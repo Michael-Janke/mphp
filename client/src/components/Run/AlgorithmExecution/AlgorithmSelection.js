@@ -151,8 +151,8 @@ export default class AlgorithmSelection extends Component {
 
   renderComparisonModeSelection() {
     const descriptionText =
-      "Select discriminating genes per cancer type against all other, " +
-      "disable to select one set of discriminating genes for all cancer types";
+      "Enable to select discriminating genes per cancer type against all others (returning one set per cancer type), " +
+      "disable to select one set of discriminating genes for all cancer types.";
     return (
       <Description text={descriptionText}>
         <StyledCheckbox
