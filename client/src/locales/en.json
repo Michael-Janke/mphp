@@ -21,15 +21,20 @@
     "NT": "Normal Tissue"
   },
   "SickTissue": {
-    "TM": "Metastatic",
-    "TP": "Primary Solid Tumor"
+    "TM": "Metastatic Tissue",
+    "TP": "Primary Solid Tumor Tissue"
   },
   "Algorithms": {
-    "tree": "Decision Tree. Add further description here.",
-    "norm": "Normalized Feature Selection. Add further description here.",
-    "basic": "Feature Selection. Add further description here.",
-    "sfs": "Sequential Forward Selection. Add further description here.",
-    "ea": "Evolutionary Algorithm. Add further description here."
+    "tree":
+      "This algorithm trains a Decision Tree to run on the data and then extracts the genes that were most helpful in dividing the cancer types.",
+    "norm":
+      "Normalized Feature Selection. When computing feature scores, this algorithm accounts for differences between healthy and sick tissue in order to remove cell differences from the result.",
+    "basic":
+      "This Feature Selection algorithm computes a score for each feature and selects the features (genes) with the best scores.",
+    "sfs":
+      "The Sequential Forward Selection greedily builds a set of features. The quality of features is measured with fitness functions, which account for the differences between sick and healthy tissue.",
+    "ea":
+      "An Evolutionary Algorithm that returns the set of genes that best divides the cancer types. This algorithm normalizes for healthy tissue in order not to find gene differences of different cells."
   },
   "Parameters": {
     "k": "The number of features (genes) that are returned.",
@@ -39,23 +44,26 @@
       "The number of preselected features (genes) that are used for the calculation to increase performance.",
     "norm":
       "The normalization method used to reduce the impact of underlying differences in healthy tissue.",
-    "fitness":
-      "The fitness function used to evaluate the intermediate results."
+    "fitness": "The fitness function used to evaluate the intermediate results."
   },
   "Evaluation": {
-    "F1Sick": "F1 score for reeeeally sick stuff. Edit description please.",
-    "F1Healthy": "F1 score for the healthy shizzle. Edit description please.",
+    "F1Sick":
+      "The F1 score for all sick tissues. This is the harmonic average of the precision and recall, 1 being the best value (perfect precision and recall) and the worst being 0.",
+    "F1Healthy":
+      "The F1 score for all healthy tissues. This is the harmonic average of the precision and recall, 1 being the best value (perfect precision and recall) and the worst being 0.",
     "CombinedFitness":
-      "CombinedFitness score of our evluation. Edit description to be helpful, please."
+      "The Combined Fitness score of our evaluations. It is the average of the clustering (average sick silhouette score - avg healthy silhouette score), classification (sick F1 score - healthy F1 score on a trained decisionTree), and sick vs healthy (avg F1 score for each cancer classification) fitness score."
   },
   "GeneExpression": {
-    "General": "Genes are differently expressed. Edit me.",
+    "General":
+      "In different cancer types, genes are differently expressed. This matrix shows which genes are over- and which are underexpressed compared to the healthy cells from which the samples were taken.",
     "TotalScores":
-      "The calculated total scores that reflect how much a gene is already connected with cancer.",
+      "The calculated total scores that reflect how much a gene is already connected with cancer, according to our connected knowledge bases.",
     "GeneScoreExplanation":
-      "If a gene is not found in one of the databases, we also check for coexpressed genes. This can result in two results being displayed in one cell (in case the coexpressed gene returned a positive result). "
+      "We search for the gene in different databases and check whether it is already associated with cancer. If a gene is not found in one of the databases, we also check for coexpressed genes. This can result in two results being displayed in one cell (in case the coexpressed gene returned a positive result). "
   },
   "General": {
-    "Run": "Some combinations not allowed, yo! Edit me."
+    "Run":
+      "Some algorithms have special requirements, resulting in the Run button being disabled if those requirements are not met. Try adding more cancer or tissue types until the button is reenabled or switch to another algorithm."
   }
 }
