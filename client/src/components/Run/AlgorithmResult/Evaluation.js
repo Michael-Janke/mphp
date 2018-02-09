@@ -23,21 +23,22 @@ export default class Evaluation extends Component {
         {this.renderHealthyScore(2)}
       </List>
     ) : (
-      <List>
-        {this.renderScore(
-          this.classificationScoreParameters(
-            this.props.classification.decisionTree
-          )
-        )}
-      </List>
-    );
+        <List>
+          {this.renderScore(
+            this.classificationScoreParameters(
+              this.props.classification.decisionTree
+            )
+          )}
+        </List>
+      );
   }
 
   renderFitnessScore(index) {
     const {
       combinedFitness,
       clusteringFitness,
-      classificationFitness
+      classificationFitness,
+      sickVsHealthyFitness
     } = this.props.fitness;
 
     const parameters = {
@@ -54,6 +55,11 @@ export default class Evaluation extends Component {
           key: "clustering-fitness",
           primaryText: clusteringFitness,
           secondaryText: "Clustering fitness"
+        },
+        {
+          key: "sickVsHealthy-fitness",
+          primaryText: sickVsHealthyFitness,
+          secondaryText: "Sick vs. healthy fitness"
         }
       ],
       index
@@ -135,6 +141,6 @@ export default class Evaluation extends Component {
   }
 }
 
-const StyledTooltipBox = styled(TooltipBox)`
+const StyledTooltipBox = styled(TooltipBox) `
   float: right;
 `;
