@@ -3,6 +3,7 @@ import numpy as np
 from utils.DimensionalityReducer import DimensionalityReducer
 from validation.Analyzer import Analyzer
 from server.availableAlgorithms import is_normalized
+from utils import Expressions
 
 dimReducer = DimensionalityReducer()
 analyzer = Analyzer()
@@ -51,9 +52,7 @@ def getData(algorithm, dataLoader):
     sick = dataLoader.replaceLabels(sick)
     healthy = dataLoader.getData(healthy_tissue_types, cancer_types)
     healthy = dataLoader.replaceLabels(healthy)
-    combined = dataLoader.getData(
-        sick_tissue_types + healthy_tissue_types, cancer_types)
-    combined = dataLoader.replaceLabels(combined)
+    combined = Expressions(np.vstack((sick.expressions, healthy.expressions)), np.hstack((sick.labels, healthy.labels)))
 
     data = {
         "sick": sick,
