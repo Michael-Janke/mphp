@@ -78,7 +78,7 @@ const ExpressionTable = props => {
                       link={`https://www.proteinatlas.org/${key}`}
                       linkCoexpressed={`https://www.proteinatlas.org/${
                         geneResults[key].proteinAtlas
-                      }`}
+                        }`}
                     />
                   )
                 );
@@ -140,7 +140,7 @@ const ExpressionTable = props => {
                       link={`https://www.proteinatlas.org/${key}`}
                       linkCoexpressed={`https://www.proteinatlas.org/${
                         geneResults[key].entrezGeneSummary
-                      }`}
+                        }`}
                     />
                   )
                 );
@@ -204,6 +204,7 @@ const StyledRoot = styled.div`
   padding-left: 100px;
   position: relative;
   overflow: auto;
+  padding-bottom: 14px;
 `;
 
 const BreakingTableRow = styled.tr`
@@ -240,7 +241,7 @@ const StyledTableRowColumn = styled.td`
   height: 56px !important;
 `;
 
-const StyledTooltipBox = styled(TooltipBox)`
+const StyledTooltipBox = styled(TooltipBox) `
   display: inline-block;
 `;
 
