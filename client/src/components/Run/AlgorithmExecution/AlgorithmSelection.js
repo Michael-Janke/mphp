@@ -15,6 +15,19 @@ import { canRunOneAgainstAll } from "../../../utils";
 export default class AlgorithmSelection extends Component {
   render() {
     const { algorithms, algorithm, datasets, dataset } = this.props;
+
+    // preselect one algorithm for faster debugging
+    // TODO: remove in the end
+    if (!algorithm.key) {
+      algorithm.key = "norm"
+      algorithm.name = "Normalized Feature Selection"
+      algorithm.parameters = {
+        "k": 10,
+        "n": 5000,
+        "norm": "exclude"
+      }
+    }
+
     return (
       <StyledMenu>
         <StyledOptions>
@@ -242,20 +255,20 @@ const StyledOptions = styled.div`
   margin: ${props => props.theme.mediumSpace};
 `;
 
-const StyledSelectField = styled(SelectField)`
+const StyledSelectField = styled(SelectField) `
   button {
     fill: ${props => props.theme.textColor} !important;
   }
 `;
 
-const StyledInnerSelectField = styled(SelectField)`
+const StyledInnerSelectField = styled(SelectField) `
   margin-left: ${props => props.theme.mediumSpace};
 `;
 
-const StyledTextField = styled(TextField)`
+const StyledTextField = styled(TextField) `
   margin-left: ${props => props.theme.mediumSpace};
 `;
 
-const StyledCheckbox = styled(Checkbox)`
+const StyledCheckbox = styled(Checkbox) `
   margin-left: ${props => props.theme.mediumSpace};
 `;
