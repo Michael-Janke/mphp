@@ -5,16 +5,32 @@ from validation.Analyzer import Analyzer
 from server.availableAlgorithms import is_normalized
 from utils import Expressions
 from utils.Sampler import Sampler
+from datetime import datetime
 
 dimReducer = DimensionalityReducer()
 analyzer = Analyzer()
 
 def execute(algorithm, dataLoader, one_against_rest, oversampling):
+    start = datetime.now()
     data = getData(algorithm, dataLoader, oversampling)
+    print("Got data", flush=True)
+    print(datetime.now() - start, flush=True)
     
+    
+    start = datetime.now()
     labels, gene_indices = run(algorithm, data, one_against_rest)
+    print("Feature Selection done", flush=True)
+    print(datetime.now() - start, flush=True)
+    
+    start = datetime.now()
     expression_matrix = calcExpressionMatrix(algorithm, data, gene_indices, one_against_rest)
+    print("Expression Matrix done", flush=True)
+    print(datetime.now() - start, flush=True)
+    
+    start = datetime.now()
     evaluation = evaluate(algorithm, data, gene_indices, one_against_rest)
+    print("Validation done", flush=True)
+    print(datetime.now() - start, flush=True)
 
     if one_against_rest:
         response = {}

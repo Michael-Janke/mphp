@@ -45,24 +45,27 @@ if __name__ == '__main__':
     
     #selected_genes = dimReducer.getNormalizedFeatures(sick, healthy, k=10)
     #selected_genes = dimReducer.getOneAgainstRestFeatures(sick, healthy, 10, "norm", "relief")
-    #selected_genes = dimReducer.getOneAgainstRestFeatures(sick, healthy, 10, "norm", "exclude")
+    selected_genes = dimReducer.getOneAgainstRestFeatures(sick, healthy, 10, "norm", "exclude")
 
     #selected_genes = dimReducer.getDecisionTreeFeatures(data, 10)
     #selected_genes = dimReducer.getOneAgainstRestFeatures(data, "", 10, "tree")
     
     #selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3, fitness="combined", returnMultipleSets =True)
-    selected_genes = dimReducer.getOneAgainstRestFeatures(sick, healthy, 3, fitness="combined", normalization="exclude")
+    #selected_genes = dimReducer.getOneAgainstRestFeatures(sick, healthy, 3, fitness="combined", normalization="exclude")
     pprint(selected_genes)
     print(datetime.now() - start)
     print("done")
+    
+    start = datetime.now()
+    expressions = analyzer.computeExpressionMatrixOneAgainstRest(sick, healthy, selected_genes)
+    #results = analyzer.computeFeatureValidationOneAgainstRest(sick, healthy, selected_genes)
+    print(datetime.now() - start)
     """
     features = dimReducer.getOneAgainstRestFeatures(sick,healthy)
     pprint(features)
 
-    results = analyzer.computeFeatureValidationOneAgainstRest(sick, healthy, features)
     pprint(results)
 
-    expressions = analyzer.computeExpressionMatrixOneAgainstRest(sick, healthy, features)
     pprint(expressions)
 
     # Feature Selection

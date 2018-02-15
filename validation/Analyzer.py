@@ -8,6 +8,8 @@ from collections import defaultdict
 from numpy.core.defchararray import find
 from scipy.stats import mannwhitneyu
 
+from joblib import Parallel, delayed
+
 class Analyzer:
     def __init__(self):
         pass
@@ -21,18 +23,28 @@ class Analyzer:
         selected_genes_dict: call with result from getOneAgainstRestFeatures
     '''
     def computeFeatureValidationOneAgainstRest(self, sick, healthy, selected_genes_dict):
-        results = {}
-        for label, genes in selected_genes_dict.items():
-            results[label] = self.computeFeatureValidation(sick, healthy, genes, true_label=label)
+        n_jobs = len(selected_genes_dict.keys())
+        items = list(selected_genes_dict.items())
+
+        results = Parallel(n_jobs=n_jobs, backend="threading")\
+            (delayed(self.computeFeatureValidationWrapper)(sick, healthy, label, genes) for label, genes in items)
+
+        combined_results = {}
+        for label, validation in results:
+            combined_results[label] = validation
 
         if healthy:
             cumulated_fitness = 0
-            for res in results.values():
+            for res in combined_results.values():
                 cumulated_fitness += res["fitness"]["combinedFitness"]
 
-            results["meanFitness"] = cumulated_fitness / len(results.keys())
+            combined_results["meanFitness"] = cumulated_fitness / len(combined_results.keys())
 
-        return results
+        return combined_results
+
+    def computeFeatureValidationWrapper(self, sick, healthy, label, genes):
+        validation = self.computeFeatureValidation(sick, healthy, genes, true_label=label)
+        return label, validation
 
     '''
         case 1:
@@ -80,12 +92,21 @@ class Analyzer:
         selected_genes_dict: call with result from getOneAgainstRestFeatures
     '''
     def computeExpressionMatrixOneAgainstRest(self, sick, healthy, selected_genes_dict):
-        results = {}
-        for label, genes in selected_genes_dict.items():
-            matrix = self.computeExpressionMatrix(sick, healthy, genes)
-            results[label] = {label: matrix[label]}
+        n_jobs = len(selected_genes_dict.keys())
+        items = list(selected_genes_dict.items())
 
-        return results
+        results = Parallel(n_jobs=n_jobs, backend="threading")\
+            (delayed(self.computeExpressionMatrixWrapper)(sick, healthy, label, genes) for label, genes in items)
+
+        combined_results = {}
+        for label, matrix in results:
+            combined_results[label] = {label: matrix[label]}
+
+        return combined_results
+
+    def computeExpressionMatrixWrapper(self, sick, healthy, label, genes):
+        matrix = self.computeExpressionMatrix(sick, healthy, genes)
+        return label, matrix
 
     '''
         sick and healthy should contain at least one cancer type

@@ -203,7 +203,7 @@ class DimensionalityReducer():
             n_jobs = min(8, n_jobs)
             chunks = self.chunks(genes, int(len(genes) / n_jobs))
             fitness_scores = Parallel(n_jobs=n_jobs, backend="threading")\
-                (delayed(self.call_fitness_function)(sick, healthy, indices, chunks[i], fitness, true_label) for i in range(n_jobs))
+                (delayed(self.call_fitness_function)(sick, healthy, indices, chunk, fitness, true_label) for chunk in chunks)
 
             scores = []
             for f in fitness_scores:
