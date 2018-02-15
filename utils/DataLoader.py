@@ -5,6 +5,10 @@ import re
 import utils
 
 
+from datetime import datetime
+from pprint import pprint
+
+
 class DataLoader:
     def __init__(self, dataset):
         self.dataset = dataset
@@ -58,7 +62,6 @@ class DataLoader:
         return self.statistics
 
     def getData(self, sample_types, cancer_types, excluded_cancer_types=[]):
-        combined_data = labels = []
 
         if len(cancer_types) == 1 and cancer_types[0].lower() == 'all':
             cancer_types = self.cancer_types
@@ -68,7 +71,7 @@ class DataLoader:
 
         labels_vector = []
         new_sample_types = []
-        for sample_index, sample_type in enumerate(sample_types):
+        for sample_type in sample_types:
             if sample_type == "healthy":
                 new_sample_types.extend(
                     [type for type in self.sample_types if type.startswith("N")])
@@ -84,24 +87,36 @@ class DataLoader:
             else:
                 labels_vector.append(sample_type)
                 new_sample_types.append(sample_type)
+        
+        n_rows = 0
+        for cancer_type in cancer_types:
+            for sample_type in new_sample_types:
+                if sample_type in self.data[cancer_type]:
+                    n_rows += self.data[cancer_type][sample_type].shape[0]
+
+        combined_data = np.empty((n_rows, self.gene_labels.shape[0]))
+        labels = np.empty(n_rows, dtype=str)
+        filled_row_count = 0
+        filled_label_count = 0
 
         for cancer_type in cancer_types:
+
             for sample_index, sample_type in enumerate(new_sample_types):
                 label = cancer_type + "-" + labels_vector[sample_index]
 
                 if sample_type in self.data[cancer_type]:
-                    if len(combined_data) == 0:
-                        combined_data = self.data[cancer_type][sample_type]
-                        labels = [label] * \
-                            self.data[cancer_type][sample_type].shape[0]
-                    else:
-                        combined_data = np.concatenate(
-                            (combined_data, self.data[cancer_type][sample_type]), axis=0)
-                        labels = np.concatenate(
-                            (labels, [label] * self.data[cancer_type][sample_type].shape[0]), axis=0)
+                    sample_count = self.data[cancer_type][sample_type].shape[0]
+
+                    combined_data[filled_row_count:filled_row_count+sample_count,:] = self.data[cancer_type][sample_type]
+                    labels[filled_label_count:filled_label_count+sample_count] = label
+
+                    filled_row_count += sample_count
+                    filled_label_count += sample_count
 
         labels = np.transpose(labels)
-        _, label_counts = np.unique(labels, return_counts=True)
+
+        print(labels.shape)
+        print(combined_data.shape)
 
         return utils.Expressions(combined_data, labels)
 
@@ -126,6 +141,3 @@ class DataLoader:
             'cancerTypes': self.cancer_types,
             'sampleTypes': self.sample_types
         }
-
-    def getStatistics(self):
-        return self.statistics
