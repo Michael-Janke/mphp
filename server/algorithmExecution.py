@@ -69,14 +69,13 @@ def getData(algorithm, dataLoader, oversampling):
     sick = dataLoader.replaceLabels(sick)
     healthy = dataLoader.getData(healthy_tissue_types, cancer_types)
     healthy = dataLoader.replaceLabels(healthy)
-    combined = Expressions(np.vstack((sick.expressions, healthy.expressions)), np.hstack((sick.labels, healthy.labels)))
 
     if oversampling:
         sampler = Sampler()
         healthy = sampler.over_sample(healthy)
         sick = sampler.over_sample(sick)
-        combined = sampler.over_sample(combined)
 
+    combined = Expressions(np.vstack((sick.expressions, healthy.expressions)), np.hstack((sick.labels, healthy.labels)))
     data = {
         "sick": sick,
         "healthy": healthy,
