@@ -19,7 +19,7 @@ export default class AlgorithmSelection extends Component {
     // preselect one algorithm for faster debugging
     // TODO: remove in the end
     if (!algorithm.key) {
-      this.selectAlgorithm(null, null, "norm")
+      this.selectAlgorithm(null, null, "norm");
     }
 
     return (
@@ -70,6 +70,7 @@ export default class AlgorithmSelection extends Component {
             )}
         </StyledOptions>
         {this.renderComparisonModeSelection()}
+        {this.renderOversamplingSelection()}
       </StyledMenu>
     );
   }
@@ -161,13 +162,37 @@ export default class AlgorithmSelection extends Component {
       "Enable to select discriminating genes per cancer type against all others (returning one set per cancer type), " +
       "disable to select one set of discriminating genes for all cancer types.";
     return (
-      <Description text={descriptionText}>
+      <Description text={descriptionText} position="top">
         <StyledCheckbox
           label="One against rest"
           checked={this.props.oneAgainstRest}
           onCheck={this.toggleComparisonMode.bind(this)}
           iconStyle={{ fill: boringBlue }}
           disabled={!canRunOneAgainstAll(this.props.algorithm)}
+        />
+      </Description>
+    );
+  }
+
+  renderOversamplingSelection() {
+    return (
+      <Description
+        text={
+          <div>
+            <FormattedMessage id="General.Oversampling1" />
+            <br />
+            <br />
+            <FormattedMessage id="General.Oversampling2" />
+          </div>
+        }
+        position="top"
+        icon="warning"
+      >
+        <StyledCheckbox
+          label="Oversampling"
+          checked={this.props.oversampling}
+          onCheck={this.toggleOversampling.bind(this)}
+          iconStyle={{ fill: boringBlue }}
         />
       </Description>
     );
@@ -211,6 +236,11 @@ export default class AlgorithmSelection extends Component {
     updateRun(runId, { oneAgainstRest: !oneAgainstRest });
   }
 
+  toggleOversampling() {
+    const { oversampling, runId, updateRun } = this.props;
+    updateRun(runId, { oversampling: !oversampling });
+  }
+
   selectAlgorithm(event, index, key) {
     const { algorithm, algorithms, runId, updateRun } = this.props;
     const parameters = algorithms[key].parameters;
@@ -249,20 +279,20 @@ const StyledOptions = styled.div`
   margin: ${props => props.theme.mediumSpace};
 `;
 
-const StyledSelectField = styled(SelectField) `
+const StyledSelectField = styled(SelectField)`
   button {
     fill: ${props => props.theme.textColor} !important;
   }
 `;
 
-const StyledInnerSelectField = styled(SelectField) `
+const StyledInnerSelectField = styled(SelectField)`
   margin-left: ${props => props.theme.mediumSpace};
 `;
 
-const StyledTextField = styled(TextField) `
+const StyledTextField = styled(TextField)`
   margin-left: ${props => props.theme.mediumSpace};
 `;
 
-const StyledCheckbox = styled(Checkbox) `
+const StyledCheckbox = styled(Checkbox)`
   margin-left: ${props => props.theme.mediumSpace};
 `;

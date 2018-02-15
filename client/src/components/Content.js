@@ -139,8 +139,8 @@ const mapDispatchToProps = dispatch => {
     loadContext: () => {
       dispatch(loadContext());
     },
-    startRun: (runId, oneAgainstRest, algorithm) => {
-      dispatch(startRun(runId, oneAgainstRest, algorithm));
+    startRun: (runId, oneAgainstRest, oversampling, algorithm) => {
+      dispatch(startRun(runId, oneAgainstRest, oversampling, algorithm));
     },
     deleteRun: runId => {
       dispatch(deleteRun(runId));

@@ -56,13 +56,15 @@ export function toggleTissueType(id, algorithm, tissueType) {
   };
 }
 
-export function startRun(id, oneAgainstRest, algorithm) {
+export function startRun(id, oneAgainstRest, oversampling, algorithm) {
   return dispatch => {
     oneAgainstRest = oneAgainstRest && canRunOneAgainstAll(algorithm);
     dispatch({ type: types.START_RUN, id, algorithm });
-    postRequest("/runAlgorithm", { algorithm, oneAgainstRest }).then(response =>
-      dispatch(_finishRun(id, response))
-    );
+    postRequest("/runAlgorithm", {
+      algorithm,
+      oneAgainstRest,
+      oversampling
+    }).then(response => dispatch(_finishRun(id, response)));
 
     function _finishRun(id, result) {
       return {

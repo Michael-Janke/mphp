@@ -4,13 +4,14 @@ from utils.DimensionalityReducer import DimensionalityReducer
 from validation.Analyzer import Analyzer
 from server.availableAlgorithms import is_normalized
 from utils import Expressions
+from utils.Sampler import Sampler
 
 dimReducer = DimensionalityReducer()
 analyzer = Analyzer()
 
-def execute(algorithm, dataLoader, one_against_rest):
-    data = getData(algorithm, dataLoader)
-
+def execute(algorithm, dataLoader, one_against_rest, oversampling):
+    data = getData(algorithm, dataLoader, oversampling)
+    
     labels, gene_indices = run(algorithm, data, one_against_rest)
     expression_matrix = calcExpressionMatrix(algorithm, data, gene_indices, one_against_rest)
     evaluation = evaluate(algorithm, data, gene_indices, one_against_rest)
@@ -43,7 +44,7 @@ def  assembleResponse(data, labels, gene_indices, expression_matrix, evaluation,
         'evaluation': evaluation,
     }
 
-def getData(algorithm, dataLoader):
+def getData(algorithm, dataLoader, oversampling):
     cancer_types = algorithm["cancerTypes"]
     sick_tissue_types = algorithm["sickTissueTypes"]
     healthy_tissue_types = algorithm["healthyTissueTypes"]
@@ -53,6 +54,12 @@ def getData(algorithm, dataLoader):
     healthy = dataLoader.getData(healthy_tissue_types, cancer_types)
     healthy = dataLoader.replaceLabels(healthy)
     combined = Expressions(np.vstack((sick.expressions, healthy.expressions)), np.hstack((sick.labels, healthy.labels)))
+
+    if oversampling:
+        sampler = Sampler()
+        healthy = sampler.over_sample(healthy)
+        sick = sampler.over_sample(sick)
+        combined = sampler.over_sample(combined)
 
     data = {
         "sick": sick,

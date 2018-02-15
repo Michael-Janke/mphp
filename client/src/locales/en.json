@@ -67,6 +67,10 @@
     "Run":
       "Some algorithms have special requirements, resulting in the 'Run' button being disabled if those requirements are not met. Try adding more cancer or tissue types until the button is reenabled or switch to another algorithm.",
     "OneAgainstRestResult":
-      "Because you selected the one against rest option, you can now switch between views for the selected cancer types to see all available results."
+      "Because you selected the one against rest option, you can now switch between views for the selected cancer types to see all available results.",
+    "Oversampling1":
+      "This has no effect if the cancer types you selected have at least 20 samples.",
+    "Oversampling2":
+      "In case you select a cancer type with less than 20 samples, the algorithms that are based on statistical methods might not be able to work correctly. Oversampling creates more samples for the affected cancer types, which can enable statistical methods again, but may introduce bias to the result."
   }
 }
