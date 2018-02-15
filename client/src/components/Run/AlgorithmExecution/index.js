@@ -64,30 +64,31 @@ export default class AlgorithmExecution extends Component {
       algorithm.sickTissueTypes.length !== 0;
 
     var enoughSamples = true;
-    // TODO: check for oversampling
-    // test if there are more than 10 healthy samples for each cancer type (but only if healthy types are selected)
-    if (algorithm.healthyTissueTypes.length !== 0) {
-      algorithm.cancerTypes.forEach(cancerType => {
-        var sum = 0;
-        algorithm.healthyTissueTypes.forEach(tissueType => {
-          sum += statistics.counts[cancerType][tissueType];
+    if (!this.props.oversampling) {
+      // test if there are more than 10 healthy samples for each cancer type (but only if healthy types are selected)
+      if (algorithm.healthyTissueTypes.length !== 0) {
+        algorithm.cancerTypes.forEach(cancerType => {
+          var sum = 0;
+          algorithm.healthyTissueTypes.forEach(tissueType => {
+            sum += statistics.counts[cancerType][tissueType];
+          });
+          if (sum < 10) {
+            enoughSamples = false;
+          }
         });
-        if (sum < 10) {
-          enoughSamples = false;
-        }
-      });
-    }
-    // test if there are more than 10 sick samples for each cancer type (but only if sick types are selected)
-    if (algorithm.sickTissueTypes.length !== 0) {
-      algorithm.cancerTypes.forEach(cancerType => {
-        var sum = 0;
-        algorithm.sickTissueTypes.forEach(tissueType => {
-          sum += statistics.counts[cancerType][tissueType];
+      }
+      // test if there are more than 10 sick samples for each cancer type (but only if sick types are selected)
+      if (algorithm.sickTissueTypes.length !== 0) {
+        algorithm.cancerTypes.forEach(cancerType => {
+          var sum = 0;
+          algorithm.sickTissueTypes.forEach(tissueType => {
+            sum += statistics.counts[cancerType][tissueType];
+          });
+          if (sum < 10) {
+            enoughSamples = false;
+          }
         });
-        if (sum < 10) {
-          enoughSamples = false;
-        }
-      });
+      }
     }
 
     var oneCancerTypeRunnable = true;
