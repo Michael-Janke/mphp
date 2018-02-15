@@ -13,10 +13,13 @@ from validation.Analyzer import Analyzer
 from validation.ClusterValidator import ClusterValidator
 from validation.ClassificationValidator import ClassificationValidator
 
+from multiprocessing import Array
+
 if __name__ == '__main__':
+
     print("Imported modules")
 
-    dataLoader = DataLoader("dataset4")
+    dataLoader = DataLoader("dataset5")
     dimReducer = DimensionalityReducer()
     analyzer = Analyzer()
 
@@ -25,14 +28,33 @@ if __name__ == '__main__':
     sampler = Sampler()
     print("data loaded")
 
-    healthy = dataLoader.getData(["healthy"], ["THCA","LUAD"])
+    #healthy = dataLoader.getData(["healthy"], ["THCA","LUAD"])
     #healthy = sampler.over_sample(healthy)
 
-    sick = dataLoader.getData(["sick"], ["THCA","LUAD", "HNSC", "KIRC", "UCEC"])
-    data = dataLoader.getData(["sick", "healthy"], ["THCA","LUAD", "HNSC", "KIRC", "UCEC"])
+    sick = dataLoader.getData(["sick"], ["STAD","COAD"])
+    healthy = dataLoader.getData(["healthy"], ["STAD","COAD"])
+    data = dataLoader.getData(["sick", "healthy"], ["STAD","COAD","THCA"])
+
+
     gene_labels = dataLoader.getGeneLabels()
     print("got combined data")
 
+    start = datetime.now()
+    #selected_genes = dimReducer.getFeatures(data, 10)
+    #selected_genes = dimReducer.getOneAgainstRestFeatures(data, "", 10)
+    
+    #selected_genes = dimReducer.getNormalizedFeatures(sick, healthy, k=10)
+    #selected_genes = dimReducer.getOneAgainstRestFeatures(sick, healthy, 10, "norm", "relief")
+    selected_genes = dimReducer.getOneAgainstRestFeatures(sick, healthy, 10, "norm", "exclude")
+
+    #selected_genes = dimReducer.getDecisionTreeFeatures(data, 10)
+    #selected_genes = dimReducer.getOneAgainstRestFeatures(data, "", 10, "tree")
+    
+    #selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3, fitness="combined", returnMultipleSets =True)
+    selected_genes = dimReducer.getOneAgainstRestFeatures(sick, healthy, 10, fitness="combined", normalization="exclude")
+    pprint(selected_genes)
+    print(datetime.now() - start)
+    print("done")
     """
     features = dimReducer.getOneAgainstRestFeatures(sick,healthy)
     pprint(features)
@@ -45,7 +67,6 @@ if __name__ == '__main__':
 
     # Feature Selection
     #selected_genes = dimReducer.getEAFeatures(sick,healthy,fitness="clustering")
-    #selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 3, fitness="combined")
     selected_genes = dimReducer.getNormalizedFeatures(sick, healthy, k=3, normalization="relief")
     print(selected_genes)
 
@@ -68,12 +89,12 @@ if __name__ == '__main__':
 
     pprint(selected_genes)
     print(datetime.now()-start)
-    """
 
 
     #start = datetime.now()
     #selected_genes = dimReducer.getFeaturesBySFS(sick, healthy, 10, m=100 ,fitness="classification", returnMultipleSets = False)
-    selected_genes = dimReducer.getNormalizedFeaturesE(sick, healthy, k=3, n=10000, m="chi2", returnMultipleSets=True)
-    print(selected_genes)
+    #selected_genes = dimReducer.getNormalizedFeaturesE(sick, healthy, k=3, n=10000, m="chi2", returnMultipleSets=True)
+    #print(selected_genes)
     #pprint(analyzer.computeFeatureValidation(sick, healthy, selected_genes)["fitness"])
     #print(datetime.now() - start)
+    """

@@ -196,12 +196,13 @@ class DimensionalityReducer():
         # iteratively join the best next feature based on a fitness function until k features are found
         for idx in range(k-1):
             if fitness == "combined" or fitness == "clustering":
-                n_jobs = int(len(genes) / 20) # 1 process for 20 iterations
+                n_jobs = int(len(genes) / 25) # 1 process for 25 iterations
             else:
                 n_jobs = int(len(genes) / 100) # 1 process for 100 iterations
 
+            n_jobs = min(8, n_jobs)
             chunks = self.chunks(genes, int(len(genes) / n_jobs))
-            fitness_scores = Parallel(n_jobs=n_jobs)\
+            fitness_scores = Parallel(n_jobs=n_jobs, backend="threading")\
                 (delayed(self.call_fitness_function)(sick, healthy, indices, chunks[i], fitness, true_label) for i in range(n_jobs))
 
             scores = []
@@ -261,13 +262,18 @@ class DimensionalityReducer():
         normalization: normalization method for preselection
         fitness: fitness function -> "combined", "classification", "clustering", "sick_vs_healthy", "distance"
     '''
-    def getOneAgainstRestFeatures(self, sick, healthy, k=3, method="sfs", normalization="relief", fitness="combined"):
-        n_labels = np.unique(sick.labels).shape[0]
-        feature_sets = Parallel(n_jobs=n_labels)\
-                (delayed(self.getOneAgainstRestFeaturesForLabel)(sick, healthy, k, method, normalization, fitness, label) for label in np.unique(sick.labels))
+    def getOneAgainstRestFeatures(self, sick, healthy, k=3, method="sfs", normalization="exclude", fitness="combined"):
+        labels = np.unique(sick.labels)
+        labels = [label for label in labels if label.split("-")[-1] == "sick"]      # in the case of combined data only process sick labels
+        labels = np.asarray(labels)
+        
+        n_labels = labels.shape[0]
+        n_jobs = min(5, n_labels)
 
-        # Filter None which is returned when healthy data is passed to getOneAgainstRestFeaturesForLabel
-        feature_sets = [set for set in feature_sets if set != None]
+        backend = "multiprocessing" if method == "sfs" or "ea" else "threading"
+        feature_sets = Parallel(n_jobs=n_jobs, backend=backend)\
+            (delayed(self.getOneAgainstRestFeaturesForLabel)(sick, healthy, k, method, normalization, fitness, label) for label in labels)
+
         features = {}
         for label, indices in feature_sets:
             features[label] = indices
@@ -275,10 +281,6 @@ class DimensionalityReducer():
         return features
 
     def getOneAgainstRestFeaturesForLabel(self, sick, healthy, k, method, normalization, fitness, label):
-        # If combined data is entered we only want results for sick data after all
-        if label.split("-")[1] == "healthy":
-            return None
-
         s_labels = binarize_labels(sick.labels, label)
         sick_binary = Expressions(sick.expressions, s_labels)
         label = label.split("-")[0]
