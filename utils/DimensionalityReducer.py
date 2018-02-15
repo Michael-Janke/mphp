@@ -270,7 +270,10 @@ class DimensionalityReducer():
         n_labels = labels.shape[0]
         n_jobs = min(5, n_labels)
 
-        backend = "multiprocessing" if method == "sfs" or "ea" else "threading"
+        backend = "threading"
+        if (method == "sfs" or method == "ea") and not healthy == "":
+            backend = "multiprocessing"
+        
         feature_sets = Parallel(n_jobs=n_jobs, backend=backend)\
             (delayed(self.getOneAgainstRestFeaturesForLabel)(sick, healthy, k, method, normalization, fitness, label) for label in labels)
 
