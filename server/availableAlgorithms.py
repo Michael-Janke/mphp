@@ -7,7 +7,7 @@ algorithms = {
             {
                 "key": "k",
                 "name": "#Features",
-                "default": 10
+                "default": 5
             }
         ]
     },
@@ -17,7 +17,7 @@ algorithms = {
             {
                 "key": "k",
                 "name": "#Features",
-                "default": 10
+                "default": 5
             },
             {
                 "key": "n",
@@ -38,7 +38,7 @@ algorithms = {
             {
                 "key": "k",
                 "name": "#Features",
-                "default": 10
+                "default": 5
             }
         ]
     },
@@ -48,7 +48,7 @@ algorithms = {
             {
                 "key": "k",
                 "name": "#Features",
-                "default": 10
+                "default": 5
             },
             {
                 "key": "n",
@@ -80,7 +80,7 @@ algorithms = {
             {
                 "key": "k",
                 "name": "#Features",
-                "default": 10
+                "default": 5
             },
             {
                 "key": "n",
