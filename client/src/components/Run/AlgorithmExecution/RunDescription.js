@@ -25,14 +25,14 @@ export default class RunDescription extends Component {
           ) : null}
         </Row>
         <Row>
-          {Object.keys(algorithm.parameters).map((param, index) => (
-            <span key={param}>
+          {algorithms[algorithm.key].parameters.map((param, index) => (
+            <span key={param.key}>
               <GrayText>
                 {`${index === 0 ? "" : ", "}${
-                  algorithms[algorithm.key].parameters[param].name
-                }: `}
+                  param.name
+                  }: `}
               </GrayText>
-              {algorithm.parameters[param]}
+              {algorithm.parameters[param.key]}
             </span>
           ))}
           {this.props.oneAgainstRest ? <GrayText>, </GrayText> : null}

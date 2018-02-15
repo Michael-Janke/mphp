@@ -19,13 +19,7 @@ export default class AlgorithmSelection extends Component {
     // preselect one algorithm for faster debugging
     // TODO: remove in the end
     if (!algorithm.key) {
-      algorithm.key = "norm"
-      algorithm.name = "Normalized Feature Selection"
-      algorithm.parameters = {
-        "k": 10,
-        "n": 5000,
-        "norm": "exclude"
-      }
+      this.selectAlgorithm(null, null, "norm")
     }
 
     return (
@@ -91,28 +85,28 @@ export default class AlgorithmSelection extends Component {
     );
   }
 
-  renderParameter(parameterName, index) {
+  renderParameter(index) {
     const { algorithms, algorithm } = this.props;
-    const parameter = algorithms[algorithm.key].parameters[parameterName];
+    const parameter = algorithms[algorithm.key].parameters[index];
     if (parameter.available) {
-      return this.renderTextSelectionParameter(parameterName, index);
+      return this.renderTextSelectionParameter(index);
     } else {
-      return this.renderNumericParameter(parameterName, index);
+      return this.renderNumericParameter(index);
     }
   }
 
-  renderTextSelectionParameter(parameterName, index) {
+  renderTextSelectionParameter(index) {
     const { disabled, algorithms, algorithm } = this.props;
-    const parameter = algorithms[algorithm.key].parameters[parameterName];
+    const parameter = algorithms[algorithm.key].parameters[index];
     return (
-      <StyledParameter key={parameterName}>
+      <StyledParameter key={parameter.key}>
         <StyledInnerSelectField
-          key={parameterName}
-          id={parameterName}
+          key={parameter.key}
+          id={parameter.key}
           value={
-            this.props.algorithm.parameters[parameterName] || parameter.default
+            this.props.algorithm.parameters[parameter.key] || parameter.default
           }
-          onChange={this.changeTextSelectionParameter.bind(this, parameterName)}
+          onChange={this.changeTextSelectionParameter.bind(this, parameter.key)}
           floatingLabelText={parameter.name}
           floatingLabelFixed={true}
           autoWidth={true}
@@ -122,12 +116,12 @@ export default class AlgorithmSelection extends Component {
         >
           {parameter.available.map(x => {
             return (
-              <MenuItem key={x} id={parameterName} value={x} primaryText={x} />
+              <MenuItem key={x} id={parameter.key} value={x} primaryText={x} />
             );
           })}
         </StyledInnerSelectField>
         <TooltipBox
-          text={<FormattedMessage id={`Parameters.${parameterName}`} />}
+          text={<FormattedMessage id={`Parameters.${parameter.key}`} />}
         >
           <HelpIcon />
         </TooltipBox>
@@ -135,15 +129,15 @@ export default class AlgorithmSelection extends Component {
     );
   }
 
-  renderNumericParameter(parameterName, index) {
+  renderNumericParameter(index) {
     const { disabled, algorithms, algorithm } = this.props;
-    const parameter = algorithms[algorithm.key].parameters[parameterName];
+    const parameter = algorithms[algorithm.key].parameters[index];
     return (
-      <StyledParameter key={parameterName}>
+      <StyledParameter key={parameter.key}>
         <StyledTextField
-          id={parameterName}
+          id={parameter.key}
           value={
-            this.props.algorithm.parameters[parameterName] || parameter.default
+            this.props.algorithm.parameters[parameter.key] || parameter.default
           }
           hintText={parameter.default}
           floatingLabelText={parameter.name}
@@ -154,7 +148,7 @@ export default class AlgorithmSelection extends Component {
           style={{ width: 210 }}
         />
         <TooltipBox
-          text={<FormattedMessage id={`Parameters.${parameterName}`} />}
+          text={<FormattedMessage id={`Parameters.${parameter.key}`} />}
         >
           <HelpIcon />
         </TooltipBox>
@@ -223,8 +217,8 @@ export default class AlgorithmSelection extends Component {
     const updatedValues = {
       name: algorithms[key].name,
       key,
-      parameters: Object.keys(parameters).reduce((reducedParams, param) => {
-        return { ...reducedParams, [param]: parameters[param].default };
+      parameters: parameters.reduce((reducedParams, param) => {
+        return { ...reducedParams, [param.key]: param.default };
       }, {})
     };
     updateRun(runId, { algorithm: { ...algorithm, ...updatedValues } });

@@ -2,94 +2,109 @@ from collections import OrderedDict
 
 algorithms = {
     'tree': {
-        "parameters": {
-            "k": {
+        "name": "Decision Tree",
+        "parameters": [
+            {
+                "key": "k",
                 "name": "#Features",
                 "default": 10
             }
-        },
-        "name": "Decision Tree"
+        ]
     },
     'norm': {
-        "parameters": OrderedDict(
-            k={
+        "name": "Normalized Feature Selection",
+        "parameters": [
+            {
+                "key": "k",
                 "name": "#Features",
                 "default": 10
             },
-            n={
+            {
+                "key": "n",
                 "name": "#Excluded features",
                 "default": 5000
             },
-            norm={
+            {
+                "key": "norm",
                 "name": "Normalization method",
                 "default": "exclude",
                 "available": ["subtract", "exclude", "relief"]
             }
-        ),
-        "name": "Normalized Feature Selection"
+        ]
     },
     "basic": {
-        "parameters": {
-            "k": {
+        "name": "Feature Selection",
+        "parameters": [
+            {
+                "key": "k",
                 "name": "#Features",
                 "default": 10
             }
-        },
-        "name": "Feature Selection"
+        ]
     },
     "sfs": {
         "name": "Sequential Forward Selection (normalized)",
-        "parameters": OrderedDict(
-            k={
+        "parameters": [
+            {
+                "key": "k",
                 "name": "#Features",
                 "default": 10
             },
-            n={
+            {
+                "key": "n",
                 "name": "#Excluded features",
                 "default": 5000
             },
-            m={
+            {
+                "key": "m",
                 "name": "#Preselected features",
                 "default": 100
             },
-            norm={
+            {
+                "key": "norm",
                 "name": "Preselection normalization",
                 "default": "exclude",
                 "available": ["subtract", "exclude", "relief"]
             },
-            fitness={
+            {
+                "key": "fitness",
                 "name": "Fitness function",
                 "default": "combined",
                 "available": ["combined", "classification", "clustering", "sick_vs_healthy", "distance"]
             }
-        )
+        ]
     },
     "ea": {
         "name": "Evolutionary Algorithm",
-        "parameters": OrderedDict(
-            k={
+        "parameters": [
+            {
+                "key": "k",
                 "name": "#Features",
                 "default": 10
             },
-            n={
+            {
+                "key": "n",
                 "name": "#Excluded features",
                 "default": 5000
             },
-            m={
+            {
+                "key": "m",
                 "name": "#Preselected features",
                 "default": 100
             },
-            norm={
+            {
+                "key": "norm",
                 "name": "Preselection normalization",
                 "default": "exclude",
                 "available": ["subtract", "exclude", "relief"]
             },
-            fitness={
+            {
+                "key": "fitness",
                 "name": "Fitness function",
                 "default": "combined",
                 "available": ["combined", "classification", "clustering", "sick_vs_healthy", "distance"]
             }
-        )
+        ]
     }
 }
 
@@ -97,6 +112,6 @@ algorithms = {
 def is_normalized(method):
     normalized_methods = [
         key for key in algorithms.keys()
-        if "norm" in algorithms[key]["parameters"].keys()
+        if any(x.get("key", None) == "norm" for x in algorithms[key]["parameters"])
     ]
     return method in normalized_methods
