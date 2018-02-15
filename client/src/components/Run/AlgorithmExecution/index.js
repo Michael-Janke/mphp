@@ -22,12 +22,15 @@ export default class AlgorithmExecution extends Component {
             <DataSelection {...this.props} />
           </Row>
         ) : (
-            <RunDescription {...this.props} />
-          )}
+          <RunDescription {...this.props} />
+        )}
         <CardActions>
           {this.props.disabled ? null : (
             <StyledButtonContainer>
-              <TooltipBox text={<FormattedMessage id="General.Run" />}>
+              <TooltipBox
+                text={<FormattedMessage id="General.Run" />}
+                position="top"
+              >
                 <HelpIcon />
               </TooltipBox>
               <StyledButton
@@ -101,8 +104,7 @@ export default class AlgorithmExecution extends Component {
         sumSick += statistics.counts[currentCancerType][x];
       });
       oneCancerTypeRunnable =
-        (currentAlgorithm === "basic" ||
-          currentAlgorithm === "tree") &&
+        (currentAlgorithm === "basic" || currentAlgorithm === "tree") &&
         sumHealthy >= 10 &&
         sumSick >= 10;
     }
@@ -140,7 +142,7 @@ const StyledButtonContainer = styled.div`
   align-items: center;
 `;
 
-const StyledButton = styled(RaisedButton) `
+const StyledButton = styled(RaisedButton)`
   && {
     margin: 12px;
   }
