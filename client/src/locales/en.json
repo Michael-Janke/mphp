@@ -65,6 +65,8 @@
   },
   "General": {
     "Run":
-      "Some algorithms have special requirements, resulting in the 'Run' button being disabled if those requirements are not met. Try adding more cancer or tissue types until the button is reenabled or switch to another algorithm."
+      "Some algorithms have special requirements, resulting in the 'Run' button being disabled if those requirements are not met. Try adding more cancer or tissue types until the button is reenabled or switch to another algorithm.",
+    "OneAgainstRestResult":
+      "Because you selected the one against rest option, you can now switch between views for the selected cancer types to see all available results."
   }
 }

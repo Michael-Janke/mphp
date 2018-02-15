@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 import { Tabs, Tab } from "material-ui/Tabs";
+import { FormattedMessage } from "react-intl";
 
 import Plot from "./Plot";
 import Evaluation from "./Evaluation";
@@ -25,10 +26,13 @@ export default class Results extends Component {
       .reduce((reduced, key) => ({ ...reduced, [key]: result[key] }), {});
     return oneAgainstRest ? (
       <div>
-        <StyledEvaluationValue
-          primaryText={result.meanFitness}
-          secondaryText="Mean fitness score"
-        />
+        <Row>
+          <StyledExplanation>{<FormattedMessage id="General.OneAgainstRestResult" />}</StyledExplanation>
+          <StyledEvaluationValue
+            primaryText={result.meanFitness}
+            secondaryText="Mean fitness score"
+          />
+        </Row>
         <Tabs inkBarStyle={{ backgroundColor: sunYellow }}>
           {Object.keys(tabData).map(label => (
             <Tab
@@ -74,6 +78,16 @@ export default class Results extends Component {
 
 const Container = styled.div`
   padding: ${props => props.theme.mediumSpace};
+`;
+
+const Row = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
+
+const StyledExplanation = styled.div`
+  font-size: 14px;  
+  margin-right: 50px;
 `;
 
 // remove background on hover
