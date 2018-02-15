@@ -44,7 +44,7 @@
     "m":
       "The number of preselected features (genes) that are used for the calculation to increase performance.",
     "norm":
-      "The normalization method used to reduce the impact of underlying differences in healthy tissue.",
+      "The normalization method used to reduce the impact of underlying differences in healthy tissue. Attention: option 'relief' is very slow.",
     "fitness": "The fitness function used to evaluate the intermediate results."
   },
   "Evaluation": {
