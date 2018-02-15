@@ -4,11 +4,6 @@ from glob import glob
 import re
 import utils
 
-
-from datetime import datetime
-from pprint import pprint
-
-
 class DataLoader:
     def __init__(self, dataset):
         self.dataset = dataset
@@ -95,7 +90,7 @@ class DataLoader:
                     n_rows += self.data[cancer_type][sample_type].shape[0]
 
         combined_data = np.empty((n_rows, self.gene_labels.shape[0]))
-        labels = np.empty(n_rows, dtype=str)
+        labels = np.empty(n_rows, dtype='|S12')
         filled_row_count = 0
         filled_label_count = 0
 
@@ -114,9 +109,7 @@ class DataLoader:
                     filled_label_count += sample_count
 
         labels = np.transpose(labels)
-
-        print(labels.shape)
-        print(combined_data.shape)
+        labels = labels.astype(str)
 
         return utils.Expressions(combined_data, labels)
 

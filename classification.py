@@ -39,7 +39,7 @@ if __name__ == '__main__':
     print("got combined data")
     print(datetime.now() - start)
 
-    selected_genes = dimReducer.getNormalizedFeatures(sick, healthy, k=10)
+    selected_genes = dimReducer.getOneAgainstRestFeatures(sick, healthy, 10, "norm", "exclude")
 
     """
     #selected_genes = dimReducer.getFeatures(data, 10)
