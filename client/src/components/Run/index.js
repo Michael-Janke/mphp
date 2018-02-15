@@ -25,6 +25,7 @@ export default class Card extends Component {
     if (nextProps.oneAgainstRest !== this.props.oneAgainstRest) return true;
     if (nextProps.result && !this.props.result) return true;
     if (nextProps.geneResult && !this.props.geneResult) return true;
+    if (nextProps.oversampling !== this.props.oversampling) return true;
     return !deepEqual(nextProps.algorithm, this.props.algorithm);
   }
 
@@ -40,10 +41,15 @@ export default class Card extends Component {
   };
 
   startRun = () => {
-    this.props.startRun(this.props.runId, this.props.oneAgainstRest, {
-      ...this.props.algorithm,
-      dataset: this.props.dataset
-    });
+    this.props.startRun(
+      this.props.runId,
+      this.props.oneAgainstRest,
+      this.props.oversampling,
+      {
+        ...this.props.algorithm,
+        dataset: this.props.dataset
+      }
+    );
   };
 
   render() {

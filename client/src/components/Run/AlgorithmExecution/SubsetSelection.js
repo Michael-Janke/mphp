@@ -5,6 +5,7 @@ import { List } from "material-ui/List";
 import Subheader from "material-ui/Subheader";
 import { connect } from "react-redux";
 import { FormattedMessage } from "react-intl";
+import WarningIcon from "material-ui/svg-icons/alert/warning";
 
 import { toggleTcgaToken, toggleTissueType } from "../../../actions/runActions";
 import { isHealthy } from "../../../utils";
@@ -39,11 +40,13 @@ class SubsetSelection extends PureComponent {
                 >
                   <StyledButton
                     label={tcgaToken}
+                    labelPosition="before"
                     value={tcgaToken}
                     onClick={() => this.transferTcgaToken(tcgaToken)}
                     selected={algorithm.cancerTypes.includes(tcgaToken)}
                     primary={algorithm.cancerTypes.includes(tcgaToken)}
                     disabled={disabled}
+                    icon={this.countsTooLow(tcgaToken) ? <WarningIcon /> : null}
                   />
                 </TooltipBox>
               )
@@ -103,6 +106,11 @@ class SubsetSelection extends PureComponent {
 
   transferTissueType(tissueType) {
     this.props.toggleTissue(this.props.runId, this.props.algorithm, tissueType);
+  }
+
+  countsTooLow(tcgaToken) {
+    const counts = this.props.statistics[this.props.dataset].counts[tcgaToken];
+    return counts["NT"] < 20 || counts["TP"] < 20;
   }
 
   handleClose = () => {

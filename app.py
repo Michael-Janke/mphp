@@ -58,8 +58,10 @@ def context():
 
 @app.route("/runAlgorithm", methods=["POST"])
 def runSpecificAlgorithm():
-    algorithm = request.get_json()["algorithm"]
-    oneAgainstRest = request.get_json()["oneAgainstRest"]
+    requestObject = request.get_json()
+    algorithm = requestObject["algorithm"]
+    oneAgainstRest = requestObject["oneAgainstRest"]
+    oversampling = requestObject["oversampling"]
 
     if "dataset" not in algorithm:
         return abort(400, "need dataset parameter")
@@ -76,6 +78,7 @@ def runSpecificAlgorithm():
         dataset,
         algorithm["key"],
         str(oneAgainstRest),
+        str(oversampling),
         "-".join([key+str(value) for key,value in algorithm["parameters"].items()]),
         "-".join(algorithm["cancerTypes"]),
         "-".join(algorithm["healthyTissueTypes"]),
@@ -84,7 +87,7 @@ def runSpecificAlgorithm():
     if cache.isCached(cache_key):
         return cache.getCache(cache_key)
 
-    response = algorithmExecution.execute(algorithm, dataLoader, oneAgainstRest)
+    response = algorithmExecution.execute(algorithm, dataLoader, oneAgainstRest, oversampling)
 
     # workaround to replace NaN by null
     json_response = json.dumps(response)

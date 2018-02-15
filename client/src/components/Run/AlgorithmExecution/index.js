@@ -64,6 +64,7 @@ export default class AlgorithmExecution extends Component {
       algorithm.sickTissueTypes.length !== 0;
 
     var enoughSamples = true;
+    // TODO: check for oversampling
     // test if there are more than 10 healthy samples for each cancer type (but only if healthy types are selected)
     if (algorithm.healthyTissueTypes.length !== 0) {
       algorithm.cancerTypes.forEach(cancerType => {
@@ -119,10 +120,15 @@ export default class AlgorithmExecution extends Component {
   }
 
   executeAlgorithm() {
-    this.props.startRun(this.props.runId, this.props.oneAgainstRest, {
-      ...this.props.algorithm,
-      dataset: this.props.dataset
-    });
+    this.props.startRun(
+      this.props.runId,
+      this.props.oneAgainstRest,
+      this.props.oversampling,
+      {
+        ...this.props.algorithm,
+        dataset: this.props.dataset
+      }
+    );
   }
 }
 
