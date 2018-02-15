@@ -1,45 +1,46 @@
 {
   "CancerTypes": {
-    "PRAD": "Prostate adenocarcinoma",
-    "OV": "Ovarian serous cystadenocarcinoma",
+    "PRAD": "Prostate Adenocarcinoma",
+    "OV": "Ovarian Serous Cystadenocarcinoma",
     "BLCA": "Bladder Urothelial Carcinoma",
-    "CESC": "Cervical squamous cell carcinoma and endocervical adenocarcinoma",
-    "COAD": "Colon adenocarcinoma",
-    "BRCA": "Breast invasive carcinoma",
-    "ESCA": "Esophageal carcinoma",
-    "KIRC": "Kidney renal clear cell carcinoma",
-    "STAD": "Stomach adenocarcinoma",
-    "THCA": "Thyroid carcinoma",
-    "GBM": "Glioblastoma multiforme",
+    "CESC": "Cervical Squamous Cell Carcinoma and Endocervical Adenocarcinoma",
+    "COAD": "Colon Adenocarcinoma",
+    "BRCA": "Breast Invasive Carcinoma",
+    "ESCA": "Esophageal Carcinoma",
+    "KIRC": "Kidney Renal Clear Cell Carcinoma",
+    "STAD": "Stomach Adenocarcinoma",
+    "THCA": "Thyroid Carcinoma",
+    "GBM": "Glioblastoma Multiforme",
     "LAML": "Acute Myeloid Leukemia",
     "UCEC": "Uterine Corpus Endometrial Carcinoma",
     "SARC": "Sarcoma",
-    "LUAD": "Lung adenocarcinoma",
-    "HNSC": "Head and Neck squamous cell carcinoma"
+    "LUAD": "Lung Adenocarcinoma",
+    "HNSC": "Head and Neck Squamous Cell Carcinoma"
   },
   "HealthyTissue": {
-    "NT": "Normal Tissue"
+    "NT": "Solid Tissue Normal"
   },
   "SickTissue": {
-    "TM": "Metastatic Tissue",
-    "TP": "Primary Solid Tumor Tissue"
+    "TM": "Metastatic",
+    "TP": "Primary Solid Tumor",
+    "TR": "Recurrent Solid Tumor"
   },
   "Algorithms": {
     "tree":
-      "This algorithm trains a Decision Tree to run on the data and then extracts the genes that were most helpful in dividing the cancer types.",
+      "This algorithm trains a decision tree to run on the data and then extracts the genes that were most helpful in dividing the cancer types.",
     "norm":
-      "Normalized Feature Selection. When computing feature scores, this algorithm accounts for differences between healthy and sick tissue in order to remove cell differences from the result.",
+      "This algorithm is a normalized version of feature selection. When computing feature scores, this algorithm accounts for differences between healthy and sick tissue in order to remove cell differences from the result.",
     "basic":
-      "This Feature Selection algorithm computes a score for each feature and selects the features (genes) with the best scores.",
+      "This feature selection algorithm computes a score for each feature and selects the features (genes) with the best scores.",
     "sfs":
-      "The Sequential Forward Selection greedily builds a set of features. The quality of features is measured with fitness functions, which account for the differences between sick and healthy tissue.",
+      "The sequential forward selection greedily builds a set of features. The quality of features is measured with fitness functions, which account for the differences between sick and healthy tissue.",
     "ea":
-      "An Evolutionary Algorithm that returns the set of genes that best divides the cancer types. This algorithm normalizes for healthy tissue in order not to find gene differences of different cells."
+      "This evolutionary algorithm returns the set of genes that best divides the cancer types. This algorithm normalizes for healthy tissue in order not to find gene differences of different cells."
   },
   "Parameters": {
     "k": "The number of features (genes) that are returned.",
     "n":
-      "The number of features (genes) that is excluded from the calculation to increase performance.",
+      "The number of features (genes) that are excluded from the calculation to increase performance.",
     "m":
       "The number of preselected features (genes) that are used for the calculation to increase performance.",
     "norm":
@@ -52,18 +53,24 @@
     "F1Healthy":
       "The F1 score for all healthy tissues. This is the harmonic average of the precision and recall, 1 being the best value (perfect precision and recall) and the worst being 0.",
     "CombinedFitness":
-      "The Combined Fitness score of our evaluations. It is the average of the clustering (average sick silhouette score - avg healthy silhouette score), classification (sick F1 score - healthy F1 score on a trained decisionTree), and sick vs healthy (avg F1 score for each cancer classification) fitness score."
+      "The combined fitness score of our evaluations. This is the average of the clustering (average sick silhouette score - average healthy silhouette score), classification (sick F1 score - healthy F1 score on a trained decision tree), and sick vs. healthy (average F1 score for each cancer classification) fitness score."
   },
   "GeneExpression": {
     "General":
-      "In different cancer types, genes are differently expressed. This matrix shows which genes are over- and which are underexpressed compared to the healthy cells from which the samples were taken.",
+      "In different cancer types, genes are differently expressed. This matrix shows which genes are over- and which are underexpressed compared to the healthy cells from the same region.",
     "TotalScores":
       "The calculated total scores that reflect how much a gene is already connected with cancer, according to our connected knowledge bases.",
     "GeneScoreExplanation":
-      "We search for the gene in different databases and check whether it is already associated with cancer. If a gene is not found in one of the databases, we also check for coexpressed genes. This can result in two results being displayed in one cell (in case the coexpressed gene returned a positive result). "
+      "We search for the gene in different databases and check whether it is already associated with cancer. If a gene is not found in one of the databases, we also check for coexpressed genes. This can result in two results being displayed in one cell (in case the coexpressed gene returned a positive result)."
   },
   "General": {
     "Run":
-      "Some algorithms have special requirements, resulting in the Run button being disabled if those requirements are not met. Try adding more cancer or tissue types until the button is reenabled or switch to another algorithm."
+      "Some algorithms have special requirements, resulting in the 'Run' button being disabled if those requirements are not met. Try adding more cancer or tissue types until the button is reenabled or switch to another algorithm.",
+    "OneAgainstRestResult":
+      "Because you selected the one against rest option, you can now switch between views for the selected cancer types to see all available results.",
+    "Oversampling1":
+      "This has no effect if the cancer types you selected have at least 20 samples.",
+    "Oversampling2":
+      "In case you select a cancer type with less than 20 samples, the algorithms that are based on statistical methods might not be able to work correctly. Oversampling creates more samples for the affected cancer types, which can enable statistical methods again, but may introduce bias to the result."
   }
 }

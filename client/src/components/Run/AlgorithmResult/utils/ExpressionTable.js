@@ -75,6 +75,8 @@ const ExpressionTable = props => {
                       providerName="ProteinAtlas"
                       index={index}
                       entryFound={geneResults[key].proteinAtlas}
+                      name={geneNames[index]}
+                      entryFoundName={geneResults[key].proteinAtlasName}
                       link={`https://www.proteinatlas.org/${key}`}
                       linkCoexpressed={`https://www.proteinatlas.org/${
                         geneResults[key].proteinAtlas
@@ -97,6 +99,8 @@ const ExpressionTable = props => {
                       providerName="DisGeNet"
                       index={index}
                       entryFound={geneResults[key].disgenet}
+                      name={geneNames[index]}
+                      entryFoundName={geneResults[key].disgenetName}
                       link={`http://www.disgenet.org/web/DisGeNET/menu/search`}
                       linkCoexpressed={`http://www.disgenet.org/web/DisGeNET/menu/search`}
                     />
@@ -117,6 +121,8 @@ const ExpressionTable = props => {
                       providerName="Cancer Gene Census"
                       index={index}
                       entryFound={geneResults[key].cancer_gene_census}
+                      name={geneNames[index]}
+                      entryFoundName={geneResults[key].cancer_gene_censusName}
                       link={`http://cancer.sanger.ac.uk/census`}
                       linkCoexpressed={`http://cancer.sanger.ac.uk/census`}
                     />
@@ -137,6 +143,8 @@ const ExpressionTable = props => {
                       providerName="Entrez Gene Summary"
                       index={index}
                       entryFound={geneResults[key].entrezGeneSummary}
+                      name={geneNames[index]}
+                      entryFoundName={geneResults[key].entrezGeneSummaryName}
                       link={`https://www.proteinatlas.org/${key}`}
                       linkCoexpressed={`https://www.proteinatlas.org/${
                         geneResults[key].entrezGeneSummary

@@ -5,6 +5,8 @@ const ScoreRowContent = ({
   geneId,
   index,
   entryFound,
+  name,
+  entryFoundName,
   link,
   linkCoexpressed,
   providerName,
@@ -18,7 +20,7 @@ const ScoreRowContent = ({
         <SplitStyledTableRowColumn
           key={`${providerName}-${index}-1`}
           isLeft={true}
-          title={geneId}
+          title={name}
         >
           <StyledLink href={link} target="_blank">
             -
@@ -27,7 +29,7 @@ const ScoreRowContent = ({
         <SplitStyledTableRowColumn
           key={`${providerName}-${index}-2`}
           isLeft={false}
-          title={"coexpressed: " + entryFound}
+          title={entryFoundName}
         >
           <StyledLink href={linkCoexpressed} target="_blank">
             +
@@ -36,21 +38,21 @@ const ScoreRowContent = ({
       </SplitWrapper>
     </SplitWrapperWrapper>
   ) : (
-    <StyledTableRowColumn
-      key={`${providerName}-${index}`}
-      entryFound={entryFound}
-      title={
-        entryFound
-          ? coexpressed ? "coexpressed: " + entryFound : entryFound
-          : geneId
-      }
-      coexpressed={coexpressed}
-    >
-      <StyledLink href={link} target="_blank">
-        {content}
-      </StyledLink>
-    </StyledTableRowColumn>
-  );
+      <StyledTableRowColumn
+        key={`${providerName}-${index}`}
+        entryFound={entryFound}
+        title={
+          entryFound
+            ? entryFoundName
+            : name
+        }
+        coexpressed={coexpressed}
+      >
+        <StyledLink href={link} target="_blank">
+          {content}
+        </StyledLink>
+      </StyledTableRowColumn>
+    );
 };
 
 const SplitWrapperWrapper = styled.td`

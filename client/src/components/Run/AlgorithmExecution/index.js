@@ -22,12 +22,15 @@ export default class AlgorithmExecution extends Component {
             <DataSelection {...this.props} />
           </Row>
         ) : (
-            <RunDescription {...this.props} />
-          )}
+          <RunDescription {...this.props} />
+        )}
         <CardActions>
           {this.props.disabled ? null : (
             <StyledButtonContainer>
-              <TooltipBox text={<FormattedMessage id="General.Run" />}>
+              <TooltipBox
+                text={<FormattedMessage id="General.Run" />}
+                position="top"
+              >
                 <HelpIcon />
               </TooltipBox>
               <StyledButton
@@ -61,29 +64,31 @@ export default class AlgorithmExecution extends Component {
       algorithm.sickTissueTypes.length !== 0;
 
     var enoughSamples = true;
-    // test if there are more than 10 healthy samples for each cancer type (but only if healthy types are selected)
-    if (algorithm.healthyTissueTypes.length !== 0) {
-      algorithm.cancerTypes.forEach(cancerType => {
-        var sum = 0;
-        algorithm.healthyTissueTypes.forEach(tissueType => {
-          sum += statistics.counts[cancerType][tissueType];
+    if (!this.props.oversampling) {
+      // test if there are more than 10 healthy samples for each cancer type (but only if healthy types are selected)
+      if (algorithm.healthyTissueTypes.length !== 0) {
+        algorithm.cancerTypes.forEach(cancerType => {
+          var sum = 0;
+          algorithm.healthyTissueTypes.forEach(tissueType => {
+            sum += statistics.counts[cancerType][tissueType];
+          });
+          if (sum < 10) {
+            enoughSamples = false;
+          }
         });
-        if (sum < 10) {
-          enoughSamples = false;
-        }
-      });
-    }
-    // test if there are more than 10 sick samples for each cancer type (but only if sick types are selected)
-    if (algorithm.sickTissueTypes.length !== 0) {
-      algorithm.cancerTypes.forEach(cancerType => {
-        var sum = 0;
-        algorithm.sickTissueTypes.forEach(tissueType => {
-          sum += statistics.counts[cancerType][tissueType];
+      }
+      // test if there are more than 10 sick samples for each cancer type (but only if sick types are selected)
+      if (algorithm.sickTissueTypes.length !== 0) {
+        algorithm.cancerTypes.forEach(cancerType => {
+          var sum = 0;
+          algorithm.sickTissueTypes.forEach(tissueType => {
+            sum += statistics.counts[cancerType][tissueType];
+          });
+          if (sum < 10) {
+            enoughSamples = false;
+          }
         });
-        if (sum < 10) {
-          enoughSamples = false;
-        }
-      });
+      }
     }
 
     var oneCancerTypeRunnable = true;
@@ -101,8 +106,7 @@ export default class AlgorithmExecution extends Component {
         sumSick += statistics.counts[currentCancerType][x];
       });
       oneCancerTypeRunnable =
-        (currentAlgorithm === "basic" ||
-          currentAlgorithm === "tree") &&
+        (currentAlgorithm === "basic" || currentAlgorithm === "tree") &&
         sumHealthy >= 10 &&
         sumSick >= 10;
     }
@@ -117,10 +121,15 @@ export default class AlgorithmExecution extends Component {
   }
 
   executeAlgorithm() {
-    this.props.startRun(this.props.runId, this.props.oneAgainstRest, {
-      ...this.props.algorithm,
-      dataset: this.props.dataset
-    });
+    this.props.startRun(
+      this.props.runId,
+      this.props.oneAgainstRest,
+      this.props.oversampling,
+      {
+        ...this.props.algorithm,
+        dataset: this.props.dataset
+      }
+    );
   }
 }
 
@@ -140,7 +149,7 @@ const StyledButtonContainer = styled.div`
   align-items: center;
 `;
 
-const StyledButton = styled(RaisedButton) `
+const StyledButton = styled(RaisedButton)`
   && {
     margin: 12px;
   }

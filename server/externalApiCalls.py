@@ -182,12 +182,19 @@ def lookupCoxpresdb(gene):
 
     return coexpressedGenes
 
+def getGeneName(gene, gene_names_map):
+    try:
+        result = gene_names_map[int(gene[4:])]
+    except:
+        result = gene
+    return result
+
 def testGenes(genes, cache):
     response = {}
     cancer_gene_census_data = getCancerGeneCensusData()
 
     for gene in genes:
-        cache_key = "V3_" + gene
+        cache_key = "V4_" + gene
         if cache.isCached(cache_key):
             response[gene] = cache.getCache(cache_key)
             continue
@@ -218,12 +225,25 @@ def testGenes(genes, cache):
             (0.2 if proteinAtlas else 0) + \
             (0.2 if entrezGeneSummary else 0)
         score = round(score, 2)
+        
+        gene_names_file = "data/gene_names/gene_names.npy"
+        gene_names_map = np.load(gene_names_file).item()
+        proteinAtlasName = getGeneName(proteinAtlas, gene_names_map)
+        disgenetName = getGeneName(disgenet, gene_names_map)
+        cancerGeneCensusName = getGeneName(cancerGeneCensus, gene_names_map)
+        entrezGeneSummaryName = getGeneName(entrezGeneSummary, gene_names_map)
 
         response[gene] = {
             'proteinAtlas': proteinAtlas,
             'disgenet': disgenet,
             'cancer_gene_census': cancerGeneCensus,
             'entrezGeneSummary': entrezGeneSummary,
+
+            'proteinAtlasName': proteinAtlasName,
+            'disgenetName': disgenetName,
+            'cancer_gene_censusName': cancerGeneCensusName,
+            'entrezGeneSummaryName': entrezGeneSummaryName,
+
             'score': score
         }
 

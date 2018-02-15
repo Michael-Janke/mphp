@@ -7,6 +7,7 @@ const emptyRun = {
     sickTissueTypes: ["TP"]
   },
   oneAgainstRest: true,
+  oversampling: true,
   dataset: "dataset5",
   isLoading: false,
   result: null,
