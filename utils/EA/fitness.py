@@ -49,9 +49,9 @@ def classification_fitness(sick, healthy, genes, alpha=0.5, true_label="", cv=3)
 @ignore_warnings
 def sick_vs_healthy_fitness(sick, healthy, genes, alpha=None, true_label=None, cv=3):
     clf = DecisionTreeClassifier(presort=True)
-    scores = []
-    for selected_label in np.unique(sick.labels):
-        label = selected_label.split("-")[0]
+    
+    if not true_label is None:
+        label = true_label.split("-")[0]
         sick_indices = np.flatnonzero(np.core.defchararray.find(sick.labels, label) != -1)
         healthy_indices = np.flatnonzero(np.core.defchararray.find(healthy.labels, label) != -1)
 
@@ -59,9 +59,22 @@ def sick_vs_healthy_fitness(sick, healthy, genes, alpha=None, true_label=None, c
         labels = np.hstack((sick.labels[sick_indices], healthy.labels[healthy_indices]))
 
         score = cross_validate(clf, data, labels, cv=cv, scoring="f1_macro", return_train_score=False)["test_score"].mean()
-        scores.append(score)
+        return score
 
-    return min(scores)
+    else:
+        scores = []
+        for selected_label in np.unique(sick.labels):
+            label = selected_label.split("-")[0]
+            sick_indices = np.flatnonzero(np.core.defchararray.find(sick.labels, label) != -1)
+            healthy_indices = np.flatnonzero(np.core.defchararray.find(healthy.labels, label) != -1)
+
+            data = np.vstack((sick.expressions[sick_indices][:,genes], healthy.expressions[healthy_indices][:,genes]))
+            labels = np.hstack((sick.labels[sick_indices], healthy.labels[healthy_indices]))
+
+            score = cross_validate(clf, data, labels, cv=cv, scoring="f1_macro", return_train_score=False)["test_score"].mean()
+            scores.append(score)
+
+        return np.mean(scores)
 
 def clustering_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
     sick_silhouette_samples = (silhouette_samples(sick.expressions[:,genes], sick.labels) + 1) / 2
@@ -79,7 +92,7 @@ def clustering_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
 def combined_fitness(sick, healthy, genes, alpha=0.5, beta=0.5, true_label="", cv=3, return_single_scores=False):
     class_score = classification_fitness(sick, healthy, genes, alpha, true_label=true_label, cv=cv)
     clust_score = clustering_fitness(sick, healthy, genes, alpha, true_label=true_label)
-    s_v_h_score = sick_vs_healthy_fitness(sick, healthy, genes, cv=cv)
+    s_v_h_score = sick_vs_healthy_fitness(sick, healthy, genes, true_label=true_label, cv=cv)
     combi_score = (class_score + clust_score + s_v_h_score) / 3
 
     if return_single_scores:
