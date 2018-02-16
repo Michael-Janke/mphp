@@ -79,12 +79,15 @@ def sick_vs_healthy_fitness(sick, healthy, genes, alpha=None, true_label=None, c
 
 def clustering_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
     start = time()
-    sick_split = StratifiedShuffleSplit(n_splits=1, test_size=None, train_size=min(len(sick.labels)-1, 100), random_state=0)
-    healthy_split = StratifiedShuffleSplit(n_splits=1, test_size=None, train_size=min(len(healthy.labels)-1, 100), random_state=0)
+    n_cancers = np.unique(sick.labels).shape[0]
+    sick_split = StratifiedShuffleSplit(n_splits=1, test_size=None, train_size=min(len(sick.labels)-n_cancers, n_cancers*100), random_state=0)
+    healthy_split = StratifiedShuffleSplit(n_splits=1, test_size=None, train_size=min(len(healthy.labels)-n_cancers, n_cancers*100), random_state=0)
     sick_indices, _ = next(sick_split.split(sick.expressions, sick.labels))
     healthy_indices, _ = next(healthy_split.split(healthy.expressions, healthy.labels))
-    sick_silhouette_samples = (silhouette_samples(sick.expressions[sick_indices,:][:,genes], sick.labels[sick_indices]) + 1) / 2
-    healthy_silhouette_samples = (silhouette_samples(healthy.expressions[healthy_indices,:][:,genes], healthy.labels[healthy_indices]) + 1) / 2
+
+    sick_silhouette_samples = (silhouette_samples(sick.expressions[:,genes][sick_indices,:], sick.labels[sick_indices]) + 1) / 2
+    healthy_silhouette_samples = (silhouette_samples(healthy.expressions[:,genes][healthy_indices,:], healthy.labels[healthy_indices]) + 1) / 2
+    
     fitness = 0
     if not true_label:
         sick_cluster_silhouettes = [np.mean(sick_silhouette_samples[sick.labels[sick_indices]==label]) for label in np.unique(sick.labels)]
