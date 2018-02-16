@@ -42,14 +42,15 @@ export default class InteractivePlot extends Component {
     if (data && geneNames) {
       plotData = Object.keys(data).map((key, index) => {
         const cancerType = key.split("-")[0];
-        const tissueType = key.split("-")[1];
 
         if (oneAgainstRest) {
-          if (cancerType === this.props.cancerType && tissueType === "sick") {
+          const tissueType = key.split("-")[1];
+          if (cancerType === this.props.cancerType) {
             color = Color(statisticsColors[5]);
           } else {
             color = Color(statisticsColors[2]);
           }
+          color = tissueType === "sick" ? color : color.lighten(7);
         } else if (oldCancerType !== cancerType) {
           color = Color(statisticsColors[colorIndex++]);
           oldCancerType = cancerType;
