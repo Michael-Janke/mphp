@@ -48,6 +48,7 @@ def execute(algorithm, dataLoader, one_against_rest, oversampling):
 
 def  assembleResponse(data, labels, gene_indices, expression_matrix, evaluation, geneLabels, geneNames):
     X = data["combined"].expressions[:, gene_indices]
+    X = X[:,0:3]
     response_data = {}
     for label in np.unique(labels):
         response_data[label] = X[labels == label, :].T.tolist()

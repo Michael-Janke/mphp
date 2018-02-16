@@ -83,11 +83,16 @@ def clustering_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
         silhoutte_healthy = np.mean(healthy_silhouette_samples[healthy.labels==true_label+"-healthy"])
         return (alpha * silhoutte_sick + (1- alpha) * (1 - silhoutte_healthy))
 
-def combined_fitness(sick, healthy, genes, alpha=0.5, beta=0.5, true_label="", cv=3):
-    return 1/3 * classification_fitness(sick, healthy, genes, alpha, true_label=true_label, cv=cv)\
-        + 1/3 * clustering_fitness(sick, healthy, genes, alpha, true_label=true_label)\
-        + 1/3 * sick_vs_healthy_fitness(sick, healthy, genes, cv=cv)
+def combined_fitness(sick, healthy, genes, alpha=0.5, beta=0.5, true_label="", cv=3, return_single_scores=False):
+    class_score = classification_fitness(sick, healthy, genes, alpha, true_label=true_label, cv=cv)
+    clust_score = clustering_fitness(sick, healthy, genes, alpha, true_label=true_label)
+    s_v_h_score = sick_vs_healthy_fitness(sick, healthy, genes, cv=cv)
+    combi_score = (class_score + clust_score + s_v_h_score) / 3
 
+    if return_single_scores:
+        return (combi_score, class_score, clust_score, s_v_h_score)
+    else:
+        return combi_score
 
 def distance_fitness(sick, healthy, genes, true_label=""):
     sick_intra_distance, sick_inner_distance = compute_cluster_distance(sick, genes, true_label)
