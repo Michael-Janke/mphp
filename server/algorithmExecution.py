@@ -104,9 +104,9 @@ def run(algorithm, data, oneAgainstRest):
         healthy = data["healthy"] if method_is_normalized else ""
 
         if norm != None:
-            features = dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method, normalization=norm)
+            features = dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method, fitness=fitness, normalization=norm)
         else:
-            features = dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method)
+            features = dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method, fitness=fitness)
 
         return labels, features
 

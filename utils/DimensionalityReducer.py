@@ -201,7 +201,7 @@ class DimensionalityReducer():
             if fitness == "combined" or fitness == "clustering":
                 n_jobs = int(len(temp_genes) / 25) # 1 process for 25 iterations
             else:
-                n_jobs = int(len(temp_genes) / 100) # 1 process for 100 iterations
+                n_jobs = int(len(genes) / 50) # 1 process for 50 iterations
 
             n_jobs = max(1, n_jobs)
             n_jobs = min(8, n_jobs)
@@ -274,7 +274,7 @@ class DimensionalityReducer():
         backend = "threading"
         if (method == "sfs" or method == "ea") and not healthy == "":
             backend = "multiprocessing"
-        
+
         feature_sets = Parallel(n_jobs=n_jobs, backend=backend)\
             (delayed(self.getOneAgainstRestFeaturesForLabel)(sick, healthy, k, method, normalization, fitness, label) for label in labels)
 
