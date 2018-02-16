@@ -64,7 +64,7 @@ export default class InteractivePlot extends Component {
         }
 
         return {
-          type: "scatter3d",
+          type: `scatter${geneNames.length > 2 ? "3d" : ""}`,
           mode: "markers",
           name: key,
           x: data[key][0],
@@ -78,29 +78,49 @@ export default class InteractivePlot extends Component {
         };
       });
 
-      plotLayout = {
-        margin: {
-          l: 0,
-          r: 0,
-          b: 0,
-          t: 0
-        },
-        scene: {
-          xaxis: {
-            title: geneNames[0]
-          },
-          yaxis: {
-            title: geneNames[1]
-          },
-          zaxis: {
-            title: geneNames[2]
-          }
-        },
-        legend: {
-          yanchor: "middle",
-          y: 0.7
-        }
-      };
+      plotLayout =
+        geneNames.length > 2
+          ? {
+              margin: {
+                l: 0,
+                r: 0,
+                b: 0,
+                t: 0
+              },
+              scene: {
+                xaxis: {
+                  title: geneNames[0]
+                },
+                yaxis: {
+                  title: geneNames[1]
+                },
+                zaxis: {
+                  title: geneNames[2]
+                }
+              },
+              legend: {
+                yanchor: "middle",
+                y: 0.7
+              }
+            }
+          : {
+              margin: {
+                l: 0,
+                r: 0,
+                b: 0,
+                t: 0
+              },
+              xaxis: {
+                title: geneNames[0]
+              },
+              yaxis: {
+                title: geneNames[1]
+              },
+              legend: {
+                yanchor: "middle",
+                y: 0.7
+              }
+            };
     }
 
     return (
