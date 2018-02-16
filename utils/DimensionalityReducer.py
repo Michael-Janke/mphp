@@ -201,11 +201,7 @@ class DimensionalityReducer():
             if fitness == "combined" or fitness == "clustering":
                 n_jobs = int(len(temp_genes) / 25) # 1 process for 25 iterations
             else:
-<<<<<<< HEAD
                 n_jobs = int(len(genes) / 50) # 1 process for 50 iterations
-=======
-                n_jobs = int(len(temp_genes) / 100) # 1 process for 100 iterations
->>>>>>> d540490b82a51a7abd2970d820e21c7ef79a61d0
 
             n_jobs = max(1, n_jobs)
             n_jobs = min(8, n_jobs)
