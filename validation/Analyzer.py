@@ -117,17 +117,17 @@ class Analyzer:
         for label in np.unique(sick.labels):
             cancertype = label.split("-")[0]
 
-            healthy_X = healthy.expressions[healthy.labels==cancertype+"-healthy"]
-            sick_X = sick.expressions[sick.labels==cancertype+"-sick"]
+            sick_rows = np.flatnonzero(np.core.defchararray.find(cancertype+"-sick",sick.labels)!=-1)
+            healthy_rows = np.flatnonzero(np.core.defchararray.find(cancertype+"-healthy",healthy.labels)!=-1)
 
             for gene in selected_genes:
-                if healthy_X.shape[0] < 20:
-                    U_high, p_high = mannwhitneyu(sick_X[:,gene], healthy_X[:,gene], alternative="greater")
-                    U_low,  p_low  = mannwhitneyu(sick_X[:,gene], healthy_X[:,gene], alternative="less")
-                    expression = "greater" if p_high < 0.01 else "less" if p_low < 0.01 else "unchanged"
+                _, p_high = mannwhitneyu(sick.expressions[sick_rows,gene], healthy.expressions[healthy_rows,gene], alternative="greater")
+                _, p_low  = mannwhitneyu(sick.expressions[sick_rows,gene], healthy.expressions[healthy_rows,gene], alternative="less")
+                expression = "greater" if p_high < 0.01 else "less" if p_low < 0.01 else "unchanged"
+                
+                if healthy_rows.shape[0] < 20:
                     expressions[cancertype].append("cant compute - " + expression)
                 else:
-                    U_high, p_high = mannwhitneyu(sick_X[:,gene], healthy_X[:,gene], alternative="greater")
-                    U_low,  p_low  = mannwhitneyu(sick_X[:,gene], healthy_X[:,gene], alternative="less")
-                    expressions[cancertype].append("greater" if p_high < 0.01 else "less" if p_low < 0.01 else "unchanged")
+                    expressions[cancertype].append(expression)
+
         return expressions
