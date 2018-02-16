@@ -272,7 +272,7 @@ class DimensionalityReducer():
         n_jobs = min(5, n_labels)
 
         backend = "threading"
-        if (method == "sfs" or method == "ea") and not healthy == "" and not fitness == "distance":
+        if (method == "sfs" or method == "ea") and not healthy == "":
             backend = "multiprocessing"
 
         feature_sets = Parallel(n_jobs=n_jobs, backend=backend)\
