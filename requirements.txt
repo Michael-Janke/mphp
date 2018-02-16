@@ -12,3 +12,4 @@ Flask-Cors==3.0.3
 imbalanced-learn==0.3.2
 gunicorn==19.7.1
 joblib==0.11
+Werkzeug==0.14.1
