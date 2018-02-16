@@ -1,8 +1,9 @@
 import numpy as np
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import cross_val_score, cross_validate
+from sklearn.model_selection import cross_val_score, cross_validate, StratifiedShuffleSplit
 from sklearn.metrics import silhouette_samples
 from utils import ignore_warnings, binarize_labels
+from time import time
 
 from utils.EA.population import phenotype
 
@@ -49,7 +50,7 @@ def classification_fitness(sick, healthy, genes, alpha=0.5, true_label="", cv=3)
 @ignore_warnings
 def sick_vs_healthy_fitness(sick, healthy, genes, alpha=None, true_label=None, cv=3):
     clf = DecisionTreeClassifier(presort=True)
-    
+
     if not true_label is None:
         label = true_label.split("-")[0]
         sick_indices = np.flatnonzero(np.core.defchararray.find(sick.labels, label) != -1)
@@ -77,17 +78,24 @@ def sick_vs_healthy_fitness(sick, healthy, genes, alpha=None, true_label=None, c
         return np.mean(scores)
 
 def clustering_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
-    sick_silhouette_samples = (silhouette_samples(sick.expressions[:,genes], sick.labels) + 1) / 2
-    healthy_silhouette_samples = (silhouette_samples(healthy.expressions[:,genes], healthy.labels) + 1) / 2
-
+    start = time()
+    sick_split = StratifiedShuffleSplit(n_splits=1, test_size=None, train_size=min(len(sick.labels)-1, 100), random_state=0)
+    healthy_split = StratifiedShuffleSplit(n_splits=1, test_size=None, train_size=min(len(healthy.labels)-1, 100), random_state=0)
+    sick_indices, _ = next(sick_split.split(sick.expressions, sick.labels))
+    healthy_indices, _ = next(healthy_split.split(healthy.expressions, healthy.labels))
+    sick_silhouette_samples = (silhouette_samples(sick.expressions[sick_indices,:][:,genes], sick.labels[sick_indices]) + 1) / 2
+    healthy_silhouette_samples = (silhouette_samples(healthy.expressions[healthy_indices,:][:,genes], healthy.labels[healthy_indices]) + 1) / 2
+    fitness = 0
     if not true_label:
-        sick_cluster_silhouettes = [np.mean(sick_silhouette_samples[sick.labels==label]) for label in np.unique(sick.labels)]
-        healthy_cluster_silhouettes = [np.mean(healthy_silhouette_samples[healthy.labels==label]) for label in np.unique(healthy.labels)]
-        return (alpha * np.mean(sick_cluster_silhouettes) + (1 - alpha) * (1 - np.mean(healthy_cluster_silhouettes)))
+        sick_cluster_silhouettes = [np.mean(sick_silhouette_samples[sick.labels[sick_indices]==label]) for label in np.unique(sick.labels)]
+        healthy_cluster_silhouettes = [np.mean(healthy_silhouette_samples[healthy.labels[healthy_indices]==label]) for label in np.unique(healthy.labels)]
+        fitness = (alpha * np.mean(sick_cluster_silhouettes) + (1 - alpha) * (1 - np.mean(healthy_cluster_silhouettes)))
     else:
-        silhoutte_sick = np.mean(sick_silhouette_samples[sick.labels==true_label+"-sick"])
-        silhoutte_healthy = np.mean(healthy_silhouette_samples[healthy.labels==true_label+"-healthy"])
-        return (alpha * silhoutte_sick + (1- alpha) * (1 - silhoutte_healthy))
+        silhoutte_sick = np.mean(sick_silhouette_samples[sick.labels[sick_indices]==true_label+"-sick"])
+        silhoutte_healthy = np.mean(healthy_silhouette_samples[healthy.labels[healthy_indices]==true_label+"-healthy"])
+        fitness = (alpha * silhoutte_sick + (1- alpha) * (1 - silhoutte_healthy))
+    print(sick.expressions.shape[0], healthy.expressions.shape[0], len(genes), time() - start)
+    return fitness
 
 def combined_fitness(sick, healthy, genes, alpha=0.5, beta=0.5, true_label="", cv=3, return_single_scores=False):
     class_score = classification_fitness(sick, healthy, genes, alpha, true_label=true_label, cv=cv)
