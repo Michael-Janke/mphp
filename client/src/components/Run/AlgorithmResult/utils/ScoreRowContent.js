@@ -4,17 +4,17 @@ import styled from "styled-components";
 const ScoreRowContent = ({
   geneId,
   index,
-  entryFound,
+  geneResult,
   name,
-  entryFoundName,
   link,
   linkCoexpressed,
-  providerName,
-  coexpressed
+  providerName
 }) => {
-  const content = entryFound ? "+" : "-";
-  coexpressed = entryFound !== geneId;
-  return entryFound && coexpressed ? (
+  const entryFound = geneResult.gene !== "notFound" && geneResult.gene !== "noCancer";
+  const entryFoundName = geneResult.name;
+  const coexpressed = geneResult.coexpressed !== "notFound" && geneResult.coexpressed !== "noCancer" && geneResult.coexpressed !== geneId;
+
+  return coexpressed ? (
     <SplitWrapperWrapper>
       <SplitWrapper>
         <SplitStyledTableRowColumn
@@ -41,6 +41,7 @@ const ScoreRowContent = ({
       <StyledTableRowColumn
         key={`${providerName}-${index}`}
         entryFound={entryFound}
+        noCancer={geneResult.gene == "noCancer"}
         title={
           entryFound
             ? entryFoundName
@@ -49,7 +50,7 @@ const ScoreRowContent = ({
         coexpressed={coexpressed}
       >
         <StyledLink href={link} target="_blank">
-          {content}
+          {entryFound ? "+" : "-"}
         </StyledLink>
       </StyledTableRowColumn>
     );
@@ -78,7 +79,8 @@ const SplitStyledTableRowColumn = styled.div`
 
 const StyledTableRowColumn = styled.td`
   background: ${props =>
-    props.entryFound ? props.theme.leafGreen : props.theme.lightGray};
+    props.entryFound ? props.theme.leafGreen :
+      (props.noCancer ? props.theme.lightGray : props.theme.darkGray)};
   text-align: center;
   font-size: 1em;
   border-left: solid 1px white;
