@@ -111,7 +111,8 @@ def distance_fitness(sick, healthy, genes, true_label=""):
 
 
 def compute_cluster_distance(data, genes, true_label=""):
-    normalized_data = data.expressions[:,genes] / np.max(data.expressions[:,genes], axis=0)
+    normalized_data = np.copy(data.expressions[:,genes])
+    normalized_data = normalized_data / np.max(normalized_data, axis=0)
 
     centers = []
     deviations = []
@@ -125,8 +126,11 @@ def compute_cluster_distance(data, genes, true_label=""):
     dist = 0
     for i in range(len(unique_labels)-1):
         for j in range(i+1, len(unique_labels)-1):
-            if true_label in unique_labels[i] or true_label in unique_labels[j] or not true_label:
+            if true_label == "":
                 dist += np.linalg.norm(centers[i][0] - centers[j][0])
+            else:
+                if true_label in unique_labels[i] or true_label in unique_labels[j]:
+                    dist += np.linalg.norm(centers[i][0] - centers[j][0])
 
     number_types = np.unique(data.labels).shape[0]
     deviation = np.sum(deviations)/number_types
