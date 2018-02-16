@@ -190,31 +190,32 @@ class DimensionalityReducer():
         called by getFeaturesBySFS
     '''
     def getFeatureSetBySFS(self, sick, healthy, genes, k, fitness, true_label=""):
+        temp_genes = np.copy(genes)
+
         # first gene has highest score and will be selected first
-        indices = [genes[0]]
+        indices = [temp_genes[0]]
+        temp_genes = np.delete(temp_genes, 0)
 
         # iteratively join the best next feature based on a fitness function until k features are found
         for idx in range(k-1):
             if fitness == "combined" or fitness == "clustering":
-                n_jobs = int(len(genes) / 25) # 1 process for 25 iterations
+                n_jobs = int(len(temp_genes) / 25) # 1 process for 25 iterations
             else:
-                n_jobs = int(len(genes) / 100) # 1 process for 100 iterations
+                n_jobs = int(len(temp_genes) / 100) # 1 process for 100 iterations
 
+            n_jobs = max(1, n_jobs)
             n_jobs = min(8, n_jobs)
-            chunks = self.chunks(genes, int(len(genes) / n_jobs))
+            chunks = self.chunks(temp_genes, int(len(temp_genes) / n_jobs))
             fitness_scores = Parallel(n_jobs=n_jobs, backend="threading")\
-                (delayed(self.call_fitness_function)(sick, healthy, indices, chunks[i], fitness, true_label) for i in range(n_jobs))
+                (delayed(self.call_fitness_function)(sick, healthy, indices, chunk, fitness, true_label) for chunk in chunks)
 
             scores = []
             for f in fitness_scores:
                 scores.extend(f)
-            best_genes = np.asarray(scores).argsort()[::-1]
+            best_gene = np.asarray(scores).argsort()[-1]
 
-            i = 0
-            while genes[best_genes[i]] in indices:
-                i += 1
-
-            indices.append(genes[best_genes[i]])
+            indices.append(genes[best_gene])
+            temp_genes = np.delete(temp_genes, best_gene)
             print("added new feature", flush=True)
 
         return np.asarray(indices)

@@ -5,16 +5,32 @@ from validation.Analyzer import Analyzer
 from server.availableAlgorithms import is_normalized
 from utils import Expressions
 from utils.Sampler import Sampler
+from datetime import datetime
 
 dimReducer = DimensionalityReducer()
 analyzer = Analyzer()
 
 def execute(algorithm, dataLoader, one_against_rest, oversampling):
+    start = datetime.now()
     data = getData(algorithm, dataLoader, oversampling)
+    print("Got data", flush=True)
+    print(datetime.now() - start, flush=True)
     
+    
+    start = datetime.now()
     labels, gene_indices = run(algorithm, data, one_against_rest)
+    print("Feature Selection done", flush=True)
+    print(datetime.now() - start, flush=True)
+    
+    start = datetime.now()
     expression_matrix = calcExpressionMatrix(algorithm, data, gene_indices, one_against_rest)
+    print("Expression Matrix done", flush=True)
+    print(datetime.now() - start, flush=True)
+    
+    start = datetime.now()
     evaluation = evaluate(algorithm, data, gene_indices, one_against_rest)
+    print("Validation done", flush=True)
+    print(datetime.now() - start, flush=True)
 
     if one_against_rest:
         response = {}
@@ -32,6 +48,7 @@ def execute(algorithm, dataLoader, one_against_rest, oversampling):
 
 def  assembleResponse(data, labels, gene_indices, expression_matrix, evaluation, geneLabels, geneNames):
     X = data["combined"].expressions[:, gene_indices]
+    X = X[:,0:3]
     response_data = {}
     for label in np.unique(labels):
         response_data[label] = X[labels == label, :].T.tolist()
@@ -53,14 +70,13 @@ def getData(algorithm, dataLoader, oversampling):
     sick = dataLoader.replaceLabels(sick)
     healthy = dataLoader.getData(healthy_tissue_types, cancer_types)
     healthy = dataLoader.replaceLabels(healthy)
-    combined = Expressions(np.vstack((sick.expressions, healthy.expressions)), np.hstack((sick.labels, healthy.labels)))
 
     if oversampling:
         sampler = Sampler()
         healthy = sampler.over_sample(healthy)
         sick = sampler.over_sample(sick)
-        combined = sampler.over_sample(combined)
 
+    combined = Expressions(np.vstack((sick.expressions, healthy.expressions)), np.hstack((sick.labels, healthy.labels)))
     data = {
         "sick": sick,
         "healthy": healthy,

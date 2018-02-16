@@ -8,6 +8,8 @@ from collections import defaultdict
 from numpy.core.defchararray import find
 from scipy.stats import mannwhitneyu
 
+from joblib import Parallel, delayed
+
 class Analyzer:
     def __init__(self):
         pass
@@ -21,18 +23,28 @@ class Analyzer:
         selected_genes_dict: call with result from getOneAgainstRestFeatures
     '''
     def computeFeatureValidationOneAgainstRest(self, sick, healthy, selected_genes_dict):
-        results = {}
-        for label, genes in selected_genes_dict.items():
-            results[label] = self.computeFeatureValidation(sick, healthy, genes, true_label=label)
+        n_jobs = len(selected_genes_dict.keys())
+        items = list(selected_genes_dict.items())
+
+        results = Parallel(n_jobs=n_jobs, backend="threading")\
+            (delayed(self.computeFeatureValidationWrapper)(sick, healthy, label, genes) for label, genes in items)
+
+        combined_results = {}
+        for label, validation in results:
+            combined_results[label] = validation
 
         if healthy:
             cumulated_fitness = 0
-            for res in results.values():
+            for res in combined_results.values():
                 cumulated_fitness += res["fitness"]["combinedFitness"]
 
-            results["meanFitness"] = cumulated_fitness / len(results.keys())
+            combined_results["meanFitness"] = cumulated_fitness / len(combined_results.keys())
 
-        return results
+        return combined_results
+
+    def computeFeatureValidationWrapper(self, sick, healthy, label, genes):
+        validation = self.computeFeatureValidation(sick, healthy, genes, true_label=label)
+        return label, validation
 
     '''
         case 1:
@@ -52,12 +64,11 @@ class Analyzer:
 
         healthy_validation = self.assembleValidationOutput(healthy, selected_genes, true_label=true_label)
 
-        class_fitness = classification_fitness(sick, healthy, selected_genes, true_label=true_label, cv=5)
-        clus_fitness = clustering_fitness(sick, healthy, selected_genes, true_label=true_label)
-        comb_fitness = combined_fitness(sick, healthy, selected_genes, true_label=true_label, cv=5)
+        fitness_scores = combined_fitness(sick, healthy, selected_genes, true_label=true_label, cv=5, return_single_scores=True)
+        comb_fitness, class_fitness, clus_fitness, s_vs_h_fitness = fitness_scores
+        
         dist_fitness = distance_fitness(sick, healthy, selected_genes, true_label=true_label)
-        s_vs_h_fitness = sick_vs_healthy_fitness(sick, healthy, selected_genes, cv=5)
-
+        
         return {
             "sick": sick_validation,
             "healthy": healthy_validation,
@@ -80,12 +91,21 @@ class Analyzer:
         selected_genes_dict: call with result from getOneAgainstRestFeatures
     '''
     def computeExpressionMatrixOneAgainstRest(self, sick, healthy, selected_genes_dict):
-        results = {}
-        for label, genes in selected_genes_dict.items():
-            matrix = self.computeExpressionMatrix(sick, healthy, genes)
-            results[label] = {label: matrix[label]}
+        n_jobs = len(selected_genes_dict.keys())
+        items = list(selected_genes_dict.items())
 
-        return results
+        results = Parallel(n_jobs=n_jobs, backend="threading")\
+            (delayed(self.computeExpressionMatrixWrapper)(sick, healthy, label, genes) for label, genes in items)
+
+        combined_results = {}
+        for label, matrix in results:
+            combined_results[label] = {label: matrix[label]}
+
+        return combined_results
+
+    def computeExpressionMatrixWrapper(self, sick, healthy, label, genes):
+        matrix = self.computeExpressionMatrix(sick, healthy, genes)
+        return label, matrix
 
     '''
         sick and healthy should contain at least one cancer type
@@ -96,17 +116,17 @@ class Analyzer:
         for label in np.unique(sick.labels):
             cancertype = label.split("-")[0]
 
-            healthy_X = healthy.expressions[healthy.labels==cancertype+"-healthy"]
-            sick_X = sick.expressions[sick.labels==cancertype+"-sick"]
+            sick_rows = np.flatnonzero(np.core.defchararray.find(cancertype+"-sick",sick.labels)!=-1)
+            healthy_rows = np.flatnonzero(np.core.defchararray.find(cancertype+"-healthy",healthy.labels)!=-1)
 
             for gene in selected_genes:
-                if healthy_X.shape[0] < 20:
-                    U_high, p_high = mannwhitneyu(sick_X[:,gene], healthy_X[:,gene], alternative="greater")
-                    U_low,  p_low  = mannwhitneyu(sick_X[:,gene], healthy_X[:,gene], alternative="less")
-                    expression = "greater" if p_high < 0.01 else "less" if p_low < 0.01 else "unchanged"
+                _, p_high = mannwhitneyu(sick.expressions[sick_rows,gene], healthy.expressions[healthy_rows,gene], alternative="greater")
+                _, p_low  = mannwhitneyu(sick.expressions[sick_rows,gene], healthy.expressions[healthy_rows,gene], alternative="less")
+                expression = "greater" if p_high < 0.01 else "less" if p_low < 0.01 else "unchanged"
+                
+                if healthy_rows.shape[0] < 20:
                     expressions[cancertype].append("cant compute - " + expression)
                 else:
-                    U_high, p_high = mannwhitneyu(sick_X[:,gene], healthy_X[:,gene], alternative="greater")
-                    U_low,  p_low  = mannwhitneyu(sick_X[:,gene], healthy_X[:,gene], alternative="less")
-                    expressions[cancertype].append("greater" if p_high < 0.01 else "less" if p_low < 0.01 else "unchanged")
+                    expressions[cancertype].append(expression)
+
         return expressions
