@@ -78,7 +78,6 @@ def sick_vs_healthy_fitness(sick, healthy, genes, alpha=None, true_label=None, c
         return np.mean(scores)
 
 def clustering_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
-    start = time()
     n_cancers = np.unique(sick.labels).shape[0]
     sick_split = StratifiedShuffleSplit(n_splits=1, test_size=None, train_size=min(len(sick.labels)-n_cancers, n_cancers*100), random_state=0)
     healthy_split = StratifiedShuffleSplit(n_splits=1, test_size=None, train_size=min(len(healthy.labels)-n_cancers, n_cancers*100), random_state=0)
@@ -97,7 +96,6 @@ def clustering_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
         silhoutte_sick = np.mean(sick_silhouette_samples[sick.labels[sick_indices]==true_label+"-sick"])
         silhoutte_healthy = np.mean(healthy_silhouette_samples[healthy.labels[healthy_indices]==true_label+"-healthy"])
         fitness = (alpha * silhoutte_sick + (1- alpha) * (1 - silhoutte_healthy))
-    print(sick.expressions.shape[0], healthy.expressions.shape[0], len(genes), time() - start)
     return fitness
 
 def combined_fitness(sick, healthy, genes, alpha=0.5, beta=0.5, true_label="", cv=3, return_single_scores=False):
