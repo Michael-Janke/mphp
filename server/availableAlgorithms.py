@@ -28,7 +28,22 @@ algorithms = {
                 "key": "norm",
                 "name": "Normalization method",
                 "default": "exclude",
-                "available": ["subtract", "exclude", "relief"]
+                "available": ["subtract", "exclude"]
+            }
+        ]
+    },
+    'relief': {
+        "name": "Normalized ReliefF",
+        "parameters": [
+            {
+                "key": "k",
+                "name": "#Features",
+                "default": 5
+            },
+            {
+                "key": "n",
+                "name": "#Excluded features",
+                "default": 5000
             }
         ]
     },
@@ -64,7 +79,7 @@ algorithms = {
                 "key": "norm",
                 "name": "Preselection normalization",
                 "default": "exclude",
-                "available": ["subtract", "exclude", "relief"]
+                "available": ["subtract", "exclude"]
             },
             {
                 "key": "fitness",
@@ -96,7 +111,7 @@ algorithms = {
                 "key": "norm",
                 "name": "Preselection normalization",
                 "default": "exclude",
-                "available": ["subtract", "exclude", "relief"]
+                "available": ["subtract", "exclude"]
             },
             {
                 "key": "fitness",
@@ -112,6 +127,6 @@ algorithms = {
 def is_normalized(method):
     normalized_methods = [
         key for key in algorithms.keys()
-        if any(x.get("key", None) == "norm" for x in algorithms[key]["parameters"])
+        if key == "relief" or any(x.get("key", None) == "norm" for x in algorithms[key]["parameters"])
     ]
     return method in normalized_methods
