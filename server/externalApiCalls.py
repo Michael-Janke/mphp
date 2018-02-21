@@ -68,6 +68,7 @@ def lookupDisgenet(gene):
         f.close()
     except:
         print("Error disgenet: " + gene)
+        return "notFound"
 
     if results is not None:
 
@@ -92,8 +93,8 @@ def lookupDisgenet(gene):
             for k, v in semantic_type.items():
                 if k == 'value':
                     if 'T191' in v:
-                        return True
-    return False
+                        return gene
+    return "noCancer"
 
 
 def lookupOpenTarget(gene):
@@ -103,14 +104,16 @@ def lookupOpenTarget(gene):
         response = ot.filter_associations()
         response.filter(target=gene)
         response.filter(direct=True)
-        response.filter(scorevalue_min=0.01)
+        response.filter(scorevalue_min=0.1)
         for i, r in enumerate(response):
             disease = r['disease']['efo_info']['label']
             if any(s in disease for s in cancer_strings):
-                return True
+                return gene
+
+        return "noCancer"
 
     except: print("Error opentarget")
-    return False
+    return "notFound"
 
 
 def lookupProteinAtlas(gene):
@@ -129,10 +132,11 @@ def lookupProteinAtlas(gene):
         proteinClass = dom.getElementsByTagName('proteinClass')
         for c in proteinClass:
             if c.attributes['name'].value == "Cancer-related genes":
-                return True
+                return gene
     except:
         print("Error protein atlas: " + gene)
-    return False
+        return "notFound"
+    return "noCancer"
 
 
 def lookupCancerGeneCensus(gene, cancer_gene_census_data):
@@ -141,8 +145,8 @@ def lookupCancerGeneCensus(gene, cancer_gene_census_data):
         # filter out NaN values
         if gene_synonyms == gene_synonyms:
             if gene in gene_synonyms:
-                return True
-    return False
+                return gene
+    return "noCancer"
 
 
 def lookupEntrezGeneSummary(gene):
@@ -164,10 +168,12 @@ def lookupEntrezGeneSummary(gene):
         summary = dom.getElementsByTagName(
             'Summary')[0].childNodes[0].nodeValue
         if "cancer" in summary:
-            return True
+            return gene
+        else:
+            return "noCancer"
     except:
         print("Error entrez gene summary: " + gene)
-    return False
+        return "notFound"
 
 
 def lookupCoxpresdb(gene):
@@ -201,45 +207,55 @@ def lookupCoxpresdb(gene):
     return coexpressedGenes
 
 def getGeneName(gene, gene_names_map):
+    if not isCancer(gene):
+        return None
     try:
         result = gene_names_map[int(gene[4:])]
     except:
         result = gene
     return result
 
+def isCancer(gene):
+    return gene != "notFound" and gene != "noCancer"
+
+
+cache_version = "V5_"
+
 def testGenes(genes, cache):
     response = {}
 
     for gene in genes:
-        cache_key = "V4_" + gene
-        #if cache.isCached(cache_key):
-    #        response[gene] = cache.getCache(cache_key)
-    #        continue
+        cache_key = cache_version + "Reduced" + gene
+        if cache.isCached(cache_key):
+            response[gene] = cache.getCache(cache_key)
+            continue
+        openTarget = lookupOpenTarget(gene)
+        coOpenTarget = openTarget
 
-        openTarget = gene if lookupOpenTarget(gene) else None
         coexpressedGenes = lookupCoxpresdb(gene)
         inverted_entrez_labels_map = getInvertedEntrezNamesMap()
 
         try:
             for coGene in coexpressedGenes:
                 coGeneName = "ENSG" + str(inverted_entrez_labels_map[coGene]).zfill(11)
-                if not openTarget:
-                    openTarget = coGeneName if lookupOpenTarget(coGeneName) else None
+                if not isCancer(coOpenTarget):
+                    coOpenTarget = lookupOpenTarget(coGeneName)
 
         except:
             print("Error. No Inverted Entrez Label Entry.")
 
-        #TODO: Add openTarget to score
         score = 0
         score = round(score, 2)
 
         gene_names_file = "data/gene_names/gene_names.npy"
         gene_names_map = np.load(gene_names_file).item()
-        openTargetName = getGeneName(openTarget, gene_names_map)
 
         response[gene] = {
-            'openTarget': openTarget,
-            'openTargetName': openTargetName,
+            'openTarget': {
+                'gene': openTarget,
+                'coexpressed': coOpenTarget,
+                'name': getGeneName(coOpenTarget, gene_names_map)
+            },
             'score': score
         }
 
@@ -252,63 +268,77 @@ def fullTestGenes(genes, cache):
     cancer_gene_census_data = getCancerGeneCensusData()
 
     for gene in genes:
-        cache_key = "V4_" + gene
-        #if cache.isCached(cache_key):
-    #        response[gene] = cache.getCache(cache_key)
-    #        continue
-        disgenet = gene if lookupDisgenet(gene) else None
-        proteinAtlas = gene if lookupProteinAtlas(gene) else None
-        cancerGeneCensus = gene if lookupCancerGeneCensus(gene, cancer_gene_census_data) else None
-        entrezGeneSummary = gene if lookupEntrezGeneSummary(gene) else None
-        # TODO: new
-        openTarget = gene if lookupOpenTarget(gene) else None
+        cache_key = cache_version + "Full" + gene
+        if cache.isCached(cache_key):
+            response[gene] = cache.getCache(cache_key)
+            continue
+        disgenet = lookupDisgenet(gene)
+        proteinAtlas = lookupProteinAtlas(gene)
+        cancerGeneCensus = lookupCancerGeneCensus(gene, cancer_gene_census_data)
+        entrezGeneSummary = lookupEntrezGeneSummary(gene)
+        openTarget = lookupOpenTarget(gene)
+
+        coDisgenet = disgenet
+        coProteinAtlas = proteinAtlas
+        coCancerGeneCensus = cancerGeneCensus
+        coEntrezGeneSummary = entrezGeneSummary
+        coOpenTarget = openTarget
+
         coexpressedGenes = lookupCoxpresdb(gene)
         inverted_entrez_labels_map = getInvertedEntrezNamesMap()
 
         try:
             for coGene in coexpressedGenes:
                 coGeneName = "ENSG" + str(inverted_entrez_labels_map[coGene]).zfill(11)
-                if not disgenet:
-                    disgenet = coGeneName if lookupDisgenet(coGeneName) else None
-                if not proteinAtlas:
-                    proteinAtlas = coGeneName if lookupProteinAtlas(coGeneName) else None
-                if not cancerGeneCensus:
-                    cancerGeneCensus = coGeneName if lookupCancerGeneCensus(coGeneName, cancer_gene_census_data) else None
-                if not entrezGeneSummary:
-                    entrezGeneSummary = coGeneName if lookupEntrezGeneSummary(coGeneName) else None
-                if not openTarget:
-                    openTarget = coGeneName if lookupOpenTarget(coGeneName) else None
-
+                if not isCancer(coDisgenet):
+                    coDisgenet = lookupDisgenet(coGeneName)
+                if not isCancer(coProteinAtlas):
+                    coProteinAtlas = lookupProteinAtlas(coGeneName)
+                if not isCancer(coCancerGeneCensus):
+                    coCancerGeneCensus = lookupCancerGeneCensus(coGeneName, cancer_gene_census_data)
+                if not isCancer(coEntrezGeneSummary):
+                    coEntrezGeneSummary = lookupEntrezGeneSummary(coGeneName)
+                if not isCancer(coOpenTarget):
+                    coOpenTarget = lookupOpenTarget(coGeneName)
         except:
             print("Error. No Inverted Entrez Label Entry.")
 
-        #TODO: Add openTarget to score
-        score = (0.4 if cancerGeneCensus else 0) + \
-            (0.2 if disgenet else 0) + \
-            (0.2 if proteinAtlas else 0) + \
-            (0.2 if entrezGeneSummary else 0)
+        score = (0.4 if isCancer(cancerGeneCensus) else 0) + \
+            (0.2 if isCancer(disgenet) else 0) + \
+            (0.2 if isCancer(proteinAtlas) else 0) + \
+            (0.2 if isCancer(entrezGeneSummary) else 0) +\
+            (0.2 if isCancer(openTarget) else 0)
         score = round(score, 2)
 
         gene_names_file = "data/gene_names/gene_names.npy"
         gene_names_map = np.load(gene_names_file).item()
-        proteinAtlasName = getGeneName(proteinAtlas, gene_names_map)
-        disgenetName = getGeneName(disgenet, gene_names_map)
-        cancerGeneCensusName = getGeneName(cancerGeneCensus, gene_names_map)
-        entrezGeneSummaryName = getGeneName(entrezGeneSummary, gene_names_map)
-        openTargetName = getGeneName(openTarget, gene_names_map)
 
         response[gene] = {
-            'proteinAtlas': proteinAtlas,
-            'disgenet': disgenet,
-            'cancer_gene_census': cancerGeneCensus,
-            'entrezGeneSummary': entrezGeneSummary,
-            'openTarget': openTarget,
-
-            'proteinAtlasName': proteinAtlasName,
-            'disgenetName': disgenetName,
-            'cancer_gene_censusName': cancerGeneCensusName,
-            'entrezGeneSummaryName': entrezGeneSummaryName,
-            'openTargetName': openTargetName,
+            'openTarget': {
+                'gene': openTarget,
+                'coexpressed': coOpenTarget,
+                'name': getGeneName(coOpenTarget, gene_names_map)
+            },
+            'proteinAtlas': {
+                'gene': proteinAtlas,
+                'coexpressed': coProteinAtlas,
+                'name': getGeneName(coProteinAtlas, gene_names_map)
+            },
+            'disgenet': {
+                'gene': disgenet,
+                'coexpressed': coDisgenet,
+                'name': getGeneName(coDisgenet, gene_names_map)
+            },
+            'cancerGeneCensus': {
+                'gene': cancerGeneCensus,
+                'coexpressed': coCancerGeneCensus,
+                'name': getGeneName(coCancerGeneCensus, gene_names_map)
+            },
+            'entrezGeneSummary': {
+                'gene': entrezGeneSummary,
+                'coexpressed': coEntrezGeneSummary,
+                'name': getGeneName(coEntrezGeneSummary, gene_names_map)
+            },
             'score': score
         }
 
