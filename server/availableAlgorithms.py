@@ -127,6 +127,6 @@ algorithms = {
 def is_normalized(method):
     normalized_methods = [
         key for key in algorithms.keys()
-        if key == "relief" or any(x.get("key", None) == "norm" for x in algorithms[key]["parameters"])
+        if any(x.get("key", None) == "norm" for x in algorithms[key]["parameters"])
     ]
     return method in normalized_methods

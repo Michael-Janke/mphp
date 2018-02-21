@@ -95,6 +95,7 @@ def run(algorithm, data, oneAgainstRest):
 
     # workaround to include relief as algorithm instead of normalization method
     if method == "relief":
+        method = "norm"
         norm = "relief"
     
     method_is_normalized = is_normalized(method)
@@ -120,7 +121,7 @@ def run(algorithm, data, oneAgainstRest):
     elif method == "tree":
         gene_indices = dimReducer.getDecisionTreeFeatures(data["combined"], k)
 
-    elif method == "norm" or method == "relief":
+    elif method == "norm":
         gene_indices = dimReducer.getNormalizedFeatures(
             data["sick"], data["healthy"], norm, k, n, "chi2")
 
