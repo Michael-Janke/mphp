@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { FormattedMessage } from "react-intl";
 import HelpIcon from "material-ui/svg-icons/action/help-outline";
+import RaisedButton from "material-ui/RaisedButton";
 
 import Spinner from "../../../Spinner.js";
 import ScoreRowContent from "./ScoreRowContent";
@@ -10,6 +11,9 @@ import TooltipBox from "../../../TooltipBox";
 
 const ExpressionTable = props => {
   const { expressionMatrix, genes, geneNames, geneResults } = props.data;
+  const { runId, oneAgainstRest, cancerType, fullTestGenes } = props;
+
+  const fullRun = geneResults && "proteinAtlas" in geneResults[genes[0]];
 
   return (
     <StyledRoot>
@@ -58,7 +62,31 @@ const ExpressionTable = props => {
                 </StyledTooltipBox>
               </TableLabelContent>
             </TableLabel>,
-            <BreakingTableRow key="proteinAtlas">
+            <BreakingTableRow key="OpenTarget">
+              <StyledTableHeaderColumn title="The Open Targets Platform is a comprehensive and robust data integration for access to and visualisation of potential drug targets associated with disease. It brings together multiple data types and aims to assist users to identify and prioritise targets for further investigation.">
+                OpenTarget
+              </StyledTableHeaderColumn>
+              {genes.map((key, index) => {
+                return (
+                  geneResults[key] && (
+                    <ScoreRowContent
+                      geneId={key}
+                      key={key}
+                      providerName="openTarget"
+                      index={index}
+                      entryFound={geneResults[key].openTarget}
+                      name={geneNames[index]}
+                      entryFoundName={geneResults[key].openTargetName}
+                      link={`https://www.targetvalidation.org/target/${key}/associations`}
+                      linkCoexpressed={`https://www.targetvalidation.org/target/${key}/associations`}
+                    />
+                  )
+                );
+              })}
+            </BreakingTableRow>
+          ]}
+          {fullRun && [
+            <tr key="proteinAtlas">
               <StyledTableHeaderColumn
                 title={
                   "The Human Protein Atlas is a Swedish-based program initiated in 2003 with the aim to map all the human proteins in cells, tissues and organs using integration of various omics technologies, including antibody-based imaging, mass spectrometry-based proteomics, transcriptomics and systems biology."
@@ -80,12 +108,12 @@ const ExpressionTable = props => {
                       link={`https://www.proteinatlas.org/${key}`}
                       linkCoexpressed={`https://www.proteinatlas.org/${
                         geneResults[key].proteinAtlas
-                        }`}
+                      }`}
                     />
                   )
                 );
               })}
-            </BreakingTableRow>,
+            </tr>,
             <tr key="DisGeNet">
               <StyledTableHeaderColumn title="The DisGeNET database integrates human gene-disease associations (GDAs) from various expert curated databases and text-mining derived associations including Mendelian, complex and environmental diseases.">
                 DisGeNet
@@ -148,7 +176,7 @@ const ExpressionTable = props => {
                       link={`https://www.proteinatlas.org/${key}`}
                       linkCoexpressed={`https://www.proteinatlas.org/${
                         geneResults[key].entrezGeneSummary
-                        }`}
+                      }`}
                     />
                   )
                 );
@@ -187,12 +215,44 @@ const ExpressionTable = props => {
       {!geneResults && (
         <span>
           Loading Gene Results
-          <Spinner />{" "}
+          <Spinner />
         </span>
       )}
+      {geneResults &&
+        !fullRun && (
+          <StyledTooltipBox
+            text="Note: This loads information from external services and may take a while."
+            position="right width"
+            width={400}
+          >
+            <StyledButton
+              label="Load more."
+              primary={true}
+              onClick={() =>
+                fullTestGenes(runId, {
+                  genes,
+                  oneAgainstRest,
+                  cancerType
+                })
+              }
+            />
+          </StyledTooltipBox>
+        )}
     </StyledRoot>
   );
 };
+
+const StyledButton = styled(RaisedButton)`
+  && {
+    margin: 12px;
+  }
+  button {
+    background: ${props => props.theme.boringBlue} !important;
+  }
+  button:disabled {
+    background: ${props => props.theme.lightGray} !important;
+  }
+`;
 
 const StyledTable = styled.table`
   border-collapse: collapse;
@@ -249,7 +309,7 @@ const StyledTableRowColumn = styled.td`
   height: 56px !important;
 `;
 
-const StyledTooltipBox = styled(TooltipBox) `
+const StyledTooltipBox = styled(TooltipBox)`
   display: inline-block;
 `;
 

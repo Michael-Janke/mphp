@@ -38,21 +38,17 @@ const ScoreRowContent = ({
       </SplitWrapper>
     </SplitWrapperWrapper>
   ) : (
-      <StyledTableRowColumn
-        key={`${providerName}-${index}`}
-        entryFound={entryFound}
-        title={
-          entryFound
-            ? entryFoundName
-            : name
-        }
-        coexpressed={coexpressed}
-      >
-        <StyledLink href={link} target="_blank">
-          {content}
-        </StyledLink>
-      </StyledTableRowColumn>
-    );
+    <StyledTableRowColumn
+      key={`${providerName}-${index}`}
+      entryFound={entryFound}
+      title={entryFound ? entryFoundName : name}
+      coexpressed={coexpressed}
+    >
+      <StyledLink href={link} target="_blank">
+        {content}
+      </StyledLink>
+    </StyledTableRowColumn>
+  );
 };
 
 const SplitWrapperWrapper = styled.td`

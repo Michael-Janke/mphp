@@ -46,6 +46,11 @@ def test_genes():
     genes = request.get_json()["genes"]
     return json.dumps(externalApiCalls.testGenes(genes, cache))
 
+@app.route('/fullTestGenes', methods=["POST"])
+def full_test_genes():
+    genes = request.get_json()["genes"]
+    return json.dumps(externalApiCalls.fullTestGenes(genes, cache))
+
 
 @app.route("/context", methods=["GET"])
 def context():
@@ -63,7 +68,7 @@ def runSpecificAlgorithm():
     algorithm = requestObject["algorithm"]
     oneAgainstRest = requestObject["oneAgainstRest"]
     oversampling = requestObject["oversampling"]
-    
+
     if "dataset" not in algorithm:
         return abort(400, "need dataset parameter")
 
@@ -111,14 +116,14 @@ def flaskrun(app, default_host="0.0.0.0",
                            "[default %s]" % default_host,
                       default=default_host)
     parser.add_option("-t", "--threaded",
-                      action="store_true", 
+                      action="store_true",
                       dest="threaded",
                       default=False,
-                      help=optparse.SUPPRESS_HELP)            
+                      help=optparse.SUPPRESS_HELP)
     parser.add_option("-p", "--processes",
                       dest="processes",
                       default=1,
-                      help=optparse.SUPPRESS_HELP)            
+                      help=optparse.SUPPRESS_HELP)
     parser.add_option("-P", "--port",
                       help="Port for the Flask app " +
                            "[default %s]" % default_port,

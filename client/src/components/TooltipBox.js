@@ -12,6 +12,10 @@ class TooltipBox extends Component {
       case "right":
         tooltipstyles = "top: -5px; left: 105%;";
         break;
+      case "right width":
+        tooltipstyles = `width: ${width}px;
+        top: -5px; left: 105%;`;
+        break;
       case "left":
         tooltipstyles = "top: -5px; right: 105%;";
         break;
@@ -23,7 +27,7 @@ class TooltipBox extends Component {
         break;
       case "top right":
         tooltipstyles = `width: ${width}px;
-        top: -25px;
+        top: -40px;
         left: 105%;
         `;
         break;
