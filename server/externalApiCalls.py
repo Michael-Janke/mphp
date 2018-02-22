@@ -105,7 +105,6 @@ def lookupOpenTarget(gene):
         response = ot.filter_associations()
         response.filter(target=gene)
         response.filter(direct=True)
-        response.filter(scorevalue_min=0.1)
         for i, r in enumerate(response):
             disease = r['disease']['efo_info']['label']
             if any(s in disease for s in cancer_strings):
