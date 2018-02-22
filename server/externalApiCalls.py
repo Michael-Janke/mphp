@@ -9,6 +9,9 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 from xml.dom.minidom import parse, parseString
 ot = OpenTargetsClient()
 
+cancer_strings = ("cancer", "melanoma", "carcinoma", "leukemia", "sarcoma", "lymphoma", "Hodgkin", "tumor")
+
+
 def getCancerGeneCensusData():
     csv_file = 'data/cancer_gene_census.csv'
     return pd.read_csv(csv_file)
@@ -99,8 +102,6 @@ def lookupDisgenet(gene):
 
 def lookupOpenTarget(gene):
     try:
-        cancer_strings = ("cancer", "melanoma", "carcinoma", "leukemia", "sarcoma", "lymphoma", "Hodgkin", "tumor")
-
         response = ot.filter_associations()
         response.filter(target=gene)
         response.filter(direct=True)
@@ -167,7 +168,7 @@ def lookupEntrezGeneSummary(gene):
         dom = parseString(xml)
         summary = dom.getElementsByTagName(
             'Summary')[0].childNodes[0].nodeValue
-        if "cancer" in summary:
+        if any(s in summary for s in cancer_strings):
             return gene
         else:
             return "noCancer"
@@ -206,6 +207,7 @@ def lookupCoxpresdb(gene):
 
     return coexpressedGenes
 
+
 def getGeneName(gene, gene_names_map):
     if not isCancer(gene):
         return None
@@ -215,11 +217,13 @@ def getGeneName(gene, gene_names_map):
         result = gene
     return result
 
+
 def isCancer(gene):
     return gene != "notFound" and gene != "noCancer"
 
 
 cache_version = "V5_"
+
 
 def testGenes(genes, cache):
     response = {}
@@ -244,9 +248,6 @@ def testGenes(genes, cache):
         except:
             print("Error. No Inverted Entrez Label Entry.")
 
-        score = 0
-        score = round(score, 2)
-
         gene_names_file = "data/gene_names/gene_names.npy"
         gene_names_map = np.load(gene_names_file).item()
 
@@ -255,13 +256,13 @@ def testGenes(genes, cache):
                 'gene': openTarget,
                 'coexpressed': coOpenTarget,
                 'name': getGeneName(coOpenTarget, gene_names_map)
-            },
-            'score': score
+            }
         }
 
         cache.cache(cache_key, response[gene])
 
     return response
+
 
 def fullTestGenes(genes, cache):
     response = {}

@@ -225,7 +225,7 @@ export default class ExpressionTable extends PureComponent {
               position="right width"
               width={400}
             >
-              <StyledButton
+              <FlatButton
                 label="Load more"
                 primary={true}
                 disabled={this.state.loading}
@@ -244,18 +244,6 @@ export default class ExpressionTable extends PureComponent {
     );
   }
 }
-
-const StyledButton = styled(FlatButton)`
-  && {
-    margin: 12px;
-  }
-  button {
-    background: ${props => props.theme.boringBlue} !important;
-  }
-  button:disabled {
-    background: ${props => props.theme.lightGray} !important;
-  }
-`;
 
 const StyledTable = styled.table`
   border-collapse: collapse;

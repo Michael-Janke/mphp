@@ -17,9 +17,6 @@ const ScoreRowContent = ({
     geneResult.coexpressed !== "notFound" &&
     geneResult.coexpressed !== "noCancer" &&
     geneResult.coexpressed !== geneId;
-  console.log(geneResult);
-  console.log("entryFound ", entryFound);
-  console.log("coexpressed", coexpressed);
 
   return !entryFound && coexpressed ? (
     <SplitWrapperWrapper>
