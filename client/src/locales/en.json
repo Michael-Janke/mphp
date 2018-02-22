@@ -30,6 +30,8 @@
       "This algorithm trains a decision tree to run on the data and then extracts the genes that were most helpful in dividing the cancer types.",
     "norm":
       "This algorithm is a normalized version of feature selection. When computing feature scores, this algorithm accounts for differences between healthy and sick tissue in order to remove cell differences from the result.",
+    "relief":
+      "Attention: Slow! This algorithm first normalizes the data by excluding genes that work well when performing feature selection on healthy data. The reliefF algorithm is then only executed on the remaining genes.",
     "basic":
       "This feature selection algorithm computes a score for each feature and selects the features (genes) with the best scores.",
     "sfs":
@@ -44,7 +46,7 @@
     "m":
       "The number of preselected features (genes) that are used for the calculation to increase performance.",
     "norm":
-      "The normalization method used to reduce the impact of underlying differences in healthy tissue. Attention: option 'relief' is very slow.",
+      "The normalization method used to reduce the impact of underlying differences in healthy tissue.",
     "fitness": "The fitness function used to evaluate the intermediate results."
   },
   "Evaluation": {
@@ -53,7 +55,17 @@
     "F1Healthy":
       "The F1 score for all healthy tissues. This is the harmonic average of the precision and recall, 1 being the best value (perfect precision and recall) and the worst being 0.",
     "CombinedFitness":
-      "The combined fitness score of our evaluations. This is the average of the clustering (average sick silhouette score - average healthy silhouette score), classification (sick F1 score - healthy F1 score on a trained decision tree), and sick vs. healthy (average F1 score for each cancer classification) fitness score."
+      "The combined fitness score of our evaluations. This is the average of the clustering, classification, and sick vs. healthy fitness score.",
+    "classification-fitness":
+      "(sick F1 score - healthy F1 score on a trained decision tree)",
+    "clustering-fitness":
+      "(average sick silhouette score - average healthy silhouette score)",
+    "sickVsHealthy-fitness":
+      "(average F1 score for each cancer classification)",
+    "precision":
+      "Also called positive predictive value: The fraction of relevant instances among the retrieved instances.",
+    "recall":
+      "Also called sensitivity: The fraction of relevant instances that have been retrieved over the total amount of relevant instances."
   },
   "GeneExpression": {
     "General":

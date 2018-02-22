@@ -51,18 +51,7 @@ def classification_fitness(sick, healthy, genes, alpha=0.5, true_label="", cv=3)
 def sick_vs_healthy_fitness(sick, healthy, genes, alpha=None, true_label=None, cv=3):
     clf = DecisionTreeClassifier(presort=True)
 
-    if not true_label is None:
-        label = true_label.split("-")[0]
-        sick_indices = np.flatnonzero(np.core.defchararray.find(sick.labels, label) != -1)
-        healthy_indices = np.flatnonzero(np.core.defchararray.find(healthy.labels, label) != -1)
-
-        data = np.vstack((sick.expressions[sick_indices][:,genes], healthy.expressions[healthy_indices][:,genes]))
-        labels = np.hstack((sick.labels[sick_indices], healthy.labels[healthy_indices]))
-
-        score = cross_validate(clf, data, labels, cv=cv, scoring="f1_macro", return_train_score=False)["test_score"].mean()
-        return score
-
-    else:
+    if not true_label:
         scores = []
         for selected_label in np.unique(sick.labels):
             label = selected_label.split("-")[0]
@@ -77,6 +66,17 @@ def sick_vs_healthy_fitness(sick, healthy, genes, alpha=None, true_label=None, c
 
         return np.mean(scores)
 
+    else:
+        label = true_label.split("-")[0]
+        sick_indices = np.flatnonzero(np.core.defchararray.find(sick.labels, label) != -1)
+        healthy_indices = np.flatnonzero(np.core.defchararray.find(healthy.labels, label) != -1)
+
+        data = np.vstack((sick.expressions[sick_indices][:,genes], healthy.expressions[healthy_indices][:,genes]))
+        labels = np.hstack((sick.labels[sick_indices], healthy.labels[healthy_indices]))
+
+        score = cross_validate(clf, data, labels, cv=cv, scoring="f1_macro", return_train_score=False)["test_score"].mean()
+        return score
+
 def clustering_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
     n_cancers = np.unique(sick.labels).shape[0]
     sick_split = StratifiedShuffleSplit(n_splits=1, test_size=None, train_size=min(len(sick.labels)-n_cancers, n_cancers*100), random_state=0)
@@ -86,7 +86,7 @@ def clustering_fitness(sick, healthy, genes, alpha=0.5, true_label=""):
 
     sick_silhouette_samples = (silhouette_samples(sick.expressions[:,genes][sick_indices,:], sick.labels[sick_indices]) + 1) / 2
     healthy_silhouette_samples = (silhouette_samples(healthy.expressions[:,genes][healthy_indices,:], healthy.labels[healthy_indices]) + 1) / 2
-    
+
     fitness = 0
     if not true_label:
         sick_cluster_silhouettes = [np.mean(sick_silhouette_samples[sick.labels[sick_indices]==label]) for label in np.unique(sick.labels)]

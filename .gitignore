@@ -17,6 +17,7 @@ venv/
 
 plots/*.csv
 plots/*.pdf
+plots/*.png
 
 client/build
 

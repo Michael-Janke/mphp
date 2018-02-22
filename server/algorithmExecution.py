@@ -93,6 +93,11 @@ def run(algorithm, data, oneAgainstRest):
     norm = algorithm["parameters"].get("norm")
     fitness = algorithm["parameters"].get("fitness")
 
+    # workaround to include relief as algorithm instead of normalization method
+    if method == "relief":
+        method = "norm"
+        norm = "relief"
+    
     method_is_normalized = is_normalized(method)
     if method_is_normalized:
         labels = np.hstack((data["sick"].labels, data["healthy"].labels))
@@ -102,7 +107,7 @@ def run(algorithm, data, oneAgainstRest):
     if oneAgainstRest:
         sick = data["sick"] if method_is_normalized else data["combined"]
         healthy = data["healthy"] if method_is_normalized else ""
-
+        
         if norm != None:
             features = dimReducer.getOneAgainstRestFeatures(sick, healthy, k, method=method, fitness=fitness, normalization=norm)
         else:

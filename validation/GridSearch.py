@@ -32,13 +32,13 @@ class GridSearch(object):
         self.F_OPTIONS = ["combined"]#["combined", "classification", "clustering", "distance", "sick_vs_healthy"]
 
         self.BASIC_METHODS = {
-            "basic": self.dimReducer.getFeatures,
+            #"basic": self.dimReducer.getFeatures,
             #"tree" : self.dimReducer.getDecisionTreeFeatures,
         }
 
         self.NORMALIZED_METHODS = {
-            "subt": self.dimReducer.getNormalizedFeaturesS,
-            "excl": self.dimReducer.getNormalizedFeaturesE,
+            #"subt": self.dimReducer.getNormalizedFeaturesS,
+            #"excl": self.dimReducer.getNormalizedFeaturesE,
             #"relief": self.dimReducer.getNormalizedFeaturesR,
         }
 
@@ -57,11 +57,9 @@ class GridSearch(object):
 
     ### ALL AT ONCE ###
     def get_basic_results(self):
-        #results = Parallel(backend = "loky",n_jobs=len(self.K_OPTIONS))\
-                #(delayed(self.get_basic_results_for_k)(k) for k in self.K_OPTIONS)
-        results = []
-        for k in self.K_OPTIONS:
-            results += [self.get_basic_results_for_k(k)]
+        results = Parallel(n_jobs=1)\
+                (delayed(self.get_basic_results_for_k)(k) for k in self.K_OPTIONS)
+
         basic_results = []
         for res in results:
             basic_results.extend(res)
@@ -93,9 +91,9 @@ class GridSearch(object):
         return results
 
     def get_normalized_results(self, statistic = "chi2"):
-        #results = Parallel(n_jobs=len(self.K_OPTIONS))\
-        #        (delayed(self.get_normalized_results_for_k)(k, statistic) for k in self.K_OPTIONS)
-        results = [self.get_normalized_results_for_k(k,"f_classif") for k in self.K_OPTIONS]
+        results = Parallel(n_jobs=1)\
+                (delayed(self.get_normalized_results_for_k)(k, statistic) for k in self.K_OPTIONS)
+
         normalized_results = []
         for res in results:
             normalized_results.extend(res)
@@ -131,7 +129,7 @@ class GridSearch(object):
 
     def get_combined_results(self, statistic = "chi2", normalization = "exclude", n = 5000):
         combinations = list(itertools.product(self.K_OPTIONS, self.F_OPTIONS))
-        results = Parallel(n_jobs=len(combinations))\
+        results = Parallel(n_jobs=1)\
                 (delayed(self.get_combined_results_for_k_f)(k, fit, statistic, normalization, n) for k, fit in combinations)
 
         combined_results = []
@@ -157,7 +155,7 @@ class GridSearch(object):
 
     ### 1 vs Rest ###
     def get_one_against_rest_results(self):
-        results = Parallel(n_jobs=len(self.K_OPTIONS))\
+        results = Parallel(n_jobs=1)\
                 (delayed(self.get_one_against_rest_results_for_k)(k) for k in self.K_OPTIONS)
 
         combined_results = []

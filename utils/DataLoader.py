@@ -82,7 +82,7 @@ class DataLoader:
             else:
                 labels_vector.append(sample_type)
                 new_sample_types.append(sample_type)
-        
+
         n_rows = 0
         for cancer_type in cancer_types:
             for sample_type in new_sample_types:
