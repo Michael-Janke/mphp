@@ -23,14 +23,14 @@ export default class Evaluation extends Component {
         {this.renderHealthyScore(2)}
       </List>
     ) : (
-        <List>
-          {this.renderScore(
-            this.classificationScoreParameters(
-              this.props.classification.decisionTree
-            )
-          )}
-        </List>
-      );
+      <List>
+        {this.renderScore(
+          this.classificationScoreParameters(
+            this.props.classification.decisionTree
+          )
+        )}
+      </List>
+    );
   }
 
   renderFitnessScore(index) {
@@ -129,7 +129,17 @@ export default class Evaluation extends Component {
         }
         onNestedListToggle={() => this.toggleOpenScore(index)}
         nestedItems={nestedItems.map(nestedItem => (
-          <EvaluationValue {...nestedItem} />
+          <EvaluationValue
+            {...nestedItem}
+            rightAvatar={
+              <StyledTooltipBox
+                text={<FormattedMessage id={`Evaluation.${nestedItem.key}`} />}
+              >
+                <HelpIcon />
+                <KeyboardArrowDown />
+              </StyledTooltipBox>
+            }
+          />
         ))}
       />
     );
@@ -141,6 +151,6 @@ export default class Evaluation extends Component {
   }
 }
 
-const StyledTooltipBox = styled(TooltipBox) `
+const StyledTooltipBox = styled(TooltipBox)`
   float: right;
 `;

@@ -30,6 +30,7 @@ export default class GeneExploration extends Component {
           clusters:
         </p>
         <ExpressionTable
+          {...this.props}
           data={{
             expressionMatrix,
             genes,
