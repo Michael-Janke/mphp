@@ -214,7 +214,7 @@ class DimensionalityReducer():
                 scores.extend(f)
             best_gene = np.asarray(scores).argsort()[-1]
 
-            indices.append(genes[best_gene])
+            indices.append(temp_genes[best_gene])
             temp_genes = np.delete(temp_genes, best_gene)
             print("added new feature", flush=True)
 
@@ -267,7 +267,7 @@ class DimensionalityReducer():
         labels = np.unique(sick.labels)
         labels = [label for label in labels if label.split("-")[-1] == "sick"]      # in the case of combined data only process sick labels
         labels = np.asarray(labels)
-        
+
         n_labels = labels.shape[0]
         n_jobs = min(5, n_labels)
 
