@@ -100,3 +100,22 @@ export function testGenes(id, params) {
     }
   };
 }
+
+export function fullTestGenes(id, params) {
+  return dispatch => {
+    const { genes, oneAgainstRest, cancerType } = params;
+    postRequest("/fullTestGenes", {
+      genes
+    }).then(response => dispatch(_testGenes(id, response)));
+
+    function _testGenes(id, result) {
+      return {
+        type: types.GENE_RESULTS,
+        id,
+        oneAgainstRest,
+        cancerType,
+        result
+      };
+    }
+  };
+}

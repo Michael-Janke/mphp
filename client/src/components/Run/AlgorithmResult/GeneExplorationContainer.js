@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
 
-import { testGenes } from "../../../actions/runActions";
+import { testGenes, fullTestGenes } from "../../../actions/runActions";
 import GeneExploration from "./GeneExploration";
 
 const mapStateToProps = state => {
@@ -13,6 +13,9 @@ const mapDispatchToProps = dispatch => {
   return {
     testGenes: (runId, params) => {
       dispatch(testGenes(runId, params));
+    },
+    fullTestGenes: (runId, params) => {
+      dispatch(fullTestGenes(runId, params));
     }
   };
 };
