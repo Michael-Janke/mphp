@@ -55,7 +55,17 @@
     "F1Healthy":
       "The F1 score for all healthy tissues. This is the harmonic average of the precision and recall, 1 being the best value (perfect precision and recall) and the worst being 0.",
     "CombinedFitness":
-      "The combined fitness score of our evaluations. This is the average of the clustering (average sick silhouette score - average healthy silhouette score), classification (sick F1 score - healthy F1 score on a trained decision tree), and sick vs. healthy (average F1 score for each cancer classification) fitness score."
+      "The combined fitness score of our evaluations. This is the average of the clustering, classification, and sick vs. healthy fitness score.",
+    "classification-fitness":
+      "(sick F1 score - healthy F1 score on a trained decision tree)",
+    "clustering-fitness":
+      "(average sick silhouette score - average healthy silhouette score)",
+    "sickVsHealthy-fitness":
+      "(average F1 score for each cancer classification)",
+    "precision":
+      "Also called positive predictive value: The fraction of relevant instances among the retrieved instances.",
+    "recall":
+      "Also called sensitivity: The fraction of relevant instances that have been retrieved over the total amount of relevant instances."
   },
   "GeneExpression": {
     "General":
