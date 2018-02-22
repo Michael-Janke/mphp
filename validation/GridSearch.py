@@ -12,7 +12,7 @@ from utils.EA.fitness import combined_fitness
 from validation.Analyzer import Analyzer
 
 class GridSearch(object):
-    
+
     def __init__(self, sick, healthy, data):
         self.sick = sick
         self.healthy = healthy
@@ -48,7 +48,7 @@ class GridSearch(object):
         }
 
         self.ALL_METHODS = [
-            "basic", 
+            "basic",
             "tree",
             "norm",
             "ea",
@@ -57,9 +57,9 @@ class GridSearch(object):
 
     ### ALL AT ONCE ###
     def get_basic_results(self):
-        results = Parallel(n_jobs=len(self.K_OPTIONS))\
+        results = Parallel(n_jobs=1)\
                 (delayed(self.get_basic_results_for_k)(k) for k in self.K_OPTIONS)
-            
+
         basic_results = []
         for res in results:
             basic_results.extend(res)
@@ -83,7 +83,7 @@ class GridSearch(object):
                 start = datetime.now()
                 features = self.BASIC_METHODS[method](self.data, k)
                 time = round((datetime.now()-start).total_seconds(),2)
-                
+
                 result = self.get_result_dict_all_at_once(method, k, features, time)
                 results.append(result)
 
@@ -91,7 +91,7 @@ class GridSearch(object):
         return results
 
     def get_normalized_results(self, statistic = "chi2"):
-        results = Parallel(n_jobs=len(self.K_OPTIONS))\
+        results = Parallel(n_jobs=1)\
                 (delayed(self.get_normalized_results_for_k)(k, statistic) for k in self.K_OPTIONS)
 
         normalized_results = []
@@ -104,7 +104,7 @@ class GridSearch(object):
         results = []
         for method in self.NORMALIZED_METHODS:
             if method == "relief" and np.unique(self.sick.labels).shape[0] > 2:
-                continue 
+                continue
             if method == "excl" or method == "relief":
                 # get result for each possible exclude parameter
                 for exclude_n in self.EXCLUDE_OPTIONS:
@@ -119,7 +119,7 @@ class GridSearch(object):
                 start = datetime.now()
                 features = self.NORMALIZED_METHODS[method](self.sick, self.healthy, k, 42, statistic)
                 time = round((datetime.now()-start).total_seconds(),2)
-                
+
                 result = self.get_result_dict_all_at_once(method, k, features, time, statistic=statistic, normalization="substract")
                 results.append(result)
 
@@ -129,12 +129,12 @@ class GridSearch(object):
 
     def get_combined_results(self, statistic = "chi2", normalization = "exclude", n = 5000):
         combinations = list(itertools.product(self.K_OPTIONS, self.F_OPTIONS))
-        results = Parallel(n_jobs=len(combinations))\
+        results = Parallel(n_jobs=1)\
                 (delayed(self.get_combined_results_for_k_f)(k, fit, statistic, normalization, n) for k, fit in combinations)
 
         combined_results = []
         for res in results:
-            combined_results.extend(res)      
+            combined_results.extend(res)
         print("Combined methods are done", flush=True)
         return combined_results
 
@@ -145,7 +145,7 @@ class GridSearch(object):
                 start = datetime.now()
                 features = self.COMBINED_METHODS[method](self.sick, self.healthy, k, n, m, normalization, fit)
                 time = round((datetime.now()-start).total_seconds(),2)
-                
+
                 result = self.get_result_dict_all_at_once(method, k, features, time, statistic=statistic, exclude=n, normalization="exclude", preselect=m, fitness_method=fit)
                 results.append(result)
 
@@ -155,12 +155,12 @@ class GridSearch(object):
 
     ### 1 vs Rest ###
     def get_one_against_rest_results(self):
-        results = Parallel(n_jobs=len(self.K_OPTIONS))\
+        results = Parallel(n_jobs=1)\
                 (delayed(self.get_one_against_rest_results_for_k)(k) for k in self.K_OPTIONS)
-        
+
         combined_results = []
         for res in results:
-            combined_results.extend(res)     
+            combined_results.extend(res)
         return combined_results
 
     def get_one_against_rest_results_for_k(self, k):
@@ -171,7 +171,7 @@ class GridSearch(object):
                 start = datetime.now()
                 feature_sets = self.dimReducer.getOneAgainstRestFeatures(self.data, '', k, method=method)
                 time = round((datetime.now()-start).total_seconds(),2)
-            else:    
+            else:
                 start = datetime.now()
                 feature_sets = self.dimReducer.getOneAgainstRestFeatures(self.sick, self.healthy, k, method=method)
                 time = round((datetime.now()-start).total_seconds(),2)
@@ -187,7 +187,7 @@ class GridSearch(object):
 
             print("1vsRest method " + method + " is done with k "+str(k), flush=True)
         print("1vsRest methods are done with k "+str(k), flush=True)
-           
+
         return results
 
 
