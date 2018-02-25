@@ -15,7 +15,7 @@ venv/
 .vscode
 *.log
 
-plots/*.csv
+
 plots/*.pdf
 plots/*.png
 
