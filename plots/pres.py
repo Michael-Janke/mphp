@@ -6,7 +6,7 @@ import sys
 import re
 from collections import defaultdict
 
-data = pd.read_csv("plots/pres.csv", sep=",").fillna('')
+data = pd.read_csv("plots/pres_binary.csv", sep=",").fillna('')
 
 basic = defaultdict(list)
 subt = defaultdict(list)
@@ -22,6 +22,8 @@ algorithm = {
     "excl": excl,
     "sfs": sfs,
     "ea": ea,
+    "tree": tree,
+    "relief": reflieff,
 }
 
 
@@ -31,7 +33,9 @@ names = {
     "subt": "Subtract",
     "excl": "Exclude",
     "sfs": "Greedy",
-    "ea": "Evolutionary"
+    "ea": "Evolutionary",
+    "tree": "Decision Tree",
+    "relief": "ReliefF"
 }
 
 for row in data.iterrows():
