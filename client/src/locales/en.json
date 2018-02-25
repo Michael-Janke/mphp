@@ -57,11 +57,11 @@
     "CombinedFitness":
       "The combined fitness score of our evaluations. This is the average of the clustering, classification, and sick vs. healthy fitness score.",
     "classification-fitness":
-      "(sick F1 score - healthy F1 score on a trained decision tree)",
+      "For each data point, we calculate the f1-measure on a trained decision tree. For each cluster, we average these f1-measures and then take the mean of all clusters. This value should be high for the sick data and low for the healthy data.",
     "clustering-fitness":
-      "(average sick silhouette score - average healthy silhouette score)",
+      "For each data point, we calculate the silhouette score and transform it into the range [0,1]. For each cluster, we average these silhouette scores and then take the mean of all clusters. This value should be high for the sick data and low for the healthy data.",
     "sickVsHealthy-fitness":
-      "(average F1 score for each cancer classification)",
+      "For each cancer type, a classifier is trained to discriminate between sick and healthy data. We then classify points and receive an f1-score for each cancer type that is averaged over all types.",
     "precision":
       "Also called positive predictive value: The fraction of relevant instances among the retrieved instances.",
     "recall":
