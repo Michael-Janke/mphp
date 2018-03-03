@@ -281,10 +281,10 @@ def fullTestGenes(genes, cache):
     cancer_gene_census_data = getCancerGeneCensusData()
 
     for gene in genes:
-        cache_key = cache_version + "Full" + gene
-        if cache.isCached(cache_key):
-            response[gene] = cache.getCache(cache_key)
-            continue
+        #cache_key = cache_version + "Full" + gene
+        #if cache.isCached(cache_key):
+        #    response[gene] = cache.getCache(cache_key)
+        #    continue
         disgenet = lookupDisgenet(gene)
         proteinAtlas = lookupProteinAtlas(gene)
         cancerGeneCensus = lookupCancerGeneCensus(gene, cancer_gene_census_data)
@@ -368,6 +368,6 @@ def fullTestGenes(genes, cache):
             'score': score
         }
 
-        cache.cache(cache_key, response[gene])
+        #cache.cache(cache_key, response[gene])
 
     return response
