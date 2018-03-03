@@ -22,8 +22,8 @@ export default class AlgorithmExecution extends Component {
             <DataSelection {...this.props} />
           </Row>
         ) : (
-          <RunDescription {...this.props} />
-        )}
+            <RunDescription {...this.props} />
+          )}
         <CardActions>
           {this.props.disabled ? null : (
             <StyledButtonContainer>
@@ -63,6 +63,12 @@ export default class AlgorithmExecution extends Component {
       algorithm.healthyTissueTypes.length !== 0 ||
       algorithm.sickTissueTypes.length !== 0;
 
+    // some algorithms (norm, relief, sfs, ea) need at least one healthy and one sick tissue type
+    var oneTissueTypeRunnable = true;
+    if (algorithm.key !== "basic" && algorithm.key !== "tree") {
+      oneTissueTypeRunnable = algorithm.healthyTissueTypes.length !== 0 && algorithm.sickTissueTypes.length !== 0;
+    }
+
     var enoughSamples = true;
     if (!this.props.oversampling) {
       // test if there are more than 10 healthy samples for each cancer type (but only if healthy types are selected)
@@ -92,7 +98,7 @@ export default class AlgorithmExecution extends Component {
     }
 
     var oneCancerTypeRunnable = true;
-    // if only one cancer type is selected, only some algorithms are allowed and
+    // if only one cancer type is selected, only some algorithms (feature selection + decision tree) are allowed and
     // at least 10 healthy samples and 10 sick samples are necessary
     if (algorithm.cancerTypes.length === 1) {
       const currentAlgorithm = algorithm.key;
@@ -115,6 +121,7 @@ export default class AlgorithmExecution extends Component {
       algorithmSelected &&
       cancerTypeSelected &&
       tissueTypeSelected &&
+      oneTissueTypeRunnable &&
       enoughSamples &&
       oneCancerTypeRunnable
     );
@@ -149,7 +156,7 @@ const StyledButtonContainer = styled.div`
   align-items: center;
 `;
 
-const StyledButton = styled(RaisedButton)`
+const StyledButton = styled(RaisedButton) `
   && {
     margin: 12px;
   }

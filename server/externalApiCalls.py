@@ -105,16 +105,22 @@ def lookupOpenTarget(gene):
         response = ot.filter_associations()
         response.filter(target=gene)
         response.filter(direct=True)
-        response.filter(scorevalue_min=0.1)
+        bestScore = 0
+
         for i, r in enumerate(response):
             disease = r['disease']['efo_info']['label']
             if any(s in disease for s in cancer_strings):
-                return gene
+                score = r['association_score']['overall']
+                if score > bestScore:
+                    bestScore = score
 
-        return "noCancer"
+        if bestScore == 0:
+            return "noCancer", 0
+        else:
+            return gene, bestScore
 
     except: print("Error opentarget")
-    return "notFound"
+    return "notFound", 0
 
 
 def lookupProteinAtlas(gene):
@@ -222,7 +228,7 @@ def isCancer(gene):
     return gene != "notFound" and gene != "noCancer"
 
 
-cache_version = "V5_"
+cache_version = "V6_"
 
 
 def testGenes(genes, cache):
@@ -233,17 +239,23 @@ def testGenes(genes, cache):
         if cache.isCached(cache_key):
             response[gene] = cache.getCache(cache_key)
             continue
-        openTarget = lookupOpenTarget(gene)
+        openTarget, openTargetScore = lookupOpenTarget(gene)
         coOpenTarget = openTarget
 
         coexpressedGenes = lookupCoxpresdb(gene)
         inverted_entrez_labels_map = getInvertedEntrezNamesMap()
 
+        bestCoOpenTargetScore = 0
+        bestCoOpenTargetGene = openTarget
+
         try:
             for coGene in coexpressedGenes:
                 coGeneName = "ENSG" + str(inverted_entrez_labels_map[coGene]).zfill(11)
                 if not isCancer(coOpenTarget):
-                    coOpenTarget = lookupOpenTarget(coGeneName)
+                    coOpenTarget, coOpenTargetScore = lookupOpenTarget(coGeneName)
+                    if coOpenTargetScore > bestCoOpenTargetScore:
+                        bestCoOpenTargetGene = coGeneName
+                        bestCoOpenTargetScore = coOpenTargetScore
 
         except:
             print("Error. No Inverted Entrez Label Entry.")
@@ -254,8 +266,8 @@ def testGenes(genes, cache):
         response[gene] = {
             'openTarget': {
                 'gene': openTarget,
-                'coexpressed': coOpenTarget,
-                'name': getGeneName(coOpenTarget, gene_names_map)
+                'coexpressed': bestCoOpenTargetGene,
+                'name': getGeneName(bestCoOpenTargetGene, gene_names_map)
             }
         }
 
@@ -277,7 +289,7 @@ def fullTestGenes(genes, cache):
         proteinAtlas = lookupProteinAtlas(gene)
         cancerGeneCensus = lookupCancerGeneCensus(gene, cancer_gene_census_data)
         entrezGeneSummary = lookupEntrezGeneSummary(gene)
-        openTarget = lookupOpenTarget(gene)
+        openTarget, bestOpenTargetScore = lookupOpenTarget(gene)
 
         coDisgenet = disgenet
         coProteinAtlas = proteinAtlas
@@ -287,6 +299,9 @@ def fullTestGenes(genes, cache):
 
         coexpressedGenes = lookupCoxpresdb(gene)
         inverted_entrez_labels_map = getInvertedEntrezNamesMap()
+
+        bestCoOpenTargetScore = 0
+        bestCoOpenTargetGene = openTarget
 
         try:
             for coGene in coexpressedGenes:
@@ -299,17 +314,27 @@ def fullTestGenes(genes, cache):
                     coCancerGeneCensus = lookupCancerGeneCensus(coGeneName, cancer_gene_census_data)
                 if not isCancer(coEntrezGeneSummary):
                     coEntrezGeneSummary = lookupEntrezGeneSummary(coGeneName)
-                if not isCancer(coOpenTarget):
-                    coOpenTarget = lookupOpenTarget(coGeneName)
+                coOpenTarget, coOpenTargetScore = lookupOpenTarget(coGeneName)
+                if coOpenTargetScore > bestCoOpenTargetScore:
+                    bestCoOpenTargetGene = coGeneName
+                    bestCoOpenTargetScore = coOpenTargetScore
         except:
             print("Error. No Inverted Entrez Label Entry.")
 
-        score = (0.4 if isCancer(cancerGeneCensus) else 0) + \
-            (0.2 if isCancer(disgenet) else 0) + \
-            (0.2 if isCancer(proteinAtlas) else 0) + \
-            (0.2 if isCancer(entrezGeneSummary) else 0) +\
-            (0.2 if isCancer(openTarget) else 0)
-        score = round(score, 2)
+        # calculate score
+        proteinAtlasScore = 0.1 if isCancer(proteinAtlas) else \
+            0.05 if isCancer(coProteinAtlas) else 0
+        disgenetScore = 0.2 if isCancer(disgenet) else \
+            0.1 if isCancer(coDisgenet) else 0
+        cancerGeneCensusScore = 0.2 if isCancer(cancerGeneCensus) else \
+            0.1 if isCancer(coCancerGeneCensus) else 0
+        entrezGeneSummaryScore = 0.1 if isCancer(entrezGeneSummary) else \
+            0.05 if isCancer(coEntrezGeneSummary) else 0
+        openTargetScore = 0.4 * (bestOpenTargetScore + bestCoOpenTargetScore / 2)
+
+        score = proteinAtlasScore + disgenetScore + cancerGeneCensusScore + \
+            entrezGeneSummaryScore + openTargetScore
+        score = round(score, 3)
 
         gene_names_file = "data/gene_names/gene_names.npy"
         gene_names_map = np.load(gene_names_file).item()
@@ -317,8 +342,8 @@ def fullTestGenes(genes, cache):
         response[gene] = {
             'openTarget': {
                 'gene': openTarget,
-                'coexpressed': coOpenTarget,
-                'name': getGeneName(coOpenTarget, gene_names_map)
+                'coexpressed': bestCoOpenTargetGene,
+                'name': getGeneName(bestCoOpenTargetGene, gene_names_map)
             },
             'proteinAtlas': {
                 'gene': proteinAtlas,

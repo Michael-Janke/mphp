@@ -80,7 +80,9 @@ export default class ExpressionTable extends PureComponent {
                         geneResult={geneResults[key].openTarget}
                         name={geneNames[index]}
                         link={`https://www.targetvalidation.org/target/${key}/associations`}
-                        linkCoexpressed={`https://www.targetvalidation.org/target/${key}/associations`}
+                        linkCoexpressed={`https://www.targetvalidation.org/target/${
+                          geneResults[key].openTarget.coexpressed
+                        }/associations`}
                       />
                     )
                   );
