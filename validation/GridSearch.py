@@ -16,9 +16,8 @@ from validation.Analyzer import Analyzer
 class GridSearch(object):
 
     def test_PCA(self, sick,k):
-        pca = PCA(n_components=n_components)
+        pca = PCA(n_components=k)
         pca.fit(sick.expressions)
-        time = round((datetime.now()-start).total_seconds(),2)
         X = pca.transform(sick.expressions)
         return pca, X
 
@@ -33,7 +32,7 @@ class GridSearch(object):
         self.dimReducer = DimensionalityReducer()
         self.analyzer = Analyzer()
 
-        self.K_OPTIONS = range(3,20)
+        self.K_OPTIONS = range(3,21)
         self.EXCLUDE_OPTIONS = [5000]#range(1000,29001,1000)#[100, 500, 1000, 5000, 10000]
         self.M_OPTIONS = [10, 50, 100, 500]
         self.S_OPTIONS = ["chi2"]#["chi2", "f_classif", "mutual_info_classif"]
@@ -54,7 +53,7 @@ class GridSearch(object):
 
         self.COMBINED_METHODS = {
             #"ea":  self.dimReducer.getEAFeatures,
-            "sfs": self.dimReducer.getFeaturesBySFS,
+            #"sfs": self.dimReducer.getFeaturesBySFS,
         }
 
         self.ALL_METHODS = [
@@ -89,22 +88,23 @@ class GridSearch(object):
                     result = self.get_result_dict_all_at_once(method, k, features, time, statistic=stat)
                     results.append(result)
 
-            else if method == "PCA":
+            elif method == "PCA":
                 start = datetime.now()
                 pca , sick_pca = self.test_PCA(self.sick, k)
                 time = round((datetime.now()-start).total_seconds(),2)
 
-                healthy_pca = pca.transform(healthy.expressions)
-                sick_PCA = Expressions(sick_pca, sick.labels)
-                healthy_PCA = Expressions(healthy_pca, healthy.labels)
+                healthy_pca = pca.transform(self.healthy.expressions)
+                sick_PCA = Expressions(sick_pca, self.sick.labels)
+                healthy_PCA = Expressions(healthy_pca, self.healthy.labels)
                 fitness = combined_fitness(sick_PCA, healthy_PCA, range(k))
 
                 scoring = { 'f1': make_scorer(f1_score, average='macro') }
                 clf = DecisionTreeClassifier()
-                scores = cross_validate(clf, self.sick_pca, self.sick.labels, cv=5, scoring=scoring, return_train_score=False)
-                f1 = scores['test_f1'].mean()
+                scores = cross_validate(clf, sick_pca, self.sick.labels, cv=5, scoring=scoring, return_train_score=False)
+                sickf1 = scores['test_f1'].mean()
 
-                result = ["PCA", k , "", "", "", "", "", fitness, sickf1, f1, []]
+                result = ["PCA", k , "", "", "", "", "", fitness, sickf1, time, []]
+                results.append(result)
 
             else:
                 start = datetime.now()
@@ -236,8 +236,8 @@ class GridSearch(object):
         table = []
         table.append(["Method", "K", "Statistic", "Normalization", "Exclude", "Preselect", "Fitness_method", "Fitness_score", "Sick_F1", "Time", "Features"])
         table.extend(self.get_basic_results())
-        table.extend(self.get_normalized_results())
-        table.extend(self.get_combined_results())
+        #table.extend(self.get_normalized_results())
+        #table.extend(self.get_combined_results())
 
         self.table_all_at_once = table
         return table
