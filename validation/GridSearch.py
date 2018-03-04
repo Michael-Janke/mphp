@@ -2,6 +2,7 @@ import csv
 import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_validate
+from sklearn.decomposition import PCA
 from sklearn.metrics import make_scorer, f1_score
 from datetime import datetime
 from joblib import Parallel, delayed
@@ -9,9 +10,17 @@ import itertools
 
 from utils.DimensionalityReducer import DimensionalityReducer
 from utils.EA.fitness import combined_fitness
+from utils import Expressions
 from validation.Analyzer import Analyzer
 
 class GridSearch(object):
+
+    def test_PCA(self, sick,k):
+        pca = PCA(n_components=n_components)
+        pca.fit(sick.expressions)
+        time = round((datetime.now()-start).total_seconds(),2)
+        X = pca.transform(sick.expressions)
+        return pca, X
 
     def __init__(self, sick, healthy, data):
         self.sick = sick
@@ -24,7 +33,7 @@ class GridSearch(object):
         self.dimReducer = DimensionalityReducer()
         self.analyzer = Analyzer()
 
-        self.K_OPTIONS = range(3,15)
+        self.K_OPTIONS = range(3,20)
         self.EXCLUDE_OPTIONS = [5000]#range(1000,29001,1000)#[100, 500, 1000, 5000, 10000]
         self.M_OPTIONS = [10, 50, 100, 500]
         self.S_OPTIONS = ["chi2"]#["chi2", "f_classif", "mutual_info_classif"]
@@ -34,6 +43,7 @@ class GridSearch(object):
         self.BASIC_METHODS = {
             #"basic": self.dimReducer.getFeatures,
             #"tree" : self.dimReducer.getDecisionTreeFeatures,
+            "PCA" : self.test_PCA,
         }
 
         self.NORMALIZED_METHODS = {
@@ -78,6 +88,23 @@ class GridSearch(object):
 
                     result = self.get_result_dict_all_at_once(method, k, features, time, statistic=stat)
                     results.append(result)
+
+            else if method == "PCA":
+                start = datetime.now()
+                pca , sick_pca = self.test_PCA(self.sick, k)
+                time = round((datetime.now()-start).total_seconds(),2)
+
+                healthy_pca = pca.transform(healthy.expressions)
+                sick_PCA = Expressions(sick_pca, sick.labels)
+                healthy_PCA = Expressions(healthy_pca, healthy.labels)
+                fitness = combined_fitness(sick_PCA, healthy_PCA, range(k))
+
+                scoring = { 'f1': make_scorer(f1_score, average='macro') }
+                clf = DecisionTreeClassifier()
+                scores = cross_validate(clf, self.sick_pca, self.sick.labels, cv=5, scoring=scoring, return_train_score=False)
+                f1 = scores['test_f1'].mean()
+
+                result = ["PCA", k , "", "", "", "", "", fitness, sickf1, f1, []]
 
             else:
                 start = datetime.now()
