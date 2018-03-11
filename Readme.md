@@ -3,7 +3,7 @@
 Repository for analysing gene expression data.
 
 The goal is to identify genes which are differently expressed in healthy and unhealthy people and
-which can be used to cluster cancer types into their categories.
+which can be used to cluster cancer types into their categories. The current version is deployed at `http://vm-mpws2017hp1.eaalab.hpi.uni-potsdam.de/`.
 
 ## Getting the data
 
@@ -44,6 +44,11 @@ The server should restart when file changes are detected. Also it does not die o
 * Go to the client directory `cd client`
 * Install dependencies by running `npm install`
 * Start the server using `npm start`, a tab should be opened automatically
+
+# Deployment
+
+* Add git remote `git remote add server-deploy deploy@vm-mpws2017hp1.eaalab.hpi.uni-potsdam.de:/var/mp-server-repo`
+* Push version to remote `git push server-deploy`
 
 # Analyzing the data
 
