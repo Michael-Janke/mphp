@@ -114,7 +114,7 @@ def distance_fitness(sick, healthy, genes, true_label=""):
     healthy_intra_distance, healthy_inner_distance = compute_cluster_distance(healthy, genes, true_label)
 
     fitness_sick = 5*sick_intra_distance - sick_inner_distance
-    fitness_healthy = 5*healthy_intra_distance + healthy_inner_distance
+    fitness_healthy = 5*healthy_intra_distance - healthy_inner_distance
     fitness = fitness_sick - fitness_healthy
     return fitness
 
@@ -128,13 +128,13 @@ def compute_cluster_distance(data, genes, true_label=""):
     for label in np.unique(data.labels):
         indices = np.where(label == data.labels)
         selected_data = normalized_data[indices, :]
-        centers.append(np.median(selected_data, axis=1))
+        centers.append(np.mean(selected_data, axis=0))
         deviations.append(np.std(selected_data))
 
     unique_labels = np.unique(data.labels).T
     dist = 0
     for i in range(len(unique_labels)-1):
-        for j in range(i+1, len(unique_labels)-1):
+        for j in range(i+1, len(unique_labels)):
             if true_label == "":
                 dist += np.linalg.norm(centers[i][0] - centers[j][0])
             else:
