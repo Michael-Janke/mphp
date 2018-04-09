@@ -14,7 +14,7 @@ class Header extends Component {
       <StyledHeaderContainer minimized={this.props.minimized}>
         <StyledHeader>
           <StyledLogo src={logo} />
-          <StyledTitle>Clustered Gene Analysis</StyledTitle>
+          <StyledTitle>Okoa</StyledTitle>
         </StyledHeader>
         <StyledExperimentHeader>
           <EditableText
