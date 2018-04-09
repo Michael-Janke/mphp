@@ -33,7 +33,7 @@
     "relief":
       "Attention: Slow! This algorithm first normalizes the data by excluding genes that work well when performing feature selection on healthy data. The reliefF algorithm is then only executed on the remaining genes.",
     "basic":
-      "This feature selection algorithm computes a score for each feature and selects the features (genes) with the best scores.",
+      "This feature selection algorithm computes a statistical score (chi squared) for each feature and selects the features (genes) with the best scores.",
     "sfs":
       "The sequential forward selection greedily builds a set of features. The quality of features is measured with fitness functions, which account for the differences between sick and healthy tissue.",
     "ea":
@@ -46,7 +46,7 @@
     "m":
       "The number of preselected features (genes) that are used for the calculation to increase performance.",
     "norm":
-      "The normalization method used to reduce the impact of underlying differences in healthy tissue.",
+      "The normalization method used to reduce the impact of underlying differences in healthy tissue. Exclude only uses the set of genes that discriminate the sick data, excluding the set of genes that worked well on the healthy data. Normalize subtracts the statistical test scores for each feature (score on the sick data - score on the healthy data) and then selectes the best ones.",
     "fitness": "The fitness function used to evaluate the intermediate results."
   },
   "Evaluation": {
@@ -57,11 +57,11 @@
     "CombinedFitness":
       "The combined fitness score of our evaluations. This is the average of the clustering, classification, and sick vs. healthy fitness score.",
     "classification-fitness":
-      "For each data point, we calculate the f1-measure on a trained decision tree. For each cluster, we average these f1-measures and then take the mean of all clusters. This value should be high for the sick data and low for the healthy data.",
+      "For each data point, we calculate the f1-measure on a trained decision tree. For each cluster, we average these f1-measures and then take the mean of all sick and all healthy clusters. This value should be high for the sick data and low for the healthy data.",
     "clustering-fitness":
-      "For each data point, we calculate the silhouette score and transform it into the range [0,1]. For each cluster, we average these silhouette scores and then take the mean of all clusters. This value should be high for the sick data and low for the healthy data.",
+      "For each data point, we calculate the silhouette score and transform it into the range [0,1]. For each cluster, we average these silhouette scores and then take the mean of all sick and all healthy clusters separately. This value should be high for the sick data and low for the healthy data.",
     "sickVsHealthy-fitness":
-      "For each cancer type, a classifier is trained to discriminate between sick and healthy data. We then classify points and receive an f1-score for each cancer type that is averaged over all types.",
+      "For each cancer type, we train a classifier to discriminate between sick and healthy data. We then classify points and receive an f1-score for each cancer type that is averaged over all types.",
     "precision":
       "Also called positive predictive value: The fraction of relevant instances among the retrieved instances.",
     "recall":
