@@ -34,6 +34,8 @@ cd /var/mp-server-repo
 ./hooks/post-receive
 ```
 
+The server is started on boot, configured at `crontab -u deploy -e`. 
+
 <a name="deployment"/>
 
 ### Deployment
@@ -52,7 +54,7 @@ git push server-deploy
 
 We are using a git remote on our deployment server (for instructions go [here](https://gist.github.com/noelboss/3fe13927025b89757f8fb12e9066f2fa)) that runs an install and start script via the post-receive hook. The hook can be found in `scripts/git_hook_post-receive`. Make sure the hook on the server is executable with `chmod a+x post-receive`.
 
-We also redirect port `8080` where our app is running on to the default port `80`.
+We also redirect port `8080` where our app is running on to the default port `80`. (Due to required permissions for ports < 1024; set in `/etc/network/interfaces`)
 
 <a name="local-setup"/>
 
