@@ -1,5 +1,7 @@
 # Short Documentation
 
+This is a short documentation of the Okoa app that was developed in the 2017 master's project at the EPIC chair at HPI. The current version is deployed at [http://vm-mpws2017hp1.eaalab.hpi.uni-potsdam.de](http://vm-mpws2017hp1.eaalab.hpi.uni-potsdam.de).
+
 1.  [Infrastructure](#infrastructure)
     * [Restart the Server](#server-restart)
     * [Deployment](#deployment)
@@ -15,35 +17,42 @@
 <a name="infrastructure"/>
 ## Infrastructure
 
-```diff
-- TODO: Short server description, Url & IP
-```
+The Okoa app is deployed on a Ubuntu 16.04.3 LTS virtual machine. From the HPI network it is accessible via `vm-mpws2017hp1.eaalab.hpi.uni-potsdam.de`.
 
 <a name="server-restart"/>
 ### Restart the Server
 
-```diff
-- TODO: run hook script
+To restart the server, connect via `ssh` and manually run the git commit hook.
+
+```
+ssh deploy@vm-mpws2017hp1.eaalab.hpi.uni-potsdam.de
+cd /var/mp-server-repo
+./hooks/post-receive
 ```
 
 <a name="deployment"/>
 ### Deployment
 
-* Add git remote `git remote add server-deploy deploy@vm-mpws2017hp1.eaalab.hpi.uni-potsdam.de:/var/mp-server-repo`
-* Push version to remote `git push server-deploy`
+To deploy, add the git remote if not already done:
 
-```diff
-- TODO: (short) how deployment works
 ```
+git remote add server-deploy deploy@vm-mpws2017hp1.eaalab.hpi.uni-potsdam.de:/var/mp-server-repo
+```
+
+Then you can push new versions to the remote that automatically are deployed:
+
+```
+git push server-deploy
+```
+
+We are using a git remote on our deployment server (for instructions go [here](https://gist.github.com/noelboss/3fe13927025b89757f8fb12e9066f2fa)) that runs an install and start script via the post-receive hook. The hook can be found in `scripts/git_hook_post-receive`. Make sure the hook on the server is executable with `chmod a+x post-receive`.
+
+We also redirect port `8080` where our app is running on to the default port `80`.
 
 <a name="local-setup"/>
 ### Local Setup
 
-Python version 3 and x64 is required.
-
-```diff
-- TODO: Node, npm, pip,...
-```
+We tested our setup with x64, Python 3.5.3, Pip 9.0.1, Node 9.4.0, and NPM 5.6.0.
 
 #### Flask Server
 
