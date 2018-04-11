@@ -125,7 +125,7 @@ Inside each folder is a data and meta data file and a folder for subsets which c
 ### Adding Data
 
 ```diff
-- TODO: kurz halten, wo muss man nachgucken?
+- TODO: kurz halten, wo muss man nachgucken, worauf muss man achten?
 ```
 
 <a name="app"/>
@@ -133,8 +133,10 @@ Inside each folder is a data and meta data file and a folder for subsets which c
 ## App
 
 ```diff
-- TODO: Architecture Diagram, short intro
+- TODO: short intro
 ```
+
+![Architecture](architecture.png)
 
 <a name="backend"/>
 
