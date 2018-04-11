@@ -1,17 +1,32 @@
-# Documentation
+# Short Documentation
 
+1.  [Infrastructure](#infrastructure)
+    * [Restart the Server](#server-restart)
+    * [Deployment](#deployment)
+    * [Local Setup](#local-setup)
+2.  [Data](#data)
+    * [Parsing](#parsing)
+    * [Adding Data](#adding-data)
+3.  [App](#app)
+    * [Backend](#backend)
+    * [Frontend](#frontend)
+    * [Analyzing the Data](#analyzing-data)
+
+<a name="infrastructure"/>
 ## Infrastructure
 
 ```diff
 - TODO: Short server description, Url & IP
 ```
 
+<a name="server-restart"/>
 ### Restart the Server
 
 ```diff
 - TODO: run hook script
 ```
 
+<a name="deployment"/>
 ### Deployment
 
 * Add git remote `git remote add server-deploy deploy@vm-mpws2017hp1.eaalab.hpi.uni-potsdam.de:/var/mp-server-repo`
@@ -21,6 +36,7 @@
 - TODO: (short) how deployment works
 ```
 
+<a name="local-setup"/>
 ### Local Setup
 
 Python version 3 and x64 is required.
@@ -67,6 +83,7 @@ npm start
 
 This is also done by the `./start.sh` script in the root directory for lazy developers who don't want to change directories so much.
 
+<a name="data"/>
 ## Data
 
 The data is not part of this repository. It must be stored inside a manually created data folder.
@@ -79,36 +96,42 @@ python scripts/download_data.py
 
 Inside each folder is a data and meta data file and a folder for subsets which contain `.npy` files for each cancer type.
 
+<a name="parsing"/>
 ### Parsing
 
 ```diff
 - TODO: (short) wo ist das Modul, was macht es grob
 ```
 
+<a name="adding-data"/>
 ### Adding Data
 
 ```diff
 - TODO: kurz halten, wo muss man nachgucken?
 ```
 
+<a name="app"/>
 ## App
 
 ```diff
 - TODO: Architecture Diagram, short intro
 ```
 
+<a name="backend"/>
 ### Backend
 
 ```diff
 - TODO: Shortly describe folder structure, where to find what?; Alles, was aus dem Code nicht direkt hervor geht
 ```
 
+<a name="frontend"/>
 ### Frontend
 
 ```diff
 - TODO: Short intro (Redux); Shortly describe folder structure, where to find what?
 ```
 
+<a name="analyzing-data"/>
 ### Analyzing the Data
 
 We decided to use IDE extensions for exploration and visualization.
