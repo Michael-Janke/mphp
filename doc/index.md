@@ -10,20 +10,21 @@ This is a short documentation of the Okoa app that was developed in the 2017 mas
     * [Parsing](#parsing)
     * [Adding Data](#adding-data)
 3.  [App](#app)
+
     * [Backend](#backend)
     * [Frontend](#frontend)
     * [Analyzing the Data](#analyzing-data)
     * [Suggestions and Learnings](#suggestions-learnings)
 
-## Infrastructure
-
 <a name="infrastructure"/>
+
+## Infrastructure
 
 The Okoa app is deployed on a Ubuntu 16.04.3 LTS virtual machine. From the HPI network it is accessible via `vm-mpws2017hp1.eaalab.hpi.uni-potsdam.de`.
 
-### Restart the Server
-
 <a name="server-restart"/>
+
+### Restart the Server
 
 To restart the server, connect via `ssh` and manually run the git commit hook.
 
@@ -33,9 +34,9 @@ cd /var/mp-server-repo
 ./hooks/post-receive
 ```
 
-### Deployment
-
 <a name="deployment"/>
+
+### Deployment
 
 To deploy, add the git remote if not already done:
 
@@ -53,9 +54,9 @@ We are using a git remote on our deployment server (for instructions go [here](h
 
 We also redirect port `8080` where our app is running on to the default port `80`.
 
-### Local Setup
-
 <a name="local-setup"/>
+
+### Local Setup
 
 We tested our setup with x64, Python 3.5.3, Pip 9.0.1, Node 9.4.0, and NPM 5.6.0.
 
@@ -97,9 +98,9 @@ npm start
 
 This is also done by the `./start.sh` script in the root directory for lazy developers who don't want to change directories so much.
 
-## Data
-
 <a name="data"/>
+
+## Data
 
 The data is not part of this repository. It must be stored inside a manually created data folder.
 Each dataset is inside its own folder called `dataset<1|2|3>`.
@@ -111,49 +112,49 @@ python scripts/download_data.py
 
 Inside each folder is a data and meta data file and a folder for subsets which contain `.npy` files for each cancer type.
 
-### Parsing
-
 <a name="parsing"/>
+
+### Parsing
 
 ```diff
 - TODO: (short) wo ist das Modul, was macht es grob
 ```
 
-### Adding Data
-
 <a name="adding-data"/>
+
+### Adding Data
 
 ```diff
 - TODO: kurz halten, wo muss man nachgucken?
 ```
 
-## App
-
 <a name="app"/>
+
+## App
 
 ```diff
 - TODO: Architecture Diagram, short intro
 ```
 
-### Backend
-
 <a name="backend"/>
+
+### Backend
 
 ```diff
 - TODO: Shortly describe folder structure, where to find what?; Alles, was aus dem Code nicht direkt hervor geht
 ```
 
-### Frontend
-
 <a name="frontend"/>
+
+### Frontend
 
 ```diff
 - TODO: Short intro (Redux); Shortly describe folder structure, where to find what?
 ```
 
-### Analyzing the Data
-
 <a name="analyzing-data"/>
+
+### Analyzing the Data
 
 We decided to use IDE extensions for exploration and visualization.
 This comes with the advantage of auto-completion, linting and a better version control in comparison with Jupyter notebooks.
@@ -168,9 +169,9 @@ Each script can load specific data with the help of the DataLoader class from th
 To get the Jupyter feeling inside the exploration files, you need to add breakpoints to the code by adding `#%%`.
 This will create cells which can be executed independently after each other. Variables are stored in a session and can be explored and visualized inside the IDE.
 
-### Suggestions and Learnings
-
 <a name="suggestions-learnings"/>
+
+### Suggestions and Learnings
 
 * DataLoader should be initialized only once as it reads all the data files into memory
 
