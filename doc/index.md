@@ -34,7 +34,7 @@ cd /var/mp-server-repo
 ./hooks/post-receive
 ```
 
-The server is started on boot, configured at `crontab -u deploy -e`. 
+The server is started on boot, configured at `crontab -u deploy -e`.
 
 <a name="deployment"/>
 
@@ -54,7 +54,7 @@ git push server-deploy
 
 We are using a git remote on our deployment server (for instructions go [here](https://gist.github.com/noelboss/3fe13927025b89757f8fb12e9066f2fa)) that runs an install and start script via the post-receive hook. The hook can be found in `scripts/git_hook_post-receive`. Make sure the hook on the server is executable with `chmod a+x post-receive`.
 
-We also redirect port `8080` where our app is running on to the default port `80`. (Due to required permissions for ports < 1024; set in `/etc/network/interfaces`)
+Due to required permissions for ports < 1024 that are set in `/etc/network/interfaces`, we redirect port `8080` where our app is running on to the default port `80`.
 
 <a name="local-setup"/>
 
@@ -134,9 +134,7 @@ Inside each folder is a data and meta data file and a folder for subsets which c
 
 ## App
 
-```diff
-- TODO: short intro
-```
+Our app consists of a Flask backend and a React frontend. In the following diagram basic interactions between modules are depicted that are further explained in the following sections.
 
 ![Architecture](architecture.png)
 
@@ -144,23 +142,27 @@ Inside each folder is a data and meta data file and a folder for subsets which c
 
 ### Backend
 
-The backend routes are defined in the app.py which can be found in the top-level of the repo. It is also responsible for loading the data and running the server. We moved some logic from the app.py into the server folder. Furthermore, a cache implementation can be found in the utils folder.
+The backend routes are defined in the `app.py` which can be found in the top-level of the repo. It is also responsible for loading the data and running the server. We moved some logic from the `app.py` into the `server` folder. Furthermore, a cache implementation can be found in the `utils` folder.
 
-The logic for data preparation as well as for feature selection can be found in the utils folder. It contains classes for loading, normalizing and sampling data. The data can be analyzed with the Dimensionality Reducer in the next step. It implements most of our feature selection approaches and contains utility functions to enable One-vs-Rest feature selection and the return of multiple feature subsets.
+The logic for data preparation as well as for feature selection can be found in the `utils` folder. It contains classes for loading, normalizing and sampling data. Data can be analyzed with the `DimensionalityReducer` in the next step. It implements most of our feature selection approaches and contains utility functions to enable One-vs-Rest feature selection and the return of multiple feature subsets.
 The EA implementation has its own folder where you can also find the fitness functions.
-The utils folder also contains the implementation of the reliefF algorithm from the scikit-feature repository. (https://github.com/jundongl/scikit-feature)
+The `utils` folder also contains the implementation of the reliefF algorithm from the scikit-feature repository. (https://github.com/jundongl/scikit-feature)
 
-The evaluation of feature subsets can be found in the validation folder. The Analyzer is responsible for computing fitness scores for a given feature subset, for computing the expression matrix and for providing utility functions as in the Dimensionality Reducer.
+The evaluation of feature subsets can be found in the `validation` folder. The `Analyzer` is responsible for computing fitness scores for a given feature subset, for computing the expression matrix and for providing utility functions as in the `DimensionalityReducer`.
 
-Jupyter files (e.g. classification.py) to explore and test the functionalities can be found in the top-level.
+Jupyter files (e.g. classification.py) to explore and test the functionalities can be found in the top-level (see [analyzing the data](#analyzing-data)).
 
 <a name="frontend"/>
 
 ### Frontend
 
-```diff
-- TODO: Short intro (Redux); Shortly describe folder structure, where to find what?
-```
+The frontend code can be found in the `client` directory, it was created using the [`create-react-app`](https://github.com/facebook/create-react-app) command-line tool. In the `src` directory there is the `index.js` file which is the entry point where the Redux store, [Material UI](http://www.material-ui.com/#/), and Styled Components are connected to the `App` React component.
+
+The [Redux](https://redux.js.org/) store handles our global state, especially responses of requests made to the backend. Functions handling the Redux state are located in `actions` and `reducers`. If a component needs to access the store or dispatch actions, it is wrapped in the `connect` component provided by Redux.
+
+All theme-related files can be found in the `config` folder, the variables defined there are accessible in all components that are wrapped by the `styled` component provided by [Styled Components](https://www.styled-components.com/).
+
+The `App` component renders components from the `components` directory. In its root general components, the `Header`, and `Content` reside. The `Content` renders `Runs` that are stored in the Redux store. A `Run` renders different components depending on whether it already was executed. These components are can be found in `Run` and subordinate directories. For further information on React and its component lifecycle please refer to the [React documentation](https://reactjs.org/docs/hello-world.html).
 
 <a name="analyzing-data"/>
 
