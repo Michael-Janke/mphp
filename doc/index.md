@@ -144,9 +144,15 @@ Inside each folder is a data and meta data file and a folder for subsets which c
 
 ### Backend
 
-```diff
-- TODO: Shortly describe folder structure, where to find what?; Alles, was aus dem Code nicht direkt hervor geht
-```
+The backend routes are defined in the app.py which can be found in the top-level of the repo. It is also responsible for loading the data and running the server. We moved some logic from the app.py into the server folder. Furthermore, a cache implementation can be found in the utils folder.
+
+The logic for data preparation as well as for feature selection can be found in the utils folder. It contains classes for loading, normalizing and sampling data. The data can be analyzed with the Dimensionality Reducer in the next step. It implements most of our feature selection approaches and contains utility functions to enable One-vs-Rest feature selection and the return of multiple feature subsets.
+The EA implementation has its own folder where you can also find the fitness functions.
+The utils folder also contains the implementation of the reliefF algorithm from the scikit-feature repository. (https://github.com/jundongl/scikit-feature)
+
+The evaluation of feature subsets can be found in the validation folder. The Analyzer is responsible for computing fitness scores for a given feature subset, for computing the expression matrix and for providing utility functions as in the Dimensionality Reducer.
+
+Jupyter files (e.g. classification.py) to explore and test the functionalities can be found in the top-level.
 
 <a name="frontend"/>
 
