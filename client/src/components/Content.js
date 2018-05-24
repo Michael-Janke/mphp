@@ -78,11 +78,13 @@ class Content extends Component {
 
   addMissingRuns() {
     const currentRuns = Object.keys(this.props.runs).length;
-    const missingRuns =
-      this.state.maxRunsPerRow - currentRuns % this.state.maxRunsPerRow;
-    var result = [];
-    for (let i = 0; i < missingRuns; i++) {
-      result.push(<EmptyRun key={"missingRun" + i} />);
+    let result = [];
+    if (currentRuns % this.state.maxRunsPerRow !== 0) {
+      const missingRuns =
+        this.state.maxRunsPerRow - currentRuns % this.state.maxRunsPerRow;
+      for (let i = 0; i < missingRuns; i++) {
+        result.push(<EmptyRun key={"missingRun" + i} />);
+      }
     }
     return result;
   }
