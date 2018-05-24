@@ -17,7 +17,7 @@ const Container = styled.div`
   width: 100%;
   heigth: ${props => props.theme.footerHeight};
   background-color: ${props => props.theme.slightlyBoringBlue};
-  padding-top: ${props => props.theme.mediumSpace};
+  padding-top: ${props => props.theme.smallSpace};
   padding-bottom: ${props => props.theme.smallSpace};
   display: flex;
   justify-content: center;
