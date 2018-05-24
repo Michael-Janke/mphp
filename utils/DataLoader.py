@@ -41,7 +41,12 @@ class DataLoader:
         return np.load('data/gene_names/gene_names.npy').item()
 
     def mapGeneLabelsToGeneNames(self, labels):
-        def mapfunc(gene): return self.gene_names_map[int(gene[4:])]
+        def mapfunc(gene):
+            gene_id = int(gene[4:])
+            if gene_id in self.gene_names_map:
+                return self.gene_names_map[int(gene[4:])]
+            else:
+                return gene
         return np.vectorize(mapfunc)(labels)
 
     def getGeneNamesTable(self):
