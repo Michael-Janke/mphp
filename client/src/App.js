@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import Header from "./components/Header";
 import Content from "./components/Content";
+import Footer from "./components/Footer";
 
 const THRESHOLD = 100;
 
@@ -23,6 +24,7 @@ class App extends Component {
           headerMinimized={this.state.minimize}
         >
           <Content />
+          <Footer />
         </ScrollableArea>
       </StyledRoot>
     );

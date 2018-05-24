@@ -107,6 +107,10 @@ class Content extends Component {
 const ContentContainer = styled.div`
   display: flex;
   flex-flow: row wrap;
+  min-height: calc(
+    100vh - ${props => props.theme.totalHeaderHeight} -
+      ${props => props.theme.footerHeight} + 2px
+  ); // whyever + 2px are needed to align footer to bottom
 `;
 
 const StyledSpinnerContainer = styled.div`

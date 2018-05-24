@@ -9,3 +9,5 @@ export const headerHeight = `${numericHeaderHeight}px`;
 export const experimentHeaderHeight = `${numericExperimentHeaderHeight}px`;
 export const totalHeaderHeight = `${numericHeaderHeight +
   numericExperimentHeaderHeight}px`;
+
+export const footerHeight = "40px";
