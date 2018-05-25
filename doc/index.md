@@ -20,7 +20,7 @@ This is a short documentation of the Okoa app that was developed in the 2017 mas
 
 ## Infrastructure
 
-The Okoa app is deployed on an Ubuntu 16.04.3 LTS virtual machine. From the HPI network it is accessible via `vm-mpws2017hp1.eaalab.hpi.uni-potsdam.de`.
+The Okoa app is deployed on an Ubuntu 16.04.3 LTS virtual machine. From the HPI network it is accessible via `vm-mpws2017hp1.eaalab.hpi.uni-potsdam.de` (if the name resolution does not work as in the WSL, the IP is 192.168.31.70).
 
 <a name="server-restart"/>
 
@@ -118,9 +118,9 @@ Each folder contains a data and meta data file and a folder for subsets includin
 
 ### Parsing
 
-Our system accepts raw count data and meta data as binary numpy array, stored in the `data` folder. For the datasets we used, we developed a parser located in ```scripts/parse_*_dataset.py```. If you want to add a new dataset, feel free to reuse them or fork them for another data format.
+Our system accepts raw count data and meta data as binary numpy array, stored in the `data` folder. For the datasets we used, we developed a parser located in `scripts/parse_*_dataset.py`. If you want to add a new dataset, feel free to reuse them or fork them for another data format.
 
-The script should output two numpy files (```np.save```) for each cancer type: ```{name}-{cancer-type}_count_data.npy``` and ```{name}-{cancer-type}_meta_data.npy``` stored in ```/data/{dataset}/subsets```.
+The script should output two numpy files (`np.save`) for each cancer type: `{name}-{cancer-type}_count_data.npy` and `{name}-{cancer-type}_meta_data.npy` stored in `/data/{dataset}/subsets`.
 
 <a name="adding-data"/>
 
