@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.decomposition import PCA
-from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import SelectKBest, VarianceThreshold
 from sklearn.feature_selection import chi2
 from sklearn.feature_selection import mutual_info_classif
 from sklearn.feature_selection import f_classif
@@ -77,6 +77,7 @@ class DimensionalityReducer():
             'substract': self.getNormalizedFeaturesS, # typo
             'exclude': self.getNormalizedFeaturesE,
             'relief': self.getNormalizedFeaturesR, # slow
+            'house': self.getNormalizedFeaturesH,
         }
 
         return options[normalization](sick, healthy, k, n, m, returnMultipleSets)
@@ -98,6 +99,44 @@ class DimensionalityReducer():
         scores = (sick_scores - healthy_scores)
 
         return self.getFeatureSets(scores, k, returnMultipleSets)
+
+    def getNormalizedFeaturesH(self, sick, healthy, k, n, m, returnMultipleSets = False):
+        alpha = 0.9
+        labels = np.unique(sick.labels)
+        labels = [label for label in labels if label.split("-")[-1] == "sick"]      # in the case of combined data only process sick labels
+        labels = np.asarray(labels)
+        print(labels)
+        mask = np.ones((sick.expressions.shape[1],), dtype=bool)
+        print(sick.labels.shape)
+        for label in labels:
+            print(label)
+            tissue = sick.expressions[sick.labels==label,:]
+            print(tissue.shape)
+            old = 0.0
+            new = 1.0
+            selector = None
+            while True:
+                selector = VarianceThreshold(threshold=new)
+                selector.fit(tissue)
+                removed = tissue.shape[1] - np.sum(selector.get_support())
+                print(new, old, removed, tissue.shape[1])
+                if removed > (1-alpha) * tissue.shape[1] + 3:
+                    temp = new
+                    new = (new + old) / 2
+                elif removed < (1-alpha) * tissue.shape[1] - 3:
+                    temp = new
+                    new = new + (new - old)
+                    old = temp
+                else:
+                    break
+            mask = np.logical_and(mask, selector.get_support())
+        print("total left: " + str(np.sum(mask)))
+        fs = SelectKBest(self.method_table[m], k="all")
+        fs.fit(sick.expressions, sick.labels)
+        scores = fs.scores_
+        scores[mask] = 0
+        return self.getFeatureSets(scores, k, returnMultipleSets)
+
 
     def getNormalizedFeaturesE(self, sick, healthy, k, n, m, returnMultipleSets = False):
         selector = SelectKBest(self.method_table[m], k=n)

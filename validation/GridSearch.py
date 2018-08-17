@@ -57,11 +57,12 @@ class GridSearch(object):
             #"subt": self.dimReducer.getNormalizedFeaturesS,
             #"excl": self.dimReducer.getNormalizedFeaturesE,
             #"relief": self.dimReducer.getNormalizedFeaturesR,
+            "house": self.dimReducer.getNormalizedFeaturesH,
         }
 
         self.COMBINED_METHODS = {
             #"ea":  self.dimReducer.getEAFeatures,
-            "sfs": self.dimReducer.getFeaturesBySFS,
+            #"sfs": self.dimReducer.getFeaturesBySFS,
         }
 
         self.ALL_METHODS = [
