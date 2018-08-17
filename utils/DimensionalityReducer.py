@@ -107,10 +107,13 @@ class DimensionalityReducer():
         labels = np.asarray(labels)
         print(labels)
         mask = np.ones((sick.expressions.shape[1],), dtype=bool)
-        print(sick.labels.shape)
         for label in labels:
             print(label)
-            tissue = sick.expressions[sick.labels==label,:]
+            tissuelabel = label.split("-")[0]
+            sicktissue = sick.expressions[sick.labels==tissuelabel+"-sick",:]
+            healthytissue = healthy.expressions[healthy.labels==tissuelabel+"-healthy"]
+            print(sicktissue.shape, healthytissue.shape)
+            tissue = np.vstack((sicktissue, healthytissue))
             print(tissue.shape)
             old = 0.0
             new = 1.0
