@@ -41,13 +41,14 @@ class GridSearch(object):
         self.analyzer = Analyzer()
 
         self.K_OPTIONS = range(3,21)
-        self.EXCLUDE_OPTIONS = [5000]#range(1000,29001,1000)#[100, 500, 1000, 5000, 10000]
-        self.M_OPTIONS = [10, 50, 100, 500]
+        self.EXCLUDE_OPTIONS = [5432]#range(1000,29001,1000)#[100, 500, 1000, 5000, 10000]
+        self.METHOD_OPTIONS = ["exclude"]
+        self.M_OPTIONS = [100, 100, 500]
         self.S_OPTIONS = ["f_classif"]#["chi2", "f_classif", "mutual_info_classif"]
-        self.F_OPTIONS = ["combined"]#["combined", "classification", "clustering", "distance", "sick_vs_healthy"]
+        self.F_OPTIONS = ["classification"]#["combined", "classification", "clustering", "distance", "sick_vs_healthy"]
 
         self.BASIC_METHODS = {
-            "basic": self.dimReducer.getFeatures,
+            #"basic": self.dimReducer.getFeatures,
             #"tree" : self.dimReducer.getDecisionTreeFeatures,
             #"PCA" : self.test_PCA,
         }
@@ -60,7 +61,7 @@ class GridSearch(object):
 
         self.COMBINED_METHODS = {
             #"ea":  self.dimReducer.getEAFeatures,
-            #"sfs": self.dimReducer.getFeaturesBySFS,
+            "sfs": self.dimReducer.getFeaturesBySFS,
         }
 
         self.ALL_METHODS = [
@@ -124,15 +125,11 @@ class GridSearch(object):
             self.table.flush()
 
     def get_normalized_results(self, statistic = "chi2"):
-        normalized_results = []
         for i in range(5):
-            results = Parallel(n_jobs=1)\
-                    (delayed(self.get_normalized_results_for_k)(k, statistic) for k in self.K_OPTIONS)
-
-            for res in results:
-                normalized_results.extend(res)
+            for k in self.K_OPTIONS:
+                for s in self.S_OPTIONS:
+                    self.get_normalized_results_for_k(k, s)
         print("Normalized methods are done", flush=True)
-        return normalized_results
 
     def get_normalized_results_for_k(self, k, statistic):
         results = []
@@ -158,34 +155,34 @@ class GridSearch(object):
                 results.append(result)
 
         print("Normalized methods are done with k "+str(k), flush=True)
-        return results
+        for res in results:
+            self.table.write(",".join(map(str,res))+"\n")
+            self.table.flush()
 
 
     def get_combined_results(self, statistic = "chi2", normalization = "exclude", n = 5000):
-        combinations = list(itertools.product(self.K_OPTIONS, self.F_OPTIONS))
-        results = Parallel(n_jobs=1)\
-                (delayed(self.get_combined_results_for_k_f)(k, fit, statistic, normalization, n) for k, fit in combinations)
-
-        combined_results = []
-        for res in results:
-            combined_results.extend(res)
+        combinations = list(itertools.product(self.K_OPTIONS, self.F_OPTIONS, self.S_OPTIONS, self.METHOD_OPTIONS, self.EXCLUDE_OPTIONS))
+        for k, fit, s, method, excl in combinations:
+            self.get_combined_results_for_k_f(k, fit, s, method, excl)
         print("Combined methods are done", flush=True)
-        return combined_results
 
     def get_combined_results_for_k_f(self, k, fit, statistic, normalization, n):
-        results = []
         for method in self.COMBINED_METHODS:
+            results = []
             for m in self.M_OPTIONS:
+                print(m)
                 start = datetime.now()
                 features = self.COMBINED_METHODS[method](self.sick, self.healthy, k, n, m, normalization, fit)
                 time = round((datetime.now()-start).total_seconds(),2)
 
-                result = self.get_result_dict_all_at_once(method, k, features, time, statistic=statistic, exclude=n, normalization="exclude", preselect=m, fitness_method=fit)
+                result = self.get_result_dict_all_at_once(method, k, features, time, statistic=statistic, exclude=n, normalization=normalization, preselect=m, fitness_method=fit)
                 results.append(result)
 
             print(method + " is done with k "+str(k), flush=True)
+            for res in results:
+                self.table.write(",".join(map(str,res))+"\n")
+                self.table.flush()
 
-        return results
 
     ### 1 vs Rest ###
     def get_one_against_rest_results(self):
@@ -240,11 +237,9 @@ class GridSearch(object):
         if not self.table_all_at_once is None:
             return self.table_all_at_once
 
-        table = []
-        table.append(["Method", "K", "Statistic", "Normalization", "Exclude", "Preselect", "Fitness_method", "Fitness_score", "Sick_F1", "Time", "Features"])
-        table.extend(self.get_basic_results())
-        #table.extend(self.get_normalized_results())
-        #table.extend(self.get_combined_results())
+        self.get_basic_results()
+        self.get_normalized_results()
+        self.get_combined_results()
 
         self.table_all_at_once = table
         return table
