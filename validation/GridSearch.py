@@ -41,9 +41,9 @@ class GridSearch(object):
         self.analyzer = Analyzer()
 
         self.K_OPTIONS = range(3,21)
-        self.EXCLUDE_OPTIONS = [5432]#range(1000,29001,1000)#[100, 500, 1000, 5000, 10000]
-        self.METHOD_OPTIONS = ["exclude"]
-        self.M_OPTIONS = [100, 100, 500]
+        self.EXCLUDE_OPTIONS = [7425]#range(1000,29001,1000)#[100, 500, 1000, 5000, 10000]
+        self.METHOD_OPTIONS = ["exclude", "substract", "house"]
+        self.M_OPTIONS = [1000]
         self.S_OPTIONS = ["f_classif"]#["chi2", "f_classif", "mutual_info_classif"]
         self.F_OPTIONS = ["classification"]#["combined", "classification", "clustering", "distance", "sick_vs_healthy"]
 
@@ -57,12 +57,12 @@ class GridSearch(object):
             #"subt": self.dimReducer.getNormalizedFeaturesS,
             #"excl": self.dimReducer.getNormalizedFeaturesE,
             #"relief": self.dimReducer.getNormalizedFeaturesR,
-            "house": self.dimReducer.getNormalizedFeaturesH,
+            #"house": self.dimReducer.getNormalizedFeaturesH,
         }
 
         self.COMBINED_METHODS = {
             #"ea":  self.dimReducer.getEAFeatures,
-            #"sfs": self.dimReducer.getFeaturesBySFS,
+            "sfs": self.dimReducer.getFeaturesBySFS,
         }
 
         self.ALL_METHODS = [
@@ -152,7 +152,7 @@ class GridSearch(object):
                 features = self.NORMALIZED_METHODS[method](self.sick, self.healthy, k, 42, statistic)
                 time = round((datetime.now()-start).total_seconds(),2)
 
-                result = self.get_result_dict_all_at_once(method, k, features, time, statistic=statistic, normalization="substract")
+                result = self.get_result_dict_all_at_once(method, k, features, time, statistic=statistic, normalization=method)
                 results.append(result)
 
         print("Normalized methods are done with k "+str(k), flush=True)
@@ -171,13 +171,14 @@ class GridSearch(object):
         for method in self.COMBINED_METHODS:
             results = []
             for m in self.M_OPTIONS:
-                print(m)
-                start = datetime.now()
-                features = self.COMBINED_METHODS[method](self.sick, self.healthy, k, n, m, normalization, fit)
-                time = round((datetime.now()-start).total_seconds(),2)
+                for i in range(5):
+                    print(m)
+                    start = datetime.now()
+                    features = self.COMBINED_METHODS[method](self.sick, self.healthy, k, n, m, normalization, fit)
+                    time = round((datetime.now()-start).total_seconds(),2)
 
-                result = self.get_result_dict_all_at_once(method, k, features, time, statistic=statistic, exclude=n, normalization=normalization, preselect=m, fitness_method=fit)
-                results.append(result)
+                    result = self.get_result_dict_all_at_once(method, k, features, time, statistic=statistic, exclude=n, normalization=normalization, preselect=m, fitness_method=fit)
+                    results.append(result)
 
             print(method + " is done with k "+str(k), flush=True)
             for res in results:
