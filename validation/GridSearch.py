@@ -42,8 +42,8 @@ class GridSearch(object):
 
         self.K_OPTIONS = range(3,21)
         self.EXCLUDE_OPTIONS = [7425]#range(1000,29001,1000)#[100, 500, 1000, 5000, 10000]
-        self.METHOD_OPTIONS = ["exclude", "substract", "house"]
-        self.M_OPTIONS = [1000]
+        self.METHOD_OPTIONS = ["exclude", "none"]
+        self.M_OPTIONS = [100   ]
         self.S_OPTIONS = ["f_classif"]#["chi2", "f_classif", "mutual_info_classif"]
         self.F_OPTIONS = ["classification"]#["combined", "classification", "clustering", "distance", "sick_vs_healthy"]
 
@@ -62,7 +62,8 @@ class GridSearch(object):
 
         self.COMBINED_METHODS = {
             #"ea":  self.dimReducer.getEAFeatures,
-            "sfs": self.dimReducer.getFeaturesBySFS,
+            "relieff": self.dimReducer.getReliefFeatures,
+            #"sfs": self.dimReducer.getFeaturesBySFS,
         }
 
         self.ALL_METHODS = [

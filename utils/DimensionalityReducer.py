@@ -78,9 +78,18 @@ class DimensionalityReducer():
             'exclude': self.getNormalizedFeaturesE,
             'relief': self.getNormalizedFeaturesR, # slow
             'house': self.getNormalizedFeaturesH,
+            'none': self.getUnormalizedFeatures,
         }
 
         return options[normalization](sick, healthy, k, n, m, returnMultipleSets)
+
+    def getUnormalizedFeatures(self, sick, healthy, k, n, m, returnMultipleSets = False):
+        selector = SelectKBest(self.method_table[m], k="all")
+        selector.fit(sick.expressions, sick.labels)
+
+        scores = selector.scores_
+        # subtract healthy scores from sick scores (this is the normalization)
+        return self.getFeatureSets(scores, k, returnMultipleSets)
 
     '''
         does not use parameter n
@@ -177,6 +186,16 @@ class DimensionalityReducer():
         return self.getFeatureSets(combined_scores, k, returnMultipleSets)
 
     ####### MULTI-VARIATE FEATURE SELECTION #######
+
+    def getReliefFeatures(self, sick, healthy, k=3, n=5000, m=100, normalization="exclude", fitness="combined", returnMultipleSets = False, true_label=""):
+        # preselect 100 genes in sick data which do not separate healthy data well
+        selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
+        newexpressions = sick.expressions[:,selected_genes]
+        scores = reliefF(newexpressions, sick.labels, k=k)
+        combined_scores = np.zeros(sick.expressions.shape[1])
+        combined_scores[selected_genes] = scores
+
+        return self.getFeatureSets(combined_scores, k, returnMultipleSets)
 
     '''
         sick and healthy need to contain at least two different cancer types
