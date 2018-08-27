@@ -178,7 +178,7 @@ class DimensionalityReducer():
 
         X = sick.expressions[:, indices]
 
-        scores = reliefF(X, sick.labels, k=k)
+        scores = reliefF(X, sick.labels, k = int(0.01 * sick.labels.shape[0]))
 
         combined_scores = np.zeros(selector.scores_.shape)
         combined_scores[indices] = scores
