@@ -191,7 +191,7 @@ class DimensionalityReducer():
         # preselect 100 genes in sick data which do not separate healthy data well
         selected_genes = self.getNormalizedFeatures(sick,healthy,normalization, m, n)
         newexpressions = sick.expressions[:,selected_genes]
-        scores = reliefF(newexpressions, sick.labels, k=k)
+        scores = reliefF(newexpressions, sick.labels, k=45)
         combined_scores = np.zeros(sick.expressions.shape[1])
         combined_scores[selected_genes] = scores
 

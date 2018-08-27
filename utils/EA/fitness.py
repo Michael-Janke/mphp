@@ -29,9 +29,15 @@ def get_fitness_function_name(fit):
         'sick_vs_healthy': 'sick_vs_healthy_fitness',
         'combined': 'combined_fitness',
         'distance': 'distance_fitness',
+        'sickf1': 'sickf1_fitness'
     }
 
     return options.get(fit, 'combined_fitness')
+
+def sickf1_fitness(sick,healthy,genes,alpha=0.5, true_label="", cv=3):
+    clf = DecisionTreeClassifier()
+    return cross_validate(clf, sick.expressions[:,genes], sick.labels, cv=5, scoring="f1_macro", return_train_score=False)["test_score"].mean()
+
 
 @ignore_warnings
 def classification_fitness(sick, healthy, genes, alpha=0.5, true_label="", cv=3):

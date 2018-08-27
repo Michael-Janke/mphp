@@ -45,7 +45,7 @@ class GridSearch(object):
         self.METHOD_OPTIONS = ["exclude", "none"]
         self.M_OPTIONS = [100   ]
         self.S_OPTIONS = ["f_classif"]#["chi2", "f_classif", "mutual_info_classif"]
-        self.F_OPTIONS = ["classification"]#["combined", "classification", "clustering", "distance", "sick_vs_healthy"]
+        self.F_OPTIONS = ["classification", "sickf1"]#["combined", "classification", "clustering", "distance", "sick_vs_healthy"]
 
         self.BASIC_METHODS = {
             #"basic": self.dimReducer.getFeatures,
@@ -62,8 +62,8 @@ class GridSearch(object):
 
         self.COMBINED_METHODS = {
             #"ea":  self.dimReducer.getEAFeatures,
-            "relieff": self.dimReducer.getReliefFeatures,
-            #"sfs": self.dimReducer.getFeaturesBySFS,
+            #"relieff": self.dimReducer.getReliefFeatures,
+            "sfs": self.dimReducer.getFeaturesBySFS,
         }
 
         self.ALL_METHODS = [
